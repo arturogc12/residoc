@@ -523,15 +523,49 @@
 
         async function runInlineSearch(query) {
             const q = `%${query}%`;
-            const { data: clients } = await supabase
-                .from('clients')
-                .select('id, full_name, dni, phone')
-                .or(`full_name.ilike.${q},dni.ilike.${q},phone.ilike.${q}`)
-                .limit(6);
+
+            // Run both queries in parallel
+            const [{ data: clients }, { data: batchTreatments }] = await Promise.all([
+                supabase
+                    .from('clients')
+                    .select('id, full_name, dni, phone')
+                    .or(`full_name.ilike.${q},dni.ilike.${q},phone.ilike.${q}`)
+                    .limit(5),
+                supabase
+                    .from('treatments')
+                    .select('client_id, batch_number, type, clients(id, full_name, dni)')
+                    .ilike('batch_number', q)
+                    .limit(4)
+            ]);
 
             inlineSearchResults.innerHTML = '';
 
-            if (!clients || clients.length === 0) {
+            // Build a map of client results (by id) to avoid duplicates
+            const resultMap = new Map();
+
+            (clients || []).forEach(c => {
+                resultMap.set(c.id, { id: c.id, full_name: c.full_name, dni: c.dni, phone: c.phone, tag: null });
+            });
+
+            // Add batch hits — client may or may not already be in the map
+            (batchTreatments || []).forEach(t => {
+                if (!t.clients) return;
+                const cId = t.clients.id;
+                if (!resultMap.has(cId)) {
+                    resultMap.set(cId, {
+                        id: cId,
+                        full_name: t.clients.full_name,
+                        dni: t.clients.dni,
+                        phone: null,
+                        tag: `Lote: ${t.batch_number}`
+                    });
+                } else {
+                    // Annotate existing client entry with the batch tag
+                    resultMap.get(cId).tag = `Lote: ${t.batch_number}`;
+                }
+            });
+
+            if (resultMap.size === 0) {
                 inlineSearchResults.innerHTML = `
                     <div class="px-4 py-6 text-center text-sm text-slate/30">
                         <i class="ph ph-magnifying-glass text-2xl block mb-2"></i>
@@ -541,7 +575,7 @@
                 return;
             }
 
-            clients.forEach(c => {
+            resultMap.forEach(c => {
                 const item = document.createElement('a');
                 item.href = `client-file.html?id=${c.id}`;
                 item.className = 'flex items-center gap-3 p-3 rounded-xl hover:bg-cream/80 transition-colors cursor-pointer';
@@ -550,7 +584,7 @@
                          class="w-9 h-9 rounded-full flex-shrink-0">
                     <div class="flex-1 min-w-0">
                         <div class="text-sm font-bold text-slate truncate">${c.full_name}</div>
-                        <div class="text-xs text-slate/40">${c.dni}${c.phone ? ' · ' + c.phone : ''}</div>
+                        <div class="text-xs text-slate/40">${c.dni}${c.phone ? ' · ' + c.phone : ''}${c.tag ? ' · <span class="text-brand/70 font-medium">' + c.tag + '</span>' : ''}</div>
                     </div>
                     <i class="ph ph-arrow-right text-slate/20"></i>`;
                 inlineSearchResults.appendChild(item);
