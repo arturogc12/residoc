@@ -177,28 +177,29 @@
 
 
     <!-- ===================== MAIN CONTENT ===================== -->
-    <main class="flex-1 p-8 max-w-[1400px] mx-auto w-full">
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
 
         <!-- ===== HEADER ===== -->
-        <header class="flex items-center justify-between mb-10 fade-in-up">
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4 fade-in-up">
             <div>
                 <p class="text-sm text-slate/40 font-medium mb-1">26 de febrero, 2026</p>
-                <h1 class="text-3xl font-bold text-slate tracking-tight">Hola, Dra. Elena 👋</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight">Hola, Dra. Elena 👋</h1>
             </div>
 
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3 sm:gap-4">
                 <!-- Search Bar (Spotlight) -->
                 <button id="searchBtn"
-                    class="bg-white shadow-sm rounded-2xl px-5 py-3 flex items-center gap-3 text-sm text-slate/40 border border-slate/5 w-72 hover:shadow-soft hover:border-slate/10 transition-all group">
+                    class="bg-white shadow-sm rounded-2xl px-4 sm:px-5 py-3 flex items-center gap-3 text-sm text-slate/40 border border-slate/5 flex-1 sm:flex-none sm:w-72 hover:shadow-soft hover:border-slate/10 transition-all group min-h-[44px]">
                     <i class="ph ph-magnifying-glass text-lg group-hover:text-brand transition-colors"></i>
-                    <span>Buscar cliente o lote...</span>
+                    <span class="hidden sm:inline">Buscar cliente o lote...</span>
+                    <span class="sm:hidden">Buscar...</span>
                     <kbd
-                        class="ml-auto text-[10px] font-bold bg-cream px-2 py-0.5 rounded-lg border border-slate/10 text-slate/30">⌘K</kbd>
+                        class="ml-auto text-[10px] font-bold bg-cream px-2 py-0.5 rounded-lg border border-slate/10 text-slate/30 hidden sm:inline">⌘K</kbd>
                 </button>
 
                 <!-- Notifications -->
                 <button
-                    class="relative w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate/50 hover:text-slate hover:shadow-soft transition-all">
+                    class="relative w-12 h-12 min-w-[44px] min-h-[44px] bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate/50 hover:text-slate hover:shadow-soft transition-all">
                     <i class="ph ph-bell text-xl"></i>
                     <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
@@ -206,7 +207,7 @@
         </header>
 
         <!-- ===== KPI CARDS ===== -->
-        <section class="grid grid-cols-4 gap-5 mb-8">
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 mb-8">
             <!-- KPI 1: Clientes Activos -->
             <div
                 class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-100 hover:shadow-soft transition-shadow group">
@@ -257,14 +258,14 @@
 
             <!-- KPI 4: Nuevo Servicio (Action Card) -->
             <div onclick="openNewService()"
-                class="bg-brand text-white p-6 rounded-[28px] shadow-sm border border-brand/10 fade-in-up delay-400 hover:shadow-float hover:-translate-y-1 transition-all cursor-pointer group">
+                class="bg-brand text-white p-5 sm:p-6 rounded-[28px] shadow-sm border border-brand/10 fade-in-up delay-400 hover:shadow-float hover:-translate-y-1 transition-all cursor-pointer group min-h-[44px]">
                 <div class="flex items-center justify-between mb-4">
                     <div
-                        class="w-11 h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center text-xl group-hover:bg-white group-hover:text-brand transition-all">
+                        class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-2xl bg-white/20 text-white flex items-center justify-center text-xl group-hover:bg-white group-hover:text-brand transition-all">
                         <i class="ph-fill ph-plus-circle"></i>
                     </div>
                 </div>
-                <div class="text-xl font-bold mb-1">Nuevo servicio</div>
+                <div class="text-lg sm:text-xl font-bold mb-1">Nuevo servicio</div>
                 <p class="text-sm text-white/60 font-medium">Registrar tratamiento</p>
             </div>
 
@@ -275,7 +276,8 @@
 
             <!-- ACTIVIDAD RECIENTE (Full width) -->
             <div class="bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden w-full">
-                <div class="px-7 pt-7 pb-4 flex items-center justify-between">
+                <div
+                    class="px-4 sm:px-7 pt-5 sm:pt-7 pb-3 sm:pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-slate">Actividad reciente</h2>
                         <p class="text-sm text-slate/40 mt-0.5">Últimos servicios registrados</p>
@@ -285,10 +287,10 @@
                     </a>
                 </div>
 
-                <div class="px-7 pb-3">
-                    <!-- Table Header -->
+                <div class="px-4 sm:px-7 pb-3">
+                    <!-- Table Header (hidden on mobile) -->
                     <div
-                        class="grid grid-cols-12 gap-4 text-xs font-bold text-slate/30 uppercase tracking-wider py-3 border-b border-slate/5">
+                        class="hidden sm:grid grid-cols-12 gap-4 text-xs font-bold text-slate/30 uppercase tracking-wider py-3 border-b border-slate/5">
                         <div class="col-span-4">Cliente</div>
                         <div class="col-span-3">Tratamiento</div>
                         <div class="col-span-3">Lote</div>
@@ -460,10 +462,17 @@
                         <span class="text-[9px] text-brand/60 font-bold uppercase tracking-widest"
                             id="batchAutoLabel"></span>
                     </div>
-                    <div class="relative">
-                        <i class="ph ph-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
-                        <input type="text" id="custBatch" placeholder="Se completará con la foto o manualmente"
-                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <i class="ph ph-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                            <input type="text" id="custBatch" placeholder="Foto, escáner o manual"
+                                class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                        </div>
+                        <button type="button" id="btnScanBarcode"
+                            class="min-w-[44px] min-h-[44px] bg-brand/10 text-brand rounded-2xl border border-brand/20 flex items-center justify-center hover:bg-brand hover:text-white transition-all"
+                            title="Escanear código de barras">
+                            <i class="ph ph-qr-code text-xl"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -475,6 +484,24 @@
         </div>
     </div>
 
+    <!-- ===================== BARCODE SCANNER MODAL ===================== -->
+    <div id="scannerModal"
+        class="fixed inset-0 z-[300] bg-slate/90 backdrop-blur-sm hidden items-center justify-center">
+        <div class="bg-white rounded-[32px] shadow-float w-full max-w-md mx-4 overflow-hidden border border-slate/10">
+            <div class="px-6 py-4 border-b border-slate/5 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate">Escanear código</h3>
+                    <p class="text-xs text-slate/40">Apunta al código de barras o QR del lote</p>
+                </div>
+                <button id="closeScannerBtn"
+                    class="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate/30 hover:text-slate text-2xl">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div id="scannerReader" class="w-full aspect-square"></div>
+        </div>
+    </div>
+
     <!-- ===================== SCRIPTS ===================== -->
     <!-- Autocomplete dropdown (hidden by default) -->
     <ul id="clientSuggestions"
@@ -483,9 +510,48 @@
 
     <!-- Tesseract.js OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- Barcode/QR Scanner -->
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <script type="module">
         import { supabase } from './supabase.js';
+
+        // ── Barcode / QR Scanner ─────────────────────────────────────────────
+        let html5QrCode = null;
+
+        document.getElementById('btnScanBarcode').addEventListener('click', () => {
+            const modal = document.getElementById('scannerModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            html5QrCode = new Html5Qrcode('scannerReader');
+            html5QrCode.start(
+                { facingMode: 'environment' },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    // Success — fill batch field
+                    document.getElementById('custBatch').value = decodedText;
+                    document.getElementById('batchAutoLabel').textContent = '✓ Escaneado';
+                    stopScanner();
+                },
+                () => { /* ignore scan failures */ }
+            ).catch(err => {
+                console.error('Scanner error:', err);
+                alert('No se pudo acceder a la cámara. Asegúrate de dar permisos.');
+                stopScanner();
+            });
+        });
+
+        function stopScanner() {
+            const modal = document.getElementById('scannerModal');
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => { });
+            }
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('closeScannerBtn').addEventListener('click', stopScanner);
 
         // ── Search Modal ──────────────────────────────────────────────────────
         const searchBtn = document.getElementById('searchBtn');

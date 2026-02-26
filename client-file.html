@@ -57,18 +57,19 @@
 <body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
 
     <!-- ===================== MAIN CONTENT ===================== -->
-    <main class="flex-1 p-8 max-w-[1400px] mx-auto w-full">
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
 
         <!-- ===== HEADER (Back to Dashboard) ===== -->
-        <header class="flex items-center justify-between mb-10 fade-in-up">
-            <div class="flex items-center gap-6">
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-10 gap-4 fade-in-up">
+            <div class="flex items-center gap-4 sm:gap-6">
                 <button onclick="window.location.href='dashboard.html'"
-                    class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate hover:text-brand hover:shadow-soft transition-all group">
+                    class="w-12 h-12 min-w-[44px] min-h-[44px] bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate hover:text-brand hover:shadow-soft transition-all group">
                     <i class="ph ph-arrow-left text-xl group-hover:-translate-x-1 transition-transform"></i>
                 </button>
                 <div>
                     <p class="text-sm text-slate/40 font-medium mb-1">Ficha de cliente</p>
-                    <h1 class="text-3xl font-bold text-slate tracking-tight" id="clientNameHeader">María Gómez</h1>
+                    <h1 class="text-xl sm:text-3xl font-bold text-slate tracking-tight" id="clientNameHeader">María
+                        Gómez</h1>
                 </div>
             </div>
 
@@ -76,12 +77,14 @@
                 <!-- View mode -->
                 <div id="viewModeActions" class="flex items-center gap-3">
                     <button id="editProfileBtn"
-                        class="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate/5 text-sm font-bold text-slate hover:shadow-soft transition-all flex items-center gap-2">
-                        <i class="ph ph-note-pencil"></i> Editar perfil
+                        class="bg-white px-4 sm:px-5 py-3 rounded-2xl shadow-sm border border-slate/5 text-sm font-bold text-slate hover:shadow-soft transition-all flex items-center gap-2 min-h-[44px]">
+                        <i class="ph ph-note-pencil"></i> <span class="hidden sm:inline">Editar perfil</span><span
+                            class="sm:hidden">Editar</span>
                     </button>
                     <button
-                        class="bg-brand text-white px-5 py-3 rounded-2xl shadow-sm font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <i class="ph ph-plus"></i> Nuevo servicio
+                        class="bg-brand text-white px-4 sm:px-5 py-3 rounded-2xl shadow-sm font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all flex items-center gap-2 min-h-[44px]">
+                        <i class="ph ph-plus"></i> <span class="hidden sm:inline">Nuevo servicio</span><span
+                            class="sm:hidden">Nuevo</span>
                     </button>
                 </div>
                 <!-- Edit mode (hidden by default) -->
@@ -106,7 +109,7 @@
                 <div class="flex items-center gap-6 mb-8">
                     <img id="clientAvatar"
                         src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69&bold=true&size=128"
-                        class="w-24 h-24 rounded-3xl object-cover shadow-sm flex-shrink-0">
+                        class="w-16 sm:w-24 h-16 sm:h-24 rounded-2xl sm:rounded-3xl object-cover shadow-sm flex-shrink-0">
                     <div class="flex-1 min-w-0">
                         <!-- View mode -->
                         <div id="profileViewMode">
@@ -144,7 +147,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-6 pt-8 border-t border-slate/5">
+                <div class="grid grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-slate/5">
                     <div>
                         <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Última visita</p>
                         <p class="text-sm font-bold text-slate" id="lastVisitDate">—</p>
