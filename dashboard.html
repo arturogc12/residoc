@@ -254,7 +254,7 @@
             </div>
 
             <!-- KPI 4: Nuevo Servicio (Action Card) -->
-            <div onclick="alert('Nuevo servicio')"
+            <div onclick="openNewService()"
                 class="bg-brand text-white p-6 rounded-[28px] shadow-sm border border-brand/10 fade-in-up delay-400 hover:shadow-float hover:-translate-y-1 transition-all cursor-pointer group">
                 <div class="flex items-center justify-between mb-4">
                     <div
@@ -495,6 +495,78 @@
         </div>
     </div>
 
+    <!-- ===================== NEW SERVICE MODAL ===================== -->
+    <div id="newServiceModal" class="fixed inset-0 z-[100] search-overlay hidden items-start justify-center pt-[10vh]">
+        <div
+            class="bg-white rounded-[32px] shadow-float w-full max-w-lg mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
+            <div class="px-8 py-6 border-b border-slate/5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate">Nuevo servicio</h2>
+                    <p class="text-xs text-slate/40 mt-1">Registra un nuevo tratamiento</p>
+                </div>
+                <button onclick="closeNewService()" class="text-slate/20 hover:text-slate transition-colors text-2xl">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+
+            <form id="newServiceForm" class="p-8 space-y-5">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Nombre del
+                        cliente</label>
+                    <div class="relative">
+                        <i class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="text" id="custName" required placeholder="Ej: María Gómez"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">DNI /
+                        Identificación</label>
+                    <div class="relative">
+                        <i class="ph ph-identification-card absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="text" id="custDni" required placeholder="Ej: 12345678A"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Tipo de
+                        servicio</label>
+                    <div class="relative">
+                        <i class="ph ph-eyedropper absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <select id="custService" required
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate appearance-none">
+                            <option value="" disabled selected>Selecciona un servicio</option>
+                            <option value="Ácido Hialurónico">Ácido Hialurónico</option>
+                            <option value="Tatuaje">Tatuaje</option>
+                            <option value="Microblading">Microblading</option>
+                            <option value="Peeling Químico">Peeling Químico</option>
+                        </select>
+                        <i
+                            class="ph ph-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-slate/30 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 pt-4">
+                    <div class="p-4 bg-slate text-white rounded-2xl">
+                        <p class="text-[9px] font-bold opacity-30 uppercase tracking-widest mb-0.5">ID Registro</p>
+                        <p class="text-xs font-mono font-bold" id="autoRegId">#RES-XXXXX</p>
+                    </div>
+                    <div class="p-4 bg-mint text-slate rounded-2xl">
+                        <p class="text-[9px] font-bold opacity-30 uppercase tracking-widest mb-0.5">Fecha</p>
+                        <p class="text-xs font-bold" id="autoDate">26 Feb, 2026</p>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-brand text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all mt-4 active:scale-95">
+                    Registrar y ver ficha
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- ===================== SCRIPTS ===================== -->
     <script>
         // Search Modal
@@ -519,6 +591,39 @@
             if (e.target === searchModal) closeSearch();
         });
 
+        // New Service Modal
+        const newServiceModal = document.getElementById('newServiceModal');
+        const newServiceForm = document.getElementById('newServiceForm');
+        const autoRegId = document.getElementById('autoRegId');
+        const autoDate = document.getElementById('autoDate');
+
+        function openNewService() {
+            // Auto fill data
+            const randomId = Math.floor(10000 + Math.random() * 90000);
+            autoRegId.textContent = `#RES-${randomId}`;
+
+            const now = new Date();
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            autoDate.textContent = now.toLocaleDateString('es-ES', options);
+
+            newServiceModal.classList.remove('hidden');
+            newServiceModal.classList.add('flex');
+        }
+
+        function closeNewService() {
+            newServiceModal.classList.add('hidden');
+            newServiceModal.classList.remove('flex');
+        }
+
+        newServiceForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('custName').value;
+            const dni = document.getElementById('custDni').value;
+
+            // Redirect to client-file with params
+            window.location.href = `client-file.html?name=${encodeURIComponent(name)}&dni=${encodeURIComponent(dni)}`;
+        });
+
         // Cmd+K / Ctrl+K shortcut
         document.addEventListener('keydown', (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -529,7 +634,10 @@
                     closeSearch();
                 }
             }
-            if (e.key === 'Escape') closeSearch();
+            if (e.key === 'Escape') {
+                closeSearch();
+                closeNewService();
+            }
         });
     </script>
 
