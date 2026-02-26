@@ -75,9 +75,26 @@ El diseño debe alejarse de la frialdad médica y acercarse a una estética mode
 
 # **7\. Ejemplo web:** https://www.trustkeith.co/?ref=saaspo.com
 
-## **8\. Normas**
-* **Boton home:** El logo de la app debe ser el boton home.
-* **Barra de navegación:** Debe estar en la parte superior de la pantalla. Transparente. Y solo tiene que verse arriba. Al bajar debe desaparecer. Login y dashboard no tiene barra de navegación. 
-* **Titulos:** Deben ser claros y descriptivos. Siempre la primera mayuscula y el resto minuscula.
-* **Clientes:** Los nombres de clientes siempre son links a su ficha de cliente.
+## **8. Navegación y UI**
 
+* **Botón home:** El logo de la app debe ser el botón home.
+* **Barra de navegación:** En la parte superior, transparente. Solo visible al inicio; desaparece al hacer scroll. Login y dashboard no tienen barra de navegación.
+* **Títulos:** Claros y descriptivos. Primera letra en mayúscula, el resto en minúscula.
+* **Clientes:** Los nombres de clientes siempre son enlaces a su ficha.
+
+---
+
+## **9. Diseño Mobile-First y Field-Ready**
+
+La aplicación está diseñada prioritariamente para uso en móviles y tablets. El registro ocurre en el punto de atención al cliente, no en una oficina — la interfaz debe poder manejarse con una sola mano.
+
+### **9.1. Adaptabilidad móvil**
+
+* **Framework CSS:** Tailwind CSS con breakpoints desde 360px.
+* **Touch targets:** Mínimo 44×44px en todos los elementos interactivos para uso cómodo en movimiento.
+* **Optimización de carga:** Activos ligeros para funcionamiento óptimo en redes con cobertura limitada.
+
+### **9.2. Integración de hardware**
+
+* **Escaneo de código de barras / QR:** Captura mediante la cámara del dispositivo (API nativa del navegador) para leer lotes de proveedores directamente.
+* **Captura de evidencias fotográficas:** Subida de fotos (albaranes, estado del lote, zona tratada) directamente a Supabase Storage desde la interfaz móvil.
