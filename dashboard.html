@@ -300,12 +300,6 @@
             </div>
         </section>
 
-        <!-- Rows will be injected by JS -->
-        </div>
-        </div>
-        </section>
-
-
     </main>
 
     <!-- ===================== SEARCH MODAL (Spotlight) ===================== -->
@@ -427,19 +421,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 pt-4">
-                    <div class="p-4 bg-slate text-white rounded-2xl">
-                        <p class="text-[9px] font-bold opacity-30 uppercase tracking-widest mb-0.5">ID Registro</p>
-                        <p class="text-xs font-mono font-bold" id="autoRegId">#RES-XXXXX</p>
-                    </div>
-                    <div class="p-4 bg-mint text-slate rounded-2xl">
-                        <p class="text-[9px] font-bold opacity-30 uppercase tracking-widest mb-0.5">Fecha</p>
-                        <p class="text-xs font-bold" id="autoDate">26 Feb, 2026</p>
-                    </div>
-                </div>
-
                 <button type="submit"
-                    class="w-full bg-brand text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all mt-4 active:scale-95">
+                    class="w-full bg-brand text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all active:scale-95">
                     Registrar y ver ficha
                 </button>
             </form>
@@ -447,77 +430,214 @@
     </div>
 
     <!-- ===================== SCRIPTS ===================== -->
-    <script>
-        // Search Modal
+    <!-- Autocomplete dropdown (hidden by default) -->
+    <ul id="clientSuggestions"
+        class="hidden fixed z-[200] bg-white border border-slate/10 rounded-2xl shadow-float overflow-hidden text-sm"
+        style="min-width:300px"></ul>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        // ── Search Modal ──────────────────────────────────────────────────────
         const searchBtn = document.getElementById('searchBtn');
         const searchModal = document.getElementById('searchModal');
         const searchInput = document.getElementById('searchInput');
 
-        function openSearch() {
+        window.openSearch = function () {
             searchModal.classList.remove('hidden');
             searchModal.classList.add('flex');
             setTimeout(() => searchInput.focus(), 100);
-        }
-
-        function closeSearch() {
+        };
+        window.closeSearch = function () {
             searchModal.classList.add('hidden');
             searchModal.classList.remove('flex');
-        }
+        };
 
-        searchBtn.addEventListener('click', openSearch);
-
-        searchModal.addEventListener('click', (e) => {
-            if (e.target === searchModal) closeSearch();
+        searchBtn.addEventListener('click', window.openSearch);
+        searchModal.addEventListener('click', e => {
+            if (e.target === searchModal) window.closeSearch();
         });
 
-        // New Service Modal
+        // ── New Service Modal ─────────────────────────────────────────────────
         const newServiceModal = document.getElementById('newServiceModal');
         const newServiceForm = document.getElementById('newServiceForm');
-        const autoRegId = document.getElementById('autoRegId');
-        const autoDate = document.getElementById('autoDate');
+        const custNameInput = document.getElementById('custName');
+        const custDniInput = document.getElementById('custDni');
+        const suggestions = document.getElementById('clientSuggestions');
+        let _generatedRegId = '';
 
-        function openNewService() {
-            // Auto fill data
+        window.openNewService = function () {
+            // Pre-generate reg id silently (not shown in modal)
             const randomId = Math.floor(10000 + Math.random() * 90000);
-            autoRegId.textContent = `#RES-${randomId}`;
+            _generatedRegId = `#RES-${randomId}`;
 
-            const now = new Date();
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            autoDate.textContent = now.toLocaleDateString('es-ES', options);
-
+            newServiceForm.reset();
+            hideSuggestions();
             newServiceModal.classList.remove('hidden');
             newServiceModal.classList.add('flex');
-        }
-
-        function closeNewService() {
+            setTimeout(() => custNameInput.focus(), 100);
+        };
+        window.closeNewService = function () {
             newServiceModal.classList.add('hidden');
             newServiceModal.classList.remove('flex');
+            hideSuggestions();
+        };
+
+        // ── Client Autocomplete ───────────────────────────────────────────────
+        function hideSuggestions() {
+            suggestions.classList.add('hidden');
+            suggestions.innerHTML = '';
         }
 
-        newServiceForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('custName').value;
-            const dni = document.getElementById('custDni').value;
+        let debounceTimer;
+        custNameInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const q = custNameInput.value.trim();
+            if (q.length < 2) { hideSuggestions(); return; }
 
-            // Redirect to client-file with params
-            window.location.href = `client-file.html?name=${encodeURIComponent(name)}&dni=${encodeURIComponent(dni)}`;
+            debounceTimer = setTimeout(async () => {
+                const { data } = await supabase
+                    .from('clients')
+                    .select('id,full_name,dni')
+                    .ilike('full_name', `%${q}%`)
+                    .limit(5);
+
+                if (!data || data.length === 0) { hideSuggestions(); return; }
+
+                const rect = custNameInput.getBoundingClientRect();
+                suggestions.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+                suggestions.style.left = rect.left + 'px';
+                suggestions.style.width = rect.width + 'px';
+
+                suggestions.innerHTML = data.map(c =>
+                    `<li class="px-4 py-3 hover:bg-cream cursor-pointer flex items-center gap-3 border-b border-slate/5 last:border-0"
+                         data-id="${c.id}" data-name="${c.full_name}" data-dni="${c.dni}">
+                         <i class="ph ph-user text-brand"></i>
+                         <div>
+                             <div class="font-bold text-slate text-sm">${c.full_name}</div>
+                             <div class="text-xs text-slate/40">${c.dni}</div>
+                         </div>
+                     </li>`
+                ).join('');
+
+                suggestions.classList.remove('hidden');
+            }, 250);
         });
 
-        // Cmd+K / Ctrl+K shortcut
-        document.addEventListener('keydown', (e) => {
+        suggestions.addEventListener('click', e => {
+            const li = e.target.closest('li[data-id]');
+            if (!li) return;
+            custNameInput.value = li.dataset.name;
+            custDniInput.value = li.dataset.dni;
+            hideSuggestions();
+        });
+
+        document.addEventListener('click', e => {
+            if (!suggestions.contains(e.target) && e.target !== custNameInput) hideSuggestions();
+        });
+
+        // ── Recent Activity ───────────────────────────────────────────────────
+        async function fetchRecentActivity() {
+            const { data, error } = await supabase
+                .from('treatments')
+                .select('*, clients(full_name, dni)')
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (error || !data) return;
+
+            const container = document.querySelector('.px-7.pb-3');
+            // Remove all data rows (keep header)
+            container.querySelectorAll('.data-row').forEach(r => r.remove());
+
+            if (data.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'text-sm text-slate/30 py-8 text-center data-row';
+                empty.textContent = 'Aún no hay servicios registrados';
+                container.appendChild(empty);
+                return;
+            }
+
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+                const row = document.createElement('div');
+                row.className = 'data-row grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group';
+                row.onclick = () => window.location.href = `client-file.html?id=${item.client_id}`;
+                row.innerHTML = `
+                    <div class="col-span-4 flex items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(item.clients.full_name)}&background=B8D8D8&color=4A4E69&bold=true" class="w-9 h-9 rounded-full">
+                        <div>
+                            <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">${item.clients.full_name}</div>
+                            <div class="text-xs text-slate/40">DNI: ${item.clients.dni}</div>
+                        </div>
+                    </div>
+                    <div class="col-span-3">
+                        <span class="text-xs bg-lavender/20 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
+                            <i class="ph ph-eyedropper text-lavender"></i> ${item.type}
+                        </span>
+                    </div>
+                    <div class="col-span-3">
+                        <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
+                            <i class="ph ph-barcode"></i> ${item.batch_number || '—'}
+                        </span>
+                    </div>
+                    <div class="col-span-2 text-right text-xs text-slate/40 font-medium">${date}</div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // ── Form Submit ───────────────────────────────────────────────────────
+        newServiceForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const name = custNameInput.value.trim();
+            const dni = custDniInput.value.trim();
+            const type = document.getElementById('custService').value;
+
+            // 1. Upsert client (find or create)
+            let { data: existing } = await supabase
+                .from('clients')
+                .select('id')
+                .eq('dni', dni)
+                .maybeSingle();
+
+            let clientId;
+            if (existing) {
+                clientId = existing.id;
+            } else {
+                const { data: created } = await supabase
+                    .from('clients')
+                    .insert({ full_name: name, dni })
+                    .select('id')
+                    .single();
+                clientId = created.id;
+            }
+
+            // 2. Insert treatment
+            await supabase.from('treatments').insert({
+                client_id: clientId,
+                type,
+                batch_number: 'L-2025-' + Math.floor(Math.random() * 900 + 100),
+                registration_id: _generatedRegId
+            });
+
+            window.location.href = `client-file.html?id=${clientId}`;
+        });
+
+        // ── Keyboard shortcuts ────────────────────────────────────────────────
+        document.addEventListener('keydown', e => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
-                if (searchModal.classList.contains('hidden')) {
-                    openSearch();
-                } else {
-                    closeSearch();
-                }
+                searchModal.classList.contains('hidden') ? window.openSearch() : window.closeSearch();
             }
             if (e.key === 'Escape') {
-                closeSearch();
-                closeNewService();
+                window.closeSearch();
+                window.closeNewService();
             }
         });
+
+        // ── Init ─────────────────────────────────────────────────────────────
+        fetchRecentActivity();
     </script>
 
 </body>
