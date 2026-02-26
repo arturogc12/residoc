@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Residoc</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#F9F7F2',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        slate: '#353b48',
+                        brand: {
+                            DEFAULT: '#3972B6',
+                            dark: '#2d5a92'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(74, 78, 105, 0.08)',
+                        'float': '0 30px 60px -20px rgba(74, 78, 105, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F9F7F2;
+            color: #4A4E69;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #E2C2FF;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B8D8D8;
+        }
+
+        /* Animations */
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+
+        .delay-400 {
+            animation-delay: 400ms;
+        }
+
+        .delay-500 {
+            animation-delay: 500ms;
+        }
+
+        /* Sidebar tooltip */
+        .sidebar-item {
+            position: relative;
+        }
+
+        .sidebar-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 12px);
+            top: 50%;
+            transform: translateY(-50%) scale(0.9);
+            background: #353b48;
+            color: #F9F7F2;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .sidebar-item:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        /* Search modal overlay */
+        .search-overlay {
+            backdrop-filter: blur(8px);
+            background: rgba(53, 59, 72, 0.3);
+        }
+
+        /* Sparkline animation */
+        @keyframes drawLine {
+            from {
+                stroke-dashoffset: 200;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .sparkline {
+            stroke-dasharray: 200;
+            animation: drawLine 1.5s ease forwards;
+        }
+
+        /* Pulse ring for alerts */
+        @keyframes pulseRing {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .pulse-ring {
+            animation: pulseRing 2s infinite;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside
+        class="fixed left-0 top-0 bottom-0 w-[78px] bg-slate flex flex-col items-center py-6 z-50 rounded-r-[28px] shadow-float">
+        <!-- Logo -->
+        <div class="w-10 h-10 rounded-full bg-mint flex items-center justify-center text-slate font-bold text-lg mb-8 cursor-pointer hover:scale-110 transition-transform"
+            onclick="window.location.href='index.html'">
+            R
+        </div>
+
+        <!-- Nav Icons -->
+        <nav class="flex flex-col items-center gap-2 flex-1">
+            <a href="#" data-tooltip="Dashboard"
+                class="sidebar-item w-12 h-12 rounded-2xl bg-white/10 text-cream flex items-center justify-center text-xl hover:bg-white/20 transition-all">
+                <i class="ph-fill ph-house"></i>
+            </a>
+            <a href="#" data-tooltip="Clientes"
+                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
+                <i class="ph ph-users"></i>
+            </a>
+            <a href="#" data-tooltip="Lotes"
+                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
+                <i class="ph ph-package"></i>
+            </a>
+            <a href="#" data-tooltip="Reportes"
+                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
+                <i class="ph ph-chart-bar"></i>
+            </a>
+            <a href="#" data-tooltip="Alertas"
+                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all relative">
+                <i class="ph ph-bell"></i>
+                <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full pulse-ring"></span>
+            </a>
+        </nav>
+
+        <!-- User Avatar -->
+        <div class="mt-auto flex flex-col items-center gap-3">
+            <a href="#" data-tooltip="Configuración"
+                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
+                <i class="ph ph-gear"></i>
+            </a>
+            <div class="relative cursor-pointer group">
+                <img src="https://ui-avatars.com/api/?name=Elena+R&background=E2C2FF&color=4A4E69&bold=true"
+                    alt="Dra. Elena"
+                    class="w-10 h-10 rounded-full border-2 border-cream/20 group-hover:border-mint transition-colors">
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-slate"></span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="ml-[78px] flex-1 p-8 max-w-[1400px] mx-auto w-full">
+
+        <!-- ===== HEADER ===== -->
+        <header class="flex items-center justify-between mb-10 fade-in-up">
+            <div>
+                <p class="text-sm text-slate/40 font-medium mb-1">26 de febrero, 2026</p>
+                <h1 class="text-3xl font-bold text-slate tracking-tight">Hola, Dra. Elena 👋</h1>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Search Bar (Spotlight) -->
+                <button id="searchBtn"
+                    class="bg-white shadow-sm rounded-2xl px-5 py-3 flex items-center gap-3 text-sm text-slate/40 border border-slate/5 w-72 hover:shadow-soft hover:border-slate/10 transition-all group">
+                    <i class="ph ph-magnifying-glass text-lg group-hover:text-brand transition-colors"></i>
+                    <span>Buscar cliente o lote...</span>
+                    <kbd
+                        class="ml-auto text-[10px] font-bold bg-cream px-2 py-0.5 rounded-lg border border-slate/10 text-slate/30">⌘K</kbd>
+                </button>
+
+                <!-- Notifications -->
+                <button
+                    class="relative w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate/50 hover:text-slate hover:shadow-soft transition-all">
+                    <i class="ph ph-bell text-xl"></i>
+                    <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== KPI CARDS ===== -->
+        <section class="grid grid-cols-4 gap-5 mb-8">
+            <!-- KPI 1: Clientes Activos -->
+            <div
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-100 hover:shadow-soft transition-shadow group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="w-11 h-11 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-xl group-hover:bg-brand group-hover:text-white transition-colors">
+                        <i class="ph-fill ph-users"></i>
+                    </div>
+                    <div
+                        class="flex items-center gap-1 text-green-500 text-xs font-bold bg-green-50 px-2.5 py-1 rounded-lg">
+                        <i class="ph ph-trend-up text-sm"></i> +12%
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-slate mb-1">247</div>
+                <p class="text-sm text-slate/40 font-medium">Clientes activos</p>
+            </div>
+
+            <!-- KPI 2: Servicios este mes -->
+            <div
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-200 hover:shadow-soft transition-shadow group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="w-11 h-11 rounded-2xl bg-mint/30 text-slate flex items-center justify-center text-xl group-hover:bg-mint transition-colors">
+                        <i class="ph-fill ph-calendar-check"></i>
+                    </div>
+                    <div
+                        class="flex items-center gap-1 text-green-500 text-xs font-bold bg-green-50 px-2.5 py-1 rounded-lg">
+                        <i class="ph ph-trend-up text-sm"></i> +8%
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-slate mb-1">89</div>
+                <p class="text-sm text-slate/40 font-medium">Servicios este mes</p>
+            </div>
+
+            <!-- KPI 3: Lotes registrados -->
+            <div
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-300 hover:shadow-soft transition-shadow group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="w-11 h-11 rounded-2xl bg-lavender/30 text-slate flex items-center justify-center text-xl group-hover:bg-lavender transition-colors">
+                        <i class="ph-fill ph-package"></i>
+                    </div>
+                    <span class="text-xs font-bold text-slate/30 bg-cream px-2.5 py-1 rounded-lg">100% ✓</span>
+                </div>
+                <div class="text-3xl font-bold text-slate mb-1">412</div>
+                <p class="text-sm text-slate/40 font-medium">Lotes registrados</p>
+            </div>
+
+            <!-- KPI 4: Alertas -->
+            <div
+                class="bg-gradient-to-br from-red-50 to-white p-6 rounded-[28px] shadow-sm border border-red-100 fade-in-up delay-400 hover:shadow-soft transition-shadow group">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="w-11 h-11 rounded-2xl bg-red-100 text-red-500 flex items-center justify-center text-xl pulse-ring">
+                        <i class="ph-fill ph-warning"></i>
+                    </div>
+                    <span
+                        class="text-xs font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-lg border border-red-100">Activa</span>
+                </div>
+                <div class="text-3xl font-bold text-slate mb-1">1</div>
+                <p class="text-sm text-slate/40 font-medium">Alerta activa</p>
+            </div>
+        </section>
+
+        <!-- ===== MAIN GRID: Activity + Inverse Search ===== -->
+        <section class="grid grid-cols-3 gap-5 mb-8 fade-in-up delay-500">
+
+            <!-- ACTIVIDAD RECIENTE (2 cols) -->
+            <div class="col-span-2 bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden">
+                <div class="px-7 pt-7 pb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate">Actividad reciente</h2>
+                        <p class="text-sm text-slate/40 mt-0.5">Últimos servicios registrados</p>
+                    </div>
+                    <a href="#" class="text-sm font-bold text-brand flex items-center gap-1 hover:gap-2 transition-all">
+                        Ver todo <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="px-7 pb-3">
+                    <!-- Table Header -->
+                    <div
+                        class="grid grid-cols-12 gap-4 text-xs font-bold text-slate/30 uppercase tracking-wider py-3 border-b border-slate/5">
+                        <div class="col-span-4">Cliente</div>
+                        <div class="col-span-3">Tratamiento</div>
+                        <div class="col-span-3">Lote</div>
+                        <div class="col-span-2 text-right">Fecha</div>
+                    </div>
+
+                    <!-- Row 1 -->
+                    <div
+                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
+                        <div class="col-span-4 flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69&bold=true"
+                                class="w-9 h-9 rounded-full">
+                            <div>
+                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">María
+                                    Gómez</div>
+                                <div class="text-xs text-slate/40">DNI: 12345678A</div>
+                            </div>
+                        </div>
+                        <div class="col-span-3">
+                            <span
+                                class="text-xs bg-lavender/20 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
+                                <i class="ph ph-eyedropper text-lavender"></i> Ácido Hialurónico
+                            </span>
+                        </div>
+                        <div class="col-span-3">
+                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
+                                <i class="ph ph-barcode"></i> L-2024-99X
+                            </span>
+                        </div>
+                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Hace 45 min</div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div
+                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
+                        <div class="col-span-4 flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=Carlos+M&background=E2C2FF&color=4A4E69&bold=true"
+                                class="w-9 h-9 rounded-full">
+                            <div>
+                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">
+                                    Carlos Martínez</div>
+                                <div class="text-xs text-slate/40">DNI: 87654321B</div>
+                            </div>
+                        </div>
+                        <div class="col-span-3">
+                            <span
+                                class="text-xs bg-mint/20 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
+                                <i class="ph ph-pen-nib text-mint"></i> Microblading
+                            </span>
+                        </div>
+                        <div class="col-span-3">
+                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
+                                <i class="ph ph-barcode"></i> P-2024-44K
+                            </span>
+                        </div>
+                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Hace 2h</div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div
+                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
+                        <div class="col-span-4 flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=Ana+L&background=B8D8D8&color=4A4E69&bold=true"
+                                class="w-9 h-9 rounded-full">
+                            <div>
+                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">Ana
+                                    López</div>
+                                <div class="text-xs text-slate/40">DNI: 55667788C</div>
+                            </div>
+                        </div>
+                        <div class="col-span-3">
+                            <span
+                                class="text-xs bg-orange-100 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
+                                <i class="ph ph-syringe text-orange-400"></i> Toxina Botulínica
+                            </span>
+                        </div>
+                        <div class="col-span-3">
+                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
+                                <i class="ph ph-barcode"></i> B-2024-12T
+                            </span>
+                        </div>
+                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Hace 4h</div>
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div
+                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
+                        <div class="col-span-4 flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=Lucia+F&background=E2C2FF&color=4A4E69&bold=true"
+                                class="w-9 h-9 rounded-full">
+                            <div>
+                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">Lucía
+                                    Fernández</div>
+                                <div class="text-xs text-slate/40">DNI: 99887766D</div>
+                            </div>
+                        </div>
+                        <div class="col-span-3">
+                            <span
+                                class="text-xs bg-brand/10 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
+                                <i class="ph ph-dna text-brand"></i> Dermapen
+                            </span>
+                        </div>
+                        <div class="col-span-3">
+                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
+                                <i class="ph ph-barcode"></i> D-2024-77M
+                            </span>
+                        </div>
+                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Ayer</div>
+                    </div>
+
+                    <!-- Row 5 -->
+                    <div
+                        class="grid grid-cols-12 gap-4 items-center py-4 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
+                        <div class="col-span-4 flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=Pedro+S&background=B8D8D8&color=4A4E69&bold=true"
+                                class="w-9 h-9 rounded-full">
+                            <div>
+                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">Pedro
+                                    Sánchez</div>
+                                <div class="text-xs text-slate/40">DNI: 11223344E</div>
+                            </div>
+                        </div>
+                        <div class="col-span-3">
+                            <span
+                                class="text-xs bg-slate/10 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
+                                <i class="ph ph-palette text-slate/60"></i> Tatuaje
+                            </span>
+                        </div>
+                        <div class="col-span-3">
+                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
+                                <i class="ph ph-barcode"></i> T-2024-55R
+                            </span>
+                        </div>
+                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Ayer</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUSCADOR INVERSO (1 col) -->
+            <div class="flex flex-col gap-5">
+                <!-- Inverse Search Card -->
+                <div
+                    class="bg-gradient-to-br from-slate to-[#2a2f3d] text-white p-7 rounded-[28px] shadow-float relative overflow-hidden flex-1">
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-brand/10 rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-mint/10 rounded-full blur-2xl"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-xl">
+                                <i class="ph-fill ph-shield-warning text-mint"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base">Buscador Inverso</h3>
+                                <p class="text-xs text-white/50">Localiza clientes por lote</p>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-white/60 mb-5 leading-relaxed">Introduce el número de lote para encontrar
+                            a todos los clientes a los que se les aplicó.</p>
+
+                        <!-- Search Input -->
+                        <div class="relative mb-4">
+                            <i class="ph ph-package absolute left-4 top-1/2 -translate-y-1/2 text-white/30"></i>
+                            <input type="text" placeholder="Nº de lote (ej: L-2024-99X)"
+                                class="w-full bg-white/10 border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-mint/30 focus:border-mint/40 transition-all text-sm placeholder:text-white/25 text-white font-medium">
+                        </div>
+
+                        <button
+                            class="w-full bg-mint text-slate py-3.5 rounded-2xl font-bold text-sm hover:-translate-y-0.5 transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
+                            <i class="ph ph-magnifying-glass"></i> Buscar clientes afectados
+                        </button>
+
+                        <!-- Status -->
+                        <div class="mt-5 flex items-center gap-2 text-xs text-white/40">
+                            <i class="ph-fill ph-shield-check text-mint"></i>
+                            <span>Todos los lotes verificados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Card (Active) -->
+                <div class="bg-red-50 p-5 rounded-[28px] shadow-sm border border-red-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center text-red-500 animate-pulse">
+                                <i class="ph-fill ph-siren text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate">Alerta AEMPS</p>
+                                <p class="text-[11px] text-slate/40">Hace 2 horas</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate/60 leading-relaxed mb-3">
+                            Lote <span class="font-bold font-mono text-red-500">P-2024-31W</span> retirado.
+                            Pigmento "Sunset Red" — posible reacción adversa.
+                        </p>
+                        <button
+                            class="w-full bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-red-600 transition-colors flex items-center justify-center gap-2">
+                            <i class="ph ph-warning"></i> Ver clientes afectados (3)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ACCESOS RÁPIDOS ===== -->
+        <section class="grid grid-cols-3 gap-5 fade-in-up delay-500">
+            <!-- Nuevo Servicio -->
+            <button
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-colors shrink-0">
+                    <i class="ph-fill ph-plus-circle"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-slate mb-0.5">Nuevo servicio</h3>
+                    <p class="text-xs text-slate/40">Registrar tratamiento con trazabilidad</p>
+                </div>
+                <i
+                    class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
+            </button>
+
+            <!-- Exportar PDF -->
+            <button
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-mint/30 text-slate flex items-center justify-center text-2xl group-hover:bg-mint transition-colors shrink-0">
+                    <i class="ph-fill ph-file-pdf"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-slate mb-0.5">Exportar PDF</h3>
+                    <p class="text-xs text-slate/40">Informe legal para inspecciones</p>
+                </div>
+                <i
+                    class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
+            </button>
+
+            <!-- Gestión de Alertas -->
+            <button
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-lavender/30 text-slate flex items-center justify-center text-2xl group-hover:bg-lavender transition-colors shrink-0">
+                    <i class="ph-fill ph-shield-warning"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-slate mb-0.5">Gestión de alertas</h3>
+                    <p class="text-xs text-slate/40">Monitorizar lotes retirados por AEMPS</p>
+                </div>
+                <i
+                    class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
+            </button>
+        </section>
+
+        <!-- ===== COMPLIANCE BANNER ===== -->
+        <section
+            class="mt-8 bg-gradient-to-r from-brand/5 to-mint/10 p-6 rounded-[28px] border border-brand/10 flex items-center justify-between fade-in-up delay-500">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl">
+                    <i class="ph-fill ph-shield-check"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate">Centro 100% en cumplimiento</h3>
+                    <p class="text-sm text-slate/40">Todos los lotes vinculados · Última auditoría: Hoy, 09:00</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span
+                    class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 flex items-center gap-1.5">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Conforme
+                </span>
+                <a href="#" class="text-sm font-bold text-brand flex items-center gap-1 hover:gap-2 transition-all">
+                    Ver detalles <i class="ph ph-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===================== SEARCH MODAL (Spotlight) ===================== -->
+    <div id="searchModal" class="fixed inset-0 z-[100] search-overlay hidden items-start justify-center pt-[15vh]">
+        <div
+            class="bg-white rounded-[28px] shadow-float w-full max-w-xl mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
+            <!-- Search Input -->
+            <div class="flex items-center gap-3 px-6 py-5 border-b border-slate/5">
+                <i class="ph ph-magnifying-glass text-xl text-brand"></i>
+                <input type="text" id="searchInput" autofocus
+                    placeholder="Buscar por nombre, DNI, teléfono o nº de lote..."
+                    class="flex-1 outline-none text-base font-medium placeholder:text-slate/25 text-slate bg-transparent">
+                <kbd class="text-[10px] font-bold bg-cream px-2 py-0.5 rounded-lg border border-slate/10 text-slate/30 cursor-pointer"
+                    onclick="closeSearch()">ESC</kbd>
+            </div>
+
+            <!-- Quick results -->
+            <div class="p-4">
+                <p class="text-xs font-bold text-slate/30 uppercase tracking-wider mb-3 px-2">Recientes</p>
+
+                <a href="#"
+                    class="flex items-center gap-3 p-3 rounded-2xl hover:bg-cream/80 transition-colors cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69&bold=true"
+                        class="w-9 h-9 rounded-full">
+                    <div class="flex-1">
+                        <div class="text-sm font-bold text-slate">María Gómez</div>
+                        <div class="text-xs text-slate/40">Ácido Hialurónico · L-2024-99X</div>
+                    </div>
+                    <i class="ph ph-arrow-right text-slate/20"></i>
+                </a>
+
+                <a href="#"
+                    class="flex items-center gap-3 p-3 rounded-2xl hover:bg-cream/80 transition-colors cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name=Carlos+M&background=E2C2FF&color=4A4E69&bold=true"
+                        class="w-9 h-9 rounded-full">
+                    <div class="flex-1">
+                        <div class="text-sm font-bold text-slate">Carlos Martínez</div>
+                        <div class="text-xs text-slate/40">Microblading · P-2024-44K</div>
+                    </div>
+                    <i class="ph ph-arrow-right text-slate/20"></i>
+                </a>
+
+                <a href="#"
+                    class="flex items-center gap-3 p-3 rounded-2xl hover:bg-cream/80 transition-colors cursor-pointer">
+                    <div class="w-9 h-9 rounded-full bg-lavender/30 flex items-center justify-center text-slate">
+                        <i class="ph ph-package"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-bold text-slate">Lote L-2024-99X</div>
+                        <div class="text-xs text-slate/40">Juvederm Ultra 3 · 3 usos registrados</div>
+                    </div>
+                    <i class="ph ph-arrow-right text-slate/20"></i>
+                </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-3 bg-cream/50 border-t border-slate/5 flex items-center justify-between">
+                <span class="text-xs text-slate/30">Busca por nombre, DNI, teléfono o lote</span>
+                <div class="flex items-center gap-2 text-xs text-slate/30">
+                    <kbd class="bg-white px-1.5 py-0.5 rounded border border-slate/10 text-[10px] font-bold">↑↓</kbd>
+                    <span>navegar</span>
+                    <kbd class="bg-white px-1.5 py-0.5 rounded border border-slate/10 text-[10px] font-bold">↵</kbd>
+                    <span>abrir</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script>
+        // Search Modal
+        const searchBtn = document.getElementById('searchBtn');
+        const searchModal = document.getElementById('searchModal');
+        const searchInput = document.getElementById('searchInput');
+
+        function openSearch() {
+            searchModal.classList.remove('hidden');
+            searchModal.classList.add('flex');
+            setTimeout(() => searchInput.focus(), 100);
+        }
+
+        function closeSearch() {
+            searchModal.classList.add('hidden');
+            searchModal.classList.remove('flex');
+        }
+
+        searchBtn.addEventListener('click', openSearch);
+
+        searchModal.addEventListener('click', (e) => {
+            if (e.target === searchModal) closeSearch();
+        });
+
+        // Cmd+K / Ctrl+K shortcut
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                if (searchModal.classList.contains('hidden')) {
+                    openSearch();
+                } else {
+                    closeSearch();
+                }
+            }
+            if (e.key === 'Escape') closeSearch();
+        });
+    </script>
+
+</body>
+
+</html>

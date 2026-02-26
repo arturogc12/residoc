@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residoc | Trazabilidad Clínica sin fricción</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons para iconos modernos -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#F9F7F2',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        slate: '#353b48',
+                        brand: {
+                            DEFAULT: '#3972B6',
+                            dark: '#2d5a92'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(74, 78, 105, 0.08)',
+                        'float': '0 30px 60px -20px rgba(74, 78, 105, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F9F7F2;
+            color: #4A4E69;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #E2C2FF;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B8D8D8;
+        }
+
+        /* Animaciones suaves */
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full top-0 z-50 bg-cream/80 backdrop-blur-md border-b border-slate/5 transition-all">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer">
+                <div
+                    class="w-8 h-8 rounded-full bg-slate text-cream flex items-center justify-center font-bold text-xl">
+                    <i class="ph ph-fingerprint"></i>
+                </div>
+                <span class="text-2xl font-bold tracking-tight">Residoc</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-8 font-medium">
+                <a href="#soluciones" class="hover:text-mint transition-colors">Soluciones</a>
+                <a href="#como-funciona" class="hover:text-mint transition-colors">Cómo funciona</a>
+                <a href="#seguridad" class="hover:text-mint transition-colors">Seguridad</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="#"
+                    class="hidden md:block font-medium px-4 py-2 hover:bg-black/5 rounded-lg transition-colors text-sm">Acceder</a>
+                <a href="#"
+                    class="bg-black text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-black/80 transition flex items-center gap-2">
+                    Prueba gratuita de 14 días <i class="ph ph-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section
+        class="pt-32 pb-32 px-6 overflow-hidden relative bg-gradient-to-b from-[#daebfc] to-[#eef5fd] lg:min-h-[90vh] flex flex-col justify-center">
+        <!-- Decorativa de fondo -->
+        <!-- <div class="absolute top-20 left-10 w-64 h-64 bg-mint/30 rounded-full blur-3xl -z-10"></div> -->
+        <!-- <div class="absolute bottom-10 right-20 w-80 h-80 bg-lavender/30 rounded-full blur-3xl -z-10"></div> -->
+
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+
+            <!-- Texto -->
+            <div class="max-w-xl fade-in-up md:pl-8">
+                <div
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white shadow-sm text-sm font-medium mb-12 text-slate/70">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    Las inspecciones crecieron un 30% en 2025
+                </div>
+
+                <h1 class="text-6xl md:text-[80px] font-bold leading-[1.05] mb-8 tracking-tight text-[#1a1c23]">
+                    ¿Cuánto te costaría una
+                    <br>
+                    <span class="text-brand">
+                        inspección hoy?
+                    </span>
+                </h1>
+
+                <p class="text-xl md:text-[22px] text-slate/60 mb-10 leading-relaxed font-light max-w-md">
+                    No tener el lote registrado no es un descuido, es una infracción grave según la normativa.
+                    Cumplimiento legal garantizado sin fricción operativa.
+                </p>
+
+
+
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#"
+                        class="bg-black text-white px-8 py-3.5 rounded-xl font-medium text-[15px] hover:-translate-y-0.5 transition flex items-center justify-center gap-2 shadow-sm">
+                        Prueba gratuita de 14 días <i class="ph ph-arrow-right"></i>
+                    </a>
+                    <a href="#como-funciona"
+                        class="bg-[#d2e3f5] text-[#2c3e50] font-semibold px-8 py-3.5 rounded-xl text-[15px] hover:bg-[#c2d7ed] transition flex items-center justify-center gap-2">
+                        Ver cómo funciona <i class="ph ph-arrow-right font-bold"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Dashboard Mockup Ilustrativo -->
+            <div class="relative fade-in-up delay-200">
+                <!-- Fondo patrón puntos -->
+                <div class="absolute inset-0 z-0 opacity-20"
+                    style="background-image: radial-gradient(#4A4E69 1px, transparent 1px); background-size: 20px 20px;">
+                </div>
+
+                <!-- Ventana Dashboard -->
+                <div class="relative z-10 bg-white rounded-[32px] p-2 shadow-float border border-slate/5 flex">
+                    <!-- Sidebar -->
+                    <div class="w-16 bg-slate rounded-[24px] flex flex-col items-center py-6 gap-6 text-cream/70">
+                        <div
+                            class="w-8 h-8 rounded-full bg-mint flex items-center justify-center text-slate font-bold mb-4">
+                            R</div>
+                        <i class="ph-fill ph-house text-2xl text-cream"></i>
+                        <i class="ph ph-users text-2xl hover:text-cream cursor-pointer transition"></i>
+                        <i class="ph ph-package text-2xl hover:text-cream cursor-pointer transition"></i>
+                        <i class="ph ph-chart-bar text-2xl hover:text-cream cursor-pointer transition"></i>
+                        <div class="mt-auto">
+                            <img src="https://ui-avatars.com/api/?name=Doc+A&background=E2C2FF&color=4A4E69" alt="User"
+                                class="w-8 h-8 rounded-full border-2 border-slate">
+                        </div>
+                    </div>
+
+                    <!-- Main Content Panel -->
+                    <div class="flex-1 bg-cream/30 rounded-[24px] ml-2 p-6 overflow-hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="font-bold text-lg">Hola, Dra. Elena</h3>
+                            </div>
+                            <!-- Barra de búsqueda estilo Spotlight -->
+                            <div
+                                class="bg-white shadow-sm rounded-full px-4 py-2 flex items-center gap-2 text-sm text-slate/50 border border-slate/10 w-64">
+                                <i class="ph ph-magnifying-glass"></i>
+                                <span>Buscar cliente o lote...</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Tarjeta de Estado -->
+                            <div
+                                class="bg-white rounded-2xl p-4 shadow-sm border border-slate/5 col-span-2 relative overflow-hidden">
+                                <div class="absolute right-0 top-0 w-32 h-32 bg-mint/10 rounded-bl-full -z-10"></div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-sm font-medium">Buscador Inverso Activo</span>
+                                    <i class="ph ph-shield-check text-xl text-mint"></i>
+                                </div>
+                                <div class="text-3xl font-bold flex items-end gap-2">
+                                    100% <span class="text-sm text-slate/50 font-normal mb-1">Lotes verificados</span>
+                                </div>
+
+                                <div class="mt-4 flex gap-2">
+                                    <div class="flex-1 h-1.5 bg-mint rounded-full"></div>
+                                    <div class="flex-1 h-1.5 bg-mint/30 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- Cliente Reciente -->
+                            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate/5 relative">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <img src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69"
+                                        class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <div class="text-sm font-bold">María Gómez</div>
+                                        <div class="text-xs text-slate/50">Hace 45 min</div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="text-xs bg-lavender/30 text-slate px-2 py-1 rounded-md inline-flex items-center gap-1 font-medium">
+                                    <i class="ph ph-eyedropper text-lavender"></i> Ácido Hialurónico
+                                </div>
+                                <div class="mt-2 text-[10px] text-slate/50 flex items-center gap-1">
+                                    <i class="ph ph-barcode"></i> Lote: L-2024-99X
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+
+    <!-- Core Features / How it works -->
+    <section id="como-funciona" class="py-12 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Nueva Sección: Tus facturas no son trazabilidad -->
+            <div
+                class="grid lg:grid-cols-2 gap-16 mb-32 items-center bg-[#fdfaf6] p-12 rounded-[40px] border border-slate/5">
+                <div class="order-2 lg:order-1 relative">
+                    <div class="absolute inset-0 bg-brand/5 blur-3xl -z-10 rounded-full"></div>
+                    <div class="space-y-4">
+                        <!-- El error -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate/5 flex gap-4">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                                <i class="ph ph-x text-red-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate mb-1">El albarán del proveedor</p>
+                                <p class="text-sm text-slate/60">Dice que compraste 10 viales, pero no aclara a qué
+                                    cliente inyectaste cada uno.</p>
+                            </div>
+                        </div>
+
+                        <!-- La alerta -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate/5 flex gap-4">
+                            <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                                <i class="ph ph-warning text-orange-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate mb-1">Alerta Sanitaria Urgente</p>
+                                <p class="text-sm text-slate/60">Si un lote se retira del mercado, ¿sabrías exactamente
+                                    a qué 10 clientes llamar en los próximos 5 minutos?</p>
+                            </div>
+                        </div>
+
+                        <!-- La defensa -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate/5 flex gap-4">
+                            <div
+                                class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate">
+                                <i class="ph ph-camera text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate mb-1">Defensa Legal Nula</p>
+                                <p class="text-sm text-slate/60">Ante la denuncia de una paciente, si no tienes la foto
+                                    y el registro del lote vinculado, tu posición es indefendible.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2">
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm text-slate text-sm font-medium border border-slate/5 mb-6">
+                        <i class="ph-fill ph-receipt text-slate/50"></i> El gran error del sector
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">
+                        Tus facturas <br><span class="text-red-500/80">no son</span> trazabilidad.
+                    </h2>
+                    <p class="text-lg text-slate/70 mb-8 font-light">
+                        Guardar los albaranes de compra en una carpeta no es cumplir la ley. La normativa exige vincular
+                        específicamente el número de lote y la fecha de caducidad con el DNI del paciente tratado.
+                    </p>
+                    <a href="#soluciones"
+                        class="text-brand font-medium flex items-center gap-2 hover:gap-3 transition-all">
+                        Descubre cómo automatizarlo <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bento Grid -->
+            <div class="text-center mb-16" id="soluciones">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Todo lo que necesitas para operar con <span
+                        class="text-lavender">tranquilidad</span></h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Card 1 -->
+                <div class="bg-slate text-white p-8 rounded-[32px] md:col-span-2 relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate to-[#3A3D54] z-0"></div>
+                    <div class="relative z-10 flex flex-col h-full lg:w-1/2">
+                        <h3 class="text-3xl font-bold mb-3">Ficha de Cliente</h3>
+                        <p class="text-cream/70 mb-8">Un historial clínico visual, moderno y rápido. Localiza los
+                            servicios pasados en segundos con la barra tipo Spotlight.</p>
+                        <a href="#"
+                            class="mt-auto bg-white text-slate w-max px-6 py-2 rounded-full font-medium text-sm flex items-center gap-2 group-hover:scale-105 transition-transform shadow-lg">
+                            Explorar <i class="ph ph-arrow-right"></i>
+                        </a>
+                    </div>
+                    <!-- Mockup image abstract -->
+                    <div
+                        class="absolute right-[-10%] bottom-[-20%] w-[60%] bg-white/10 backdrop-blur-md border border-white/20 h-full rounded-tl-[40px] p-6 rotate-[-5deg] transition-transform group-hover:rotate-0">
+                        <div class="w-full h-10 bg-white/20 rounded-full mb-4"></div>
+                        <div class="w-3/4 h-8 bg-white/10 rounded-full mb-4"></div>
+                        <div class="flex gap-2">
+                            <div class="w-12 h-12 bg-mint rounded-2xl"></div>
+                            <div class="w-12 h-12 rounded-2xl border border-white/20"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-lavender p-8 rounded-[32px] relative overflow-hidden group shadow-soft">
+                    <div class="relative z-10 flex flex-col h-full">
+                        <h3 class="text-2xl font-bold text-slate mb-3">Buscador Inverso</h3>
+                        <p class="text-slate/80 text-sm mb-6">¿Defecto de fábrica en un lote? Introduce el ID y localiza
+                            inmediatamente a todos los clientes afectados para actuar a tiempo.</p>
+                        <i
+                            class="ph-fill ph-shield-warning text-5xl text-white mt-auto block drop-shadow-md group-hover:scale-110 transition-transform origin-bottom-left"></i>
+                    </div>
+                </div>
+
+                <!-- Card 3 & 4: El PDF y El Botón de Pánico -->
+
+                <!-- PDF de Inspección -->
+                <div
+                    class="bg-gradient-to-br from-white to-[#f0f6fc] p-8 rounded-[32px] shadow-soft border border-brand/20 group hover:border-brand/50 transition-colors md:col-span-2 relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
+                    <div class="flex-1 z-10">
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white shadow-sm border border-brand/10 text-brand text-xs font-bold uppercase tracking-wide mb-4">
+                            El Analgésico Final</div>
+                        <h3 class="font-bold text-3xl mb-4 text-slate leading-tight">Tu libro oficial en el bolsillo.
+                            Modo Inspector.</h3>
+                        <p class="text-slate/60 text-base leading-relaxed mb-6">Cuando el inspector entre por la puerta,
+                            dale a 'Exportar'. Un informe profesional, ordenado y legal que demuestra que tu centro
+                            cumple con la Ley de Residuos y el reglamento de la AEMPS en un clic.</p>
+                        <ul class="space-y-2 text-sm text-slate/70 font-medium">
+                            <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-brand"></i> Fotos
+                                de los lotes incrustadas</li>
+                            <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-brand"></i>
+                                Historial de 5 años</li>
+                        </ul>
+                    </div>
+                    <div
+                        class="w-full md:w-64 h-80 bg-white rounded-2xl shadow-xl border border-slate/10 p-4 transform rotate-3 group-hover:rotate-0 transition-transform relative">
+                        <div class="absolute top-2 right-4 text-xs font-bold text-slate/40">PDF</div>
+                        <div class="h-4 w-1/2 bg-slate/10 rounded-full mb-6"></div>
+                        <div class="h-2 w-full bg-slate/5 rounded-full mb-3"></div>
+                        <div class="h-2 w-full bg-slate/5 rounded-full mb-3"></div>
+                        <div class="h-2 w-3/4 bg-slate/5 rounded-full mb-8"></div>
+
+                        <!-- Table mock -->
+                        <div class="flex justify-between border-b border-slate/10 pb-2 mb-2">
+                            <div class="h-2 w-8 bg-brand/30 rounded-full"></div>
+                            <div class="h-2 w-16 bg-brand/30 rounded-full"></div>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <div class="h-6 w-6 bg-slate/10 rounded-md"></div>
+                            <div class="h-2 w-20 bg-slate/20 rounded-full mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boton de Panico -->
+                <div
+                    class="bg-red-50 p-8 rounded-[32px] shadow-soft border border-red-500/20 group hover:border-red-500/40 transition-colors relative overflow-hidden flex flex-col justify-between">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-2xl -z-10 group-hover:bg-red-500/20 transition-all">
+                    </div>
+                    <div>
+                        <div
+                            class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-red-500 text-3xl mb-6 shadow-sm border border-red-200 animate-pulse">
+                            <i class="ph-fill ph-siren"></i>
+                        </div>
+                        <h3 class="font-bold text-2xl mb-3 text-slate">Gestión de Alertas en un clic.</h3>
+                        <p class="text-slate/60 text-sm leading-relaxed">¿Qué harías si la AEMPS retira hoy un lote de
+                            pigmento que usaste hace 6 meses? Con el <span class="font-semibold text-slate">Botón de
+                                Pánico</span> de Residoc, introduces el lote y tienes la lista de clientes a los que
+                            avisar en segundos. Sin buscar en 500 carpetas.</p>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- La Ducha de Realidad (Agitador de Miedo) -->
+    <section class="py-24 px-6 bg-[#1a1c23] text-white relative overflow-hidden" id="seguridad">
+        <!-- Abstract background elements -->
+        <div class="absolute top-0 right-0 w-full h-full opacity-10"
+            style="background-image: radial-gradient(circle at 80% 20%, #B8D8D8 0%, transparent 40%);"></div>
+        <div class="absolute bottom-0 left-0 w-full h-full opacity-10"
+            style="background-image: radial-gradient(circle at 20% 80%, #3972B6 0%, transparent 40%);"></div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center md:text-left mb-16 max-w-3xl">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-400 text-sm font-bold mb-6 border border-red-500/20 uppercase tracking-widest">
+                    <i class="ph-fill ph-warning-circle text-lg"></i> Aviso Urgente
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">Sanidad está endureciendo
+                    las
+                    inspecciones...</h2>
+                <p class="text-xl text-white/70 font-light leading-relaxed">Con el auge de los rellenos dérmicos y la
+                    micropigmentación, las inspecciones han aumentado un <span class="text-white font-bold">30% en
+                        2025</span> para combatir el intrusismo. No tener el número de lote vinculado a la ficha del
+                    cliente no es un despiste, <span class="text-red-400 font-medium">es una infracción grave</span>.
+                </p>
+            </div>
+
+            <!-- Dashboard de Multas -->
+            <div
+                class="bg-white/5 border border-white/10 p-8 md:p-12 rounded-[40px] relative shadow-2xl backdrop-blur-md">
+                <div
+                    class="absolute -inset-0.5 bg-gradient-to-r from-red-500/20 to-brand/20 rounded-[40px] blur-xl opacity-50 -z-10">
+                </div>
+
+                <h3 class="text-2xl font-bold mb-8 flex items-center gap-3"><i
+                        class="ph-fill ph-scales text-brand text-3xl"></i> Tabla de Sanciones (BOE 2025)</h3>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Multa 1 -->
+                    <div class="bg-black/40 p-6 rounded-3xl border border-white/5 flex flex-col justify-between">
+                        <div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center mb-4">
+                                <i class="ph-fill ph-file-dashed text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2 text-white/90">Falta de trazabilidad</h4>
+                            <p class="text-sm text-white/50 mb-6">No poder demostrar a qué cliente se aplicó un lote
+                                específico.</p>
+                        </div>
+                        <div class="text-2xl font-mono font-bold text-orange-400 border-t border-white/10 pt-4">3.001€ -
+                            15.000€</div>
+                    </div>
+
+                    <!-- Multa 2 -->
+                    <div class="bg-black/40 p-6 rounded-3xl border border-white/5 flex flex-col justify-between">
+                        <div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center mb-4">
+                                <i class="ph-fill ph-warning-octagon text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2 text-white/90">Uso no registrado</h4>
+                            <p class="text-sm text-white/50 mb-6">Uso de productos caducados o sin registro sanitario
+                                válido.</p>
+                        </div>
+                        <div class="text-2xl font-mono font-bold text-red-400 border-t border-white/10 pt-4">Hasta
+                            60.000€</div>
+                    </div>
+
+                    <!-- Multa 3 -->
+                    <div
+                        class="bg-red-500/10 p-6 rounded-3xl border border-red-500/20 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-32 h-32 bg-red-500/10 rounded-full blur-2xl"></div>
+                        <div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center mb-4">
+                                <i class="ph-fill ph-lock-key text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2 text-white/90">Clausura del centro</h4>
+                            <p class="text-sm text-white/70 mb-6 font-medium">"Cierre cautelar de la instalación por
+                                riesgo para la salud pública."</p>
+                        </div>
+                        <div
+                            class="text-sm font-bold text-red-400 border-t border-red-500/20 pt-4 uppercase tracking-wider">
+                            Impacto letal en caja</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Casos de Uso y Riesgos (Grid) -->
+    <section class="py-24 px-6 bg-[#fdfaf6] border-y border-slate/5 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">El riesgo depende del <span
+                        class="text-mint">tratamiento</span>.</h2>
+                <p class="text-xl text-slate/60 font-light max-w-2xl mx-auto">Cada tratamiento tiene sus propias reglas
+                    y los inspectores saben perfectamente dónde buscar el fallo.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tarjeta 1 -->
+                <div
+                    class="bg-white p-8 rounded-[32px] shadow-sm border border-slate/5 hover:shadow-md transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl mb-6 group-hover:bg-brand group-hover:text-white transition-colors">
+                        <i class="ph-fill ph-syringe"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2 text-slate">Medicina Estética e Inyectables</h3>
+                    <p class="text-sm text-slate/60 mb-6 font-medium h-10">Ácido Hialurónico, Toxina Botulínica,
+                        Bioestimuladores.</p>
+                    <div class="bg-red-50 p-4 rounded-2xl border border-red-500/10">
+                        <div
+                            class="text-xs font-bold text-red-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <i class="ph-fill ph-warning"></i> El Riesgo
+                        </div>
+                        <p class="text-sm text-red-900/70 leading-relaxed">Reacciones adversas tardías. Sin el lote
+                            exacto, tu seguro de responsabilidad civil puede lavarse las manos y no cubrirte.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div
+                    class="bg-white p-8 rounded-[32px] shadow-sm border border-slate/5 hover:shadow-md transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-slate/10 text-slate flex items-center justify-center text-2xl mb-6 group-hover:bg-slate group-hover:text-white transition-colors">
+                        <i class="ph-fill ph-pen-nib"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2 text-slate">Micropigmentación y Microblading</h3>
+                    <p class="text-sm text-slate/60 mb-6 font-medium h-10">Pigmentos, agujas y blades.</p>
+                    <div class="bg-red-50 p-4 rounded-2xl border border-red-500/10">
+                        <div
+                            class="text-xs font-bold text-red-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <i class="ph-fill ph-warning"></i> El Riesgo
+                        </div>
+                        <p class="text-sm text-red-900/70 leading-relaxed">Alertas sanitarias por componentes prohibidos
+                            en tintas. Sanidad exige localizar a cada cliente afectado en menos de 24h.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div
+                    class="bg-white p-8 rounded-[32px] shadow-sm border border-slate/5 hover:shadow-md transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-lavender/30 text-slate flex items-center justify-center text-2xl mb-6 group-hover:bg-lavender transition-colors">
+                        <i class="ph-fill ph-dna"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2 text-slate">Estética Avanzada (Dermapen)</h3>
+                    <p class="text-sm text-slate/60 mb-6 font-medium h-10">Cabezales de agujas y viales de mesoterapia.
+                    </p>
+                    <div class="bg-red-50 p-4 rounded-2xl border border-red-500/10">
+                        <div
+                            class="text-xs font-bold text-red-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <i class="ph-fill ph-warning"></i> El Riesgo
+                        </div>
+                        <p class="text-sm text-red-900/70 leading-relaxed">Infecciones por falta de trazabilidad en el
+                            material estéril de un solo uso en cabina.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 4 -->
+                <div
+                    class="bg-white p-8 rounded-[32px] shadow-sm border border-slate/5 hover:shadow-md transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center text-2xl mb-6 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                        <i class="ph-fill ph-palette"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2 text-slate">Tatuaje Artístico</h3>
+                    <p class="text-sm text-slate/60 mb-6 font-medium h-10">Tintas, diluyentes y agujas.</p>
+                    <div class="bg-red-50 p-4 rounded-2xl border border-red-500/10">
+                        <div
+                            class="text-xs font-bold text-red-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <i class="ph-fill ph-warning"></i> El Riesgo
+                        </div>
+                        <p class="text-sm text-red-900/70 leading-relaxed">Inspecciones policiales. El viejo "libro de
+                            tintas" manual ya no es suficiente ante una auditoría digital.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 5 -->
+                <div
+                    class="bg-white p-8 rounded-[32px] shadow-sm border border-slate/5 hover:shadow-md transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-mint/30 text-slate flex items-center justify-center text-2xl mb-6 group-hover:bg-mint transition-colors">
+                        <i class="ph-fill ph-thermometer"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2 text-slate">Esterilización (Autoclave)</h3>
+                    <p class="text-sm text-slate/60 mb-6 font-medium h-10">Instrumental reutilizable.</p>
+                    <div class="bg-red-50 p-4 rounded-2xl border border-red-500/10">
+                        <div
+                            class="text-xs font-bold text-red-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <i class="ph-fill ph-warning"></i> El Riesgo
+                        </div>
+                        <p class="text-sm text-red-900/70 leading-relaxed">No poder demostrar con un registro enlazado
+                            que el instrumental usado en el cliente "X" pasó por un ciclo de esterilización correcto ese
+                            mismo día.</p>
+                    </div>
+                </div>
+
+                <!-- CTA intermedio -->
+                <div
+                    class="bg-gradient-to-br from-slate to-[#1a1c23] p-8 rounded-[32px] text-white flex flex-col justify-between shadow-lg relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-brand/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl">
+                    </div>
+                    <div class="relative z-10 w-full mb-8">
+                        <h3 class="font-bold text-3xl mb-4 leading-tight">No esperes a la inspección <span
+                                class="text-mint">para poner orden.</span></h3>
+                        <p class="text-cream/80 text-base">Toda tu documentación de lotes en regla. Sin errores, sin
+                            multas, sin papeles perdidos.
+                        </p>
+                    </div>
+                    <div class="relative z-10 w-full mt-auto">
+                        <a href="#"
+                            class="bg-white text-slate text-center w-full py-4 rounded-2xl font-bold hover:bg-cream transition shadow-md block text-lg">Empezar
+                            ahora</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Pricing Section -->
+    <section class="py-24 bg-[#f8fafd] border-t border-[#d2e3f5]" id="pricing">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4 text-[#1a1c23] tracking-tight">Precios <span class="text-brand">sin
+                        sorpresas</span></h2>
+                <p class="text-xl text-slate/60 font-light max-w-lg mx-auto">Es más barato cumplir la ley que
+                    arriesgarse a una multa de 3.000€.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                <!-- Mensual -->
+                <div
+                    class="bg-white p-10 rounded-[40px] shadow-sm border border-slate/10 flex flex-col text-center hover:shadow-soft transition-shadow">
+                    <h3 class="text-2xl font-bold text-slate mb-2">Mensual</h3>
+                    <p class="text-slate/50 text-sm mb-8">Pago recurrente mes a mes</p>
+                    <div class="text-6xl font-bold text-[#1a1c23] mb-8 tracking-tight">19€<span
+                            class="text-xl text-slate/40 ml-1">/mes</span></div>
+
+                    <ul class="space-y-4 text-left text-slate/70 mb-10 flex-1">
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-brand text-lg"></i>
+                            Trazabilidad ilimitada</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-brand text-lg"></i>
+                            Exportación PDF Legal</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-brand text-lg"></i>
+                            Botón de Pánico</li>
+                    </ul>
+
+                    <a href="#"
+                        class="w-full block bg-slate text-white py-4 rounded-2xl font-bold hover:bg-slate/90 transition">Empezar
+                        ahora</a>
+                </div>
+
+                <!-- Anual (Recomendado) -->
+                <div
+                    class="bg-[#1a1c23] text-white p-10 rounded-[40px] shadow-xl border border-brand/30 relative flex flex-col text-center mt-[-10px] sm:mt-[-20px] mb-[-10px] sm:mb-[-20px]">
+                    <div
+                        class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-brand text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+                        Recomendado</div>
+
+                    <h3 class="text-2xl font-bold mb-2">Anual</h3>
+                    <p class="text-white/60 text-sm mb-8">La tranquilidad de todo un año</p>
+                    <div class="text-6xl font-bold mb-2 tracking-tight">190€<span
+                            class="text-xl text-white/40 ml-1">/año</span></div>
+                    <div
+                        class="bg-green-500/20 text-green-400 text-xs font-bold py-1 px-3 rounded-md w-max mx-auto mb-8 border border-green-500/20">
+                        Ahorras 2 meses gratis</div>
+
+                    <ul class="space-y-4 text-left text-white/80 mb-10 flex-1">
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-brand text-lg"></i>
+                            Todo lo del plan mensual</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-brand text-lg"></i>
+                            Soporte prioritario</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-brand text-lg"></i>
+                            <span class="italic font-light">"El precio de un solo tratamiento"</span>
+                        </li>
+                    </ul>
+
+                    <a href="#"
+                        class="w-full block bg-brand text-white py-4 rounded-2xl font-bold shadow-[0_0_20px_rgba(57,114,182,0.4)] hover:-translate-y-1 transition duration-300">Empezar
+                        ahora</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 relative text-center px-6">
+        <!-- Gradiente de fondo similar al "Ready to do privacy properly?" -->
+        <div class="absolute inset-0 bg-gradient-to-b from-cream to-[#FDF4E3] -z-10"></div>
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 tracking-tight">La tranquilidad de tener cada lote bajo
+            control.<span class="text-mint"></span></h2>
+        <p class="text-lg text-slate/70 mb-10 max-w-xl mx-auto font-light">
+            Cumpla con la normativa de trazabilidad sin hojas de cálculo. <br>
+            Genere informes de rastreo completos en segundos y supere cualquier inspección sin estrés.
+        </p>
+        <a href="#"
+            class="inline-flex items-center gap-2 bg-slate text-cream px-10 py-4 rounded-full font-medium text-lg hover:bg-slate/90 transition shadow-float hover:-translate-y-1">
+            Empezar ahora <i class="ph ph-arrow-right"></i>
+        </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white px-6 py-12 border-t border-slate/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div
+                    class="w-6 h-6 rounded-full bg-slate text-cream flex items-center justify-center font-bold text-xs">
+                    <i class="ph-fill ph-fingerprint"></i>
+                </div>
+                <span class="font-bold text-lg">Residoc</span>
+            </div>
+            <div class="text-sm text-slate/50 flex gap-6">
+                <a href="#" class="hover:text-slate">Privacidad</a>
+                <a href="#" class="hover:text-slate">Términos Legales</a>
+                <span>© 2026 Residoc Inc.</span>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        @keyframes scan {
+            0% {
+                transform: translateY(-50px);
+            }
+
+            50% {
+                transform: translateY(150px);
+            }
+
+            100% {
+                transform: translateY(-50px);
+            }
+        }
+    </style>
+</body>
+
+</html>

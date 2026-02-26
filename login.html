@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Residoc</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#F9F7F2',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        slate: '#353b48',
+                        brand: {
+                            DEFAULT: '#3972B6',
+                            dark: '#2d5a92'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(74, 78, 105, 0.08)',
+                        'float': '0 30px 60px -20px rgba(74, 78, 105, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F9F7F2;
+            color: #4A4E69;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-[#daebfc] via-cream to-[#f0f6fc]">
+
+    <!-- Background Decor -->
+    <div class="absolute top-20 left-10 w-64 h-64 bg-mint/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
+    <div class="absolute bottom-10 right-20 w-80 h-80 bg-lavender/20 rounded-full blur-3xl -z-10 animate-pulse"
+        style="animation-delay: 1s;"></div>
+
+    <div class="w-full max-w-md fade-in-up">
+        <!-- Logo -->
+        <div class="flex items-center justify-center gap-2 mb-10 cursor-pointer"
+            onclick="window.location.href='index.html'">
+            <div
+                class="w-10 h-10 rounded-full bg-slate text-cream flex items-center justify-center font-bold text-2xl shadow-lg">
+                <i class="ph ph-fingerprint"></i>
+            </div>
+            <span class="text-3xl font-bold tracking-tight text-slate">Residoc</span>
+        </div>
+
+        <!-- Login Card -->
+        <div
+            class="bg-white/80 backdrop-blur-xl p-10 rounded-[40px] shadow-float border border-white/50 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-slate mb-2 tracking-tight">Bienvenido de nuevo</h1>
+                <p class="text-slate/50 font-light">Accede a tu panel de trazabilidad.</p>
+            </div>
+
+            <form class="space-y-6">
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-bold text-slate/70 mb-2 ml-1">Email profesional</label>
+                    <div class="relative group">
+                        <i
+                            class="ph ph-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
+                        <input type="email" id="email"
+                            class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                            placeholder="ejemplo@clinica.com">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-bold text-slate/70 mb-2 ml-1">Contraseña</label>
+                    <div class="relative group">
+                        <i
+                            class="ph ph-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
+                        <input type="password" id="password"
+                            class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-12 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                            placeholder="••••••••">
+                        <button type="button"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate/30 hover:text-slate transition-colors">
+                            <i class="ph ph-eye"></i>
+                        </button>
+                    </div>
+                    <div class="flex justify-end mt-2">
+                        <a href="#"
+                            class="text-sm font-bold text-brand/70 hover:text-brand transition-colors">¿Olvidaste tu
+                            contraseña?</a>
+                    </div>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center gap-2 ml-1">
+                    <input type="checkbox" id="remember"
+                        class="w-5 h-5 rounded-lg border-slate/10 text-brand focus:ring-brand shadow-sm">
+                    <label for="remember" class="text-sm font-medium text-slate/60">Recordar mi sesión</label>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit"
+                    class="w-full bg-slate text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate/90 hover:-translate-y-1 transition-all shadow-lg active:scale-95 group">
+                    Iniciar Sesión
+                    <i class="ph ph-arrow-right inline-block ml-2 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="my-8 flex items-center gap-4">
+                <div class="h-px bg-slate/5 flex-1"></div>
+                <span class="text-xs font-bold text-slate/30 uppercase tracking-widest">O accede con</span>
+                <div class="h-px bg-slate/5 flex-1"></div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="grid grid-cols-2 gap-4">
+                <button
+                    class="bg-white border border-slate/5 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-slate/5 transition-colors shadow-sm">
+                    <i class="ph-fill ph-google-logo text-brand"></i>
+                    <span class="text-sm font-bold text-slate">Google</span>
+                </button>
+                <button
+                    class="bg-white border border-slate/5 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-slate/5 transition-colors shadow-sm">
+                    <i class="ph-fill ph-apple-logo text-slate"></i>
+                    <span class="text-sm font-bold text-slate">Apple</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer link -->
+        <p class="mt-8 text-center text-slate/50 font-medium">
+            ¿No tienes cuenta? <a href="index.html#pricing" class="text-brand font-bold hover:underline">Prueba 14 días
+                gratis</a>
+        </p>
+    </div>
+
+</body>
+
+</html>
