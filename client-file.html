@@ -92,16 +92,15 @@
                     <img id="clientAvatar"
                         src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69&bold=true&size=128"
                         class="w-24 h-24 rounded-3xl object-cover shadow-sm">
-                    <div>
+                    <div id="clientInfo">
                         <div class="flex items-center gap-3 mb-2">
-                            <h2 class="text-xl font-bold text-slate" id="clientNameTitle">María Gómez</h2>
+                            <h2 class="text-xl font-bold text-slate" id="clientNameTitle">—</h2>
                             <span
                                 class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-green-100">Activo</span>
                         </div>
-                        <div class="flex items-center gap-4 text-sm text-slate/40">
-                            <span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i>
-                                12345678A</span>
-                            <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> +34 600 000 000</span>
+                        <div class="flex items-center gap-4 text-sm text-slate/40" id="clientMeta">
+                            <span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i> —</span>
+                            <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> —</span>
                         </div>
                     </div>
                 </div>
@@ -109,16 +108,16 @@
                 <div class="grid grid-cols-3 gap-6 pt-8 border-t border-slate/5">
                     <div>
                         <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Última visita</p>
-                        <p class="text-sm font-bold text-slate" id="lastVisitDate">26 Feb, 2026</p>
+                        <p class="text-sm font-bold text-slate" id="lastVisitDate">—</p>
                     </div>
                     <div>
                         <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Total servicios
                         </p>
-                        <p class="text-sm font-bold text-slate">12 registrados</p>
+                        <p class="text-sm font-bold text-slate" id="totalServices">—</p>
                     </div>
                     <div>
-                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">ID Registro</p>
-                        <p class="text-sm font-mono font-bold text-brand">#RES-99210</p>
+                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Cliente desde</p>
+                        <p class="text-sm font-bold text-slate" id="memberSince">—</p>
                     </div>
                 </div>
             </div>
@@ -172,42 +171,44 @@
                 </div>
             </div>
         </section>
-        </div>
-        </div>
-        </section>
     </main>
 
-    <script>
+    <script type="module">
         import { supabase } from './supabase.js';
 
         const urlParams = new URLSearchParams(window.location.search);
         const clientId = urlParams.get('id');
 
         async function fetchClientData() {
-            if (!clientId) return;
+            if (!clientId) {
+                document.getElementById('clientNameHeader').textContent = 'Cliente no encontrado';
+                return;
+            }
 
-            // Fetch Client Basic Info
+            // ── Fetch Client Info ─────────────────────────────────────────────
             const { data: client, error: clientError } = await supabase
                 .from('clients')
                 .select('*')
                 .eq('id', clientId)
                 .single();
 
-            if (clientError) {
+            if (clientError || !client) {
                 console.error('Error fetching client:', clientError);
                 return;
             }
 
-            // Update UI
+            // ── Update header & profile card ──────────────────────────────────
             document.getElementById('clientNameHeader').textContent = client.full_name;
             document.getElementById('clientNameTitle').textContent = client.full_name;
-            document.getElementById('clientAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(client.full_name)}&background=B8D8D8&color=4A4E69&bold=true&size=128`;
-            document.querySelector('.flex.items-center.gap-4.text-sm.text-slate\/40').innerHTML = `
+            document.getElementById('clientAvatar').src =
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(client.full_name)}&background=B8D8D8&color=4A4E69&bold=true&size=128`;
+
+            document.getElementById('clientMeta').innerHTML = `
                 <span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i> ${client.dni}</span>
-                <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> ${client.phone || 'No disponible'}</span>
+                <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> ${client.phone || 'Sin teléfono'}</span>
             `;
 
-            // Fetch Treatment History
+            // ── Fetch Treatment History ───────────────────────────────────────
             const { data: treatments, error: treatError } = await supabase
                 .from('treatments')
                 .select('*')
@@ -219,19 +220,33 @@
                 return;
             }
 
+            // ── Update stats ──────────────────────────────────────────────────
+            document.getElementById('totalServices').textContent =
+                treatments.length > 0 ? `${treatments.length} registrado${treatments.length > 1 ? 's' : ''}` : '0 registros';
+
+            document.getElementById('lastVisitDate').textContent =
+                treatments.length > 0
+                    ? new Date(treatments[0].created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : '—';
+
+            document.getElementById('memberSince').textContent =
+                new Date(client.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            // ── Render History Rows ───────────────────────────────────────────
             const historyContainer = document.getElementById('historyContainer');
             historyContainer.innerHTML = '';
 
-            if (treatments.length > 0) {
-                document.getElementById('lastVisitDate').textContent = new Date(treatments[0].created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-                document.querySelectorAll('.text-sm.font-bold.text-slate')[1].textContent = `${treatments.length} registrados`;
-                document.querySelector('.text-sm.font-mono.font-bold.text-brand').textContent = treatments[0].registration_id;
+            if (treatments.length === 0) {
+                historyContainer.innerHTML = `
+                    <p class="text-sm text-slate/30 py-10 text-center">Aún no hay tratamientos registrados para este cliente.</p>
+                `;
+                return;
             }
 
             treatments.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
                 const row = document.createElement('div');
-                row.className = 'grid grid-cols-12 gap-4 items-center py-4 border-t border-slate/5 hover:bg-cream/50 transition-colors rounded-2xl px-2 cursor-pointer group';
+                row.className = 'grid grid-cols-12 gap-4 items-center py-4 border-t border-slate/5 hover:bg-cream/50 transition-colors rounded-2xl px-2 group';
                 row.innerHTML = `
                     <div class="col-span-2 text-sm font-bold text-slate">${date}</div>
                     <div class="col-span-4 flex items-center gap-3">
@@ -241,7 +256,7 @@
                         <span class="text-sm font-semibold text-slate">${item.type}</span>
                     </div>
                     <div class="col-span-3">
-                        <span class="text-xs font-mono text-slate/50">${item.batch_number || 'N/A'}</span>
+                        <span class="text-xs font-mono text-slate/50">${item.batch_number || '—'}</span>
                     </div>
                     <div class="col-span-2 text-xs font-mono text-brand font-bold">${item.registration_id}</div>
                     <div class="col-span-1 text-right">
