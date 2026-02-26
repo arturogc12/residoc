@@ -7,6 +7,8 @@
     <title>Residoc | Ficha de cliente</title>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase Client -->
+    <script type="module" src="./supabase.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -165,63 +167,92 @@
                         <div class="col-span-1 text-right">Acción</div>
                     </div>
 
-                    <!-- History Rows (Demo Data) -->
-                    <div class="space-y-1" id="historyContainer">
-                        <!-- Row 1 -->
-                        <div
-                            class="grid grid-cols-12 gap-4 items-center py-4 border-t border-slate/5 hover:bg-cream/50 transition-colors rounded-2xl px-2 cursor-pointer group">
-                            <div class="col-span-2 text-sm font-bold text-slate">26 Feb, 2026</div>
-                            <div class="col-span-4 flex items-center gap-3">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-lavender/20 text-slate flex items-center justify-center">
-                                    <i class="ph ph-eyedropper"></i>
-                                </div>
-                                <span class="text-sm font-semibold text-slate">Ácido Hialurónico</span>
-                            </div>
-                            <div class="col-span-3">
-                                <span class="text-xs font-mono text-slate/50">L-2024-99X</span>
-                            </div>
-                            <div class="col-span-2 text-xs font-mono text-brand font-bold">#SRV-4412</div>
-                            <div class="col-span-1 text-right">
-                                <i
-                                    class="ph ph-dots-three-outline-vertical text-slate/20 group-hover:text-slate transition-colors"></i>
-                            </div>
-                        </div>
-
-                        <!-- Row 2 -->
-                        <div
-                            class="grid grid-cols-12 gap-4 items-center py-4 border-t border-slate/5 hover:bg-cream/50 transition-colors rounded-2xl px-2 cursor-pointer group">
-                            <div class="col-span-2 text-sm font-bold text-slate">15 Ene, 2026</div>
-                            <div class="col-span-4 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-mint/20 text-slate flex items-center justify-center">
-                                    <i class="ph ph-sparkle"></i>
-                                </div>
-                                <span class="text-sm font-semibold text-slate">Peeling Químico</span>
-                            </div>
-                            <div class="col-span-3">
-                                <span class="text-xs font-mono text-slate/50">P-2025-12B</span>
-                            </div>
-                            <div class="col-span-2 text-xs font-mono text-brand font-bold">#SRV-3988</div>
-                            <div class="col-span-1 text-right">
-                                <i
-                                    class="ph ph-dots-three-outline-vertical text-slate/20 group-hover:text-slate transition-colors"></i>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- History Rows will be injected by JS -->
+                    <div class="space-y-1" id="historyContainer"></div>
                 </div>
             </div>
+        </section>
+        </div>
+        </div>
         </section>
     </main>
 
     <script>
-        // Get client info from URL (Simulated for demo)
-        const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get('name') || 'María Gómez';
-        const dni = urlParams.get('dni') || '12345678A';
+        import { supabase } from './supabase.js';
 
-        document.getElementById('clientNameHeader').textContent = name;
-        document.getElementById('clientNameTitle').textContent = name;
-        document.getElementById('clientAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=B8D8D8&color=4A4E69&bold=true&size=128`;
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id');
+
+        async function fetchClientData() {
+            if (!clientId) return;
+
+            // Fetch Client Basic Info
+            const { data: client, error: clientError } = await supabase
+                .from('clients')
+                .select('*')
+                .eq('id', clientId)
+                .single();
+
+            if (clientError) {
+                console.error('Error fetching client:', clientError);
+                return;
+            }
+
+            // Update UI
+            document.getElementById('clientNameHeader').textContent = client.full_name;
+            document.getElementById('clientNameTitle').textContent = client.full_name;
+            document.getElementById('clientAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(client.full_name)}&background=B8D8D8&color=4A4E69&bold=true&size=128`;
+            document.querySelector('.flex.items-center.gap-4.text-sm.text-slate\/40').innerHTML = `
+                <span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i> ${client.dni}</span>
+                <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> ${client.phone || 'No disponible'}</span>
+            `;
+
+            // Fetch Treatment History
+            const { data: treatments, error: treatError } = await supabase
+                .from('treatments')
+                .select('*')
+                .eq('client_id', clientId)
+                .order('created_at', { ascending: false });
+
+            if (treatError) {
+                console.error('Error fetching treatments:', treatError);
+                return;
+            }
+
+            const historyContainer = document.getElementById('historyContainer');
+            historyContainer.innerHTML = '';
+
+            if (treatments.length > 0) {
+                document.getElementById('lastVisitDate').textContent = new Date(treatments[0].created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+                document.querySelectorAll('.text-sm.font-bold.text-slate')[1].textContent = `${treatments.length} registrados`;
+                document.querySelector('.text-sm.font-mono.font-bold.text-brand').textContent = treatments[0].registration_id;
+            }
+
+            treatments.forEach(item => {
+                const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center py-4 border-t border-slate/5 hover:bg-cream/50 transition-colors rounded-2xl px-2 cursor-pointer group';
+                row.innerHTML = `
+                    <div class="col-span-2 text-sm font-bold text-slate">${date}</div>
+                    <div class="col-span-4 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-lavender/20 text-slate flex items-center justify-center">
+                            <i class="ph ph-eyedropper"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-slate">${item.type}</span>
+                    </div>
+                    <div class="col-span-3">
+                        <span class="text-xs font-mono text-slate/50">${item.batch_number || 'N/A'}</span>
+                    </div>
+                    <div class="col-span-2 text-xs font-mono text-brand font-bold">${item.registration_id}</div>
+                    <div class="col-span-1 text-right">
+                        <i class="ph ph-dots-three-outline-vertical text-slate/20 group-hover:text-slate transition-colors"></i>
+                    </div>
+                `;
+                historyContainer.appendChild(row);
+            });
+        }
+
+        fetchClientData();
     </script>
 </body>
 

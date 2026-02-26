@@ -4,6 +4,7 @@
 
 **Residoc** es una aplicación de trazabilidad sanitaria de nicho para centros de estética y estudios de tatuaje. Su misión es vincular de forma inequívoca los lotes de productos (tintas, viales, agujas) con clientes específicos para garantizar la seguridad del paciente y cumplir con normativas legales.
 
+
 ---
 
 ## **2\. Pilares de Funcionalidad (Core)**
@@ -11,8 +12,9 @@
 ### **A. Dashboard y Buscador de Clientes**
 
 * **Interfaz:** Barra de búsqueda prominente y centralizada (estilo Spotlight/Notion).  
-* **Filtros:** Búsqueda por Nombre, DNI o Teléfono.  
+* **Filtros:** Búsqueda por Nombre, DNI, Teléfono o Lote.  
 * **Navegación:** Acceso instantáneo a la Ficha de Cliente.
+
 
 ### **B. Ficha de Cliente e Historial Visual**
 
@@ -72,4 +74,10 @@ El diseño debe alejarse de la frialdad médica y acercarse a una estética mode
 * **Gráficos:** SVG interactivos para el mapa corporal.
 
 # **7\. Ejemplo web:** https://www.trustkeith.co/?ref=saaspo.com
+
+## **8\. Normas**
+* **Boton home:** El logo de la app debe ser el boton home.
+* **Barra de navegación:** Debe estar en la parte superior de la pantalla. Transparente. Y solo tiene que verse arriba. Al bajar debe desaparecer. Login y dashboard no tiene barra de navegación. 
+* **Titulos:** Deben ser claros y descriptivos. Siempre la primera mayuscula y el resto minuscula.
+* **Clientes:** Los nombres de clientes siempre son links a su ficha de cliente.
 

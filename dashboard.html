@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Supabase Client -->
+    <script type="module" src="./supabase.js"></script>
 
     <script>
         tailwind.config = {
@@ -293,137 +295,14 @@
                         <div class="col-span-2 text-right">Fecha</div>
                     </div>
 
-                    <!-- Row 1 -->
-                    <div
-                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
-                        <div class="col-span-4 flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69&bold=true"
-                                class="w-9 h-9 rounded-full">
-                            <div>
-                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">María
-                                    Gómez</div>
-                                <div class="text-xs text-slate/40">DNI: 12345678A</div>
-                            </div>
-                        </div>
-                        <div class="col-span-3">
-                            <span
-                                class="text-xs bg-lavender/20 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
-                                <i class="ph ph-eyedropper text-lavender"></i> Ácido Hialurónico
-                            </span>
-                        </div>
-                        <div class="col-span-3">
-                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
-                                <i class="ph ph-barcode"></i> L-2024-99X
-                            </span>
-                        </div>
-                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Hace 45 min</div>
-                    </div>
-
-                    <!-- Row 2 -->
-                    <div
-                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
-                        <div class="col-span-4 flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Carlos+M&background=E2C2FF&color=4A4E69&bold=true"
-                                class="w-9 h-9 rounded-full">
-                            <div>
-                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">
-                                    Carlos Martínez</div>
-                                <div class="text-xs text-slate/40">DNI: 87654321B</div>
-                            </div>
-                        </div>
-                        <div class="col-span-3">
-                            <span
-                                class="text-xs bg-mint/20 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
-                                <i class="ph ph-pen-nib text-mint"></i> Microblading
-                            </span>
-                        </div>
-                        <div class="col-span-3">
-                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
-                                <i class="ph ph-barcode"></i> P-2024-44K
-                            </span>
-                        </div>
-                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Hace 2h</div>
-                    </div>
-
-                    <!-- Row 3 -->
-                    <div
-                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
-                        <div class="col-span-4 flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Ana+L&background=B8D8D8&color=4A4E69&bold=true"
-                                class="w-9 h-9 rounded-full">
-                            <div>
-                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">Ana
-                                    López</div>
-                                <div class="text-xs text-slate/40">DNI: 55667788C</div>
-                            </div>
-                        </div>
-                        <div class="col-span-3">
-                            <span
-                                class="text-xs bg-orange-100 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
-                                <i class="ph ph-syringe text-orange-400"></i> Toxina Botulínica
-                            </span>
-                        </div>
-                        <div class="col-span-3">
-                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
-                                <i class="ph ph-barcode"></i> B-2024-12T
-                            </span>
-                        </div>
-                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Hace 4h</div>
-                    </div>
-
-                    <!-- Row 4 -->
-                    <div
-                        class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
-                        <div class="col-span-4 flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Lucia+F&background=E2C2FF&color=4A4E69&bold=true"
-                                class="w-9 h-9 rounded-full">
-                            <div>
-                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">Lucía
-                                    Fernández</div>
-                                <div class="text-xs text-slate/40">DNI: 99887766D</div>
-                            </div>
-                        </div>
-                        <div class="col-span-3">
-                            <span
-                                class="text-xs bg-brand/10 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
-                                <i class="ph ph-dna text-brand"></i> Dermapen
-                            </span>
-                        </div>
-                        <div class="col-span-3">
-                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
-                                <i class="ph ph-barcode"></i> D-2024-77M
-                            </span>
-                        </div>
-                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Ayer</div>
-                    </div>
-
-                    <!-- Row 5 -->
-                    <div
-                        class="grid grid-cols-12 gap-4 items-center py-4 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group">
-                        <div class="col-span-4 flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Pedro+S&background=B8D8D8&color=4A4E69&bold=true"
-                                class="w-9 h-9 rounded-full">
-                            <div>
-                                <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">Pedro
-                                    Sánchez</div>
-                                <div class="text-xs text-slate/40">DNI: 11223344E</div>
-                            </div>
-                        </div>
-                        <div class="col-span-3">
-                            <span
-                                class="text-xs bg-slate/10 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5">
-                                <i class="ph ph-palette text-slate/60"></i> Tatuaje
-                            </span>
-                        </div>
-                        <div class="col-span-3">
-                            <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
-                                <i class="ph ph-barcode"></i> T-2024-55R
-                            </span>
-                        </div>
-                        <div class="col-span-2 text-right text-xs text-slate/40 font-medium">Ayer</div>
-                    </div>
+                    <!-- Rows will be injected by JS -->
                 </div>
             </div>
+        </section>
+
+        <!-- Rows will be injected by JS -->
+        </div>
+        </div>
         </section>
 
 
