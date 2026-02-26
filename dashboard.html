@@ -253,27 +253,13 @@
                 <p class="text-sm text-slate/40 font-medium">Lotes registrados</p>
             </div>
 
-            <!-- KPI 4: Alertas -->
-            <div
-                class="bg-gradient-to-br from-red-50 to-white p-6 rounded-[28px] shadow-sm border border-red-100 fade-in-up delay-400 hover:shadow-soft transition-shadow group">
-                <div class="flex items-center justify-between mb-4">
-                    <div
-                        class="w-11 h-11 rounded-2xl bg-red-100 text-red-500 flex items-center justify-center text-xl pulse-ring">
-                        <i class="ph-fill ph-warning"></i>
-                    </div>
-                    <span
-                        class="text-xs font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-lg border border-red-100">Activa</span>
-                </div>
-                <div class="text-3xl font-bold text-slate mb-1">1</div>
-                <p class="text-sm text-slate/40 font-medium">Alerta activa</p>
-            </div>
         </section>
 
-        <!-- ===== MAIN GRID: Activity + Inverse Search ===== -->
-        <section class="grid grid-cols-3 gap-5 mb-8 fade-in-up delay-500">
+        <!-- ===== MAIN GRID: Activity ===== -->
+        <section class="mb-8 fade-in-up delay-500">
 
-            <!-- ACTIVIDAD RECIENTE (2 cols) -->
-            <div class="col-span-2 bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden">
+            <!-- ACTIVIDAD RECIENTE (Full width) -->
+            <div class="bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden w-full">
                 <div class="px-7 pt-7 pb-4 flex items-center justify-between">
                     <div>
                         <h2 class="text-lg font-bold text-slate">Actividad reciente</h2>
@@ -426,145 +412,54 @@
                 </div>
             </div>
 
-            <!-- BUSCADOR INVERSO (1 col) -->
-            <div class="flex flex-col gap-5">
-                <!-- Inverse Search Card -->
-                <div
-                    class="bg-gradient-to-br from-slate to-[#2a2f3d] text-white p-7 rounded-[28px] shadow-float relative overflow-hidden flex-1 group">
-                    <div class="absolute top-0 right-0 w-40 h-40 bg-brand/10 rounded-full blur-3xl"></div>
-                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-mint/10 rounded-full blur-2xl"></div>
 
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-3 mb-5">
-                            <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-xl">
-                                <i class="ph-fill ph-shield-warning text-mint"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-base">Buscador inverso</h3>
-                                <p class="text-xs text-white/50">Localiza clientes por lote</p>
-                            </div>
-                        </div>
-
-                        <p class="text-sm text-white/60 mb-5 leading-relaxed">Introduce el número de lote para encontrar
-                            a todos los clientes a los que se les aplicó.</p>
-
-                        <!-- Search Input -->
-                        <div class="relative mb-4">
-                            <i class="ph ph-package absolute left-4 top-1/2 -translate-y-1/2 text-white/30"></i>
-                            <input type="text" placeholder="Nº de lote (ej: L-2024-99X)"
-                                class="w-full bg-white/10 border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-mint/30 focus:border-mint/40 transition-all text-sm placeholder:text-white/25 text-white font-medium">
-                        </div>
-
-                        <button
-                            class="w-full bg-mint text-slate py-3.5 rounded-2xl font-bold text-sm hover:-translate-y-0.5 transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
-                            <i class="ph ph-magnifying-glass"></i> Buscar clientes afectados
-                        </button>
-
-                        <!-- Status -->
-                        <div class="mt-5 flex items-center gap-2 text-xs text-white/40">
-                            <i class="ph-fill ph-shield-check text-mint"></i>
-                            <span>Todos los lotes verificados</span>
-                        </div>
+            <!-- ===== ACCESOS RÁPIDOS ===== -->
+            <section class="grid grid-cols-3 gap-5 fade-in-up delay-500">
+                <!-- Nuevo Servicio -->
+                <button
+                    class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-colors shrink-0">
+                        <i class="ph-fill ph-plus-circle"></i>
                     </div>
-                </div>
-
-                <!-- Alert Card (Active) -->
-                <div class="bg-red-50 p-5 rounded-[28px] shadow-sm border border-red-100 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl"></div>
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div
-                                class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center text-red-500 animate-pulse">
-                                <i class="ph-fill ph-siren text-lg"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-slate">Alerta AEMPS</p>
-                                <p class="text-[11px] text-slate/40">Hace 2 horas</p>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate/60 leading-relaxed mb-3">
-                            Lote <span class="font-bold font-mono text-red-500">P-2024-31W</span> retirado.
-                            Pigmento "Sunset Red" — posible reacción adversa.
-                        </p>
-                        <button
-                            class="w-full bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-red-600 transition-colors flex items-center justify-center gap-2">
-                            <i class="ph ph-warning"></i> Ver clientes afectados (3)
-                        </button>
+                    <div>
+                        <h3 class="font-bold text-base text-slate mb-0.5">Nuevo servicio</h3>
+                        <p class="text-xs text-slate/40">Registrar tratamiento con trazabilidad</p>
                     </div>
-                </div>
-            </div>
-        </section>
+                    <i
+                        class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
+                </button>
 
-        <!-- ===== ACCESOS RÁPIDOS ===== -->
-        <section class="grid grid-cols-3 gap-5 fade-in-up delay-500">
-            <!-- Nuevo Servicio -->
-            <button
-                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl group-hover:bg-brand group-hover:text-white transition-colors shrink-0">
-                    <i class="ph-fill ph-plus-circle"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-base text-slate mb-0.5">Nuevo servicio</h3>
-                    <p class="text-xs text-slate/40">Registrar tratamiento con trazabilidad</p>
-                </div>
-                <i
-                    class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
-            </button>
+                <!-- Exportar PDF -->
+                <button
+                    class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-mint/30 text-slate flex items-center justify-center text-2xl group-hover:bg-mint transition-colors shrink-0">
+                        <i class="ph-fill ph-file-pdf"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-slate mb-0.5">Exportar PDF</h3>
+                        <p class="text-xs text-slate/40">Informe legal para inspecciones</p>
+                    </div>
+                    <i
+                        class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
+                </button>
 
-            <!-- Exportar PDF -->
-            <button
-                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-mint/30 text-slate flex items-center justify-center text-2xl group-hover:bg-mint transition-colors shrink-0">
-                    <i class="ph-fill ph-file-pdf"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-base text-slate mb-0.5">Exportar PDF</h3>
-                    <p class="text-xs text-slate/40">Informe legal para inspecciones</p>
-                </div>
-                <i
-                    class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
-            </button>
-
-            <!-- Gestión de Alertas -->
-            <button
-                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
-                <div
-                    class="w-14 h-14 rounded-2xl bg-lavender/30 text-slate flex items-center justify-center text-2xl group-hover:bg-lavender transition-colors shrink-0">
-                    <i class="ph-fill ph-shield-warning"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-base text-slate mb-0.5">Gestión de alertas</h3>
-                    <p class="text-xs text-slate/40">Monitorizar lotes retirados por AEMPS</p>
-                </div>
-                <i
-                    class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
-            </button>
-        </section>
-
-        <!-- ===== COMPLIANCE BANNER ===== -->
-        <section
-            class="mt-8 bg-gradient-to-r from-brand/5 to-mint/10 p-6 rounded-[28px] border border-brand/10 flex items-center justify-between fade-in-up delay-500">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl">
-                    <i class="ph-fill ph-shield-check"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-slate">Centro 100% en cumplimiento</h3>
-                    <p class="text-sm text-slate/40">Todos los lotes vinculados · Última auditoría: Hoy, 09:00</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <span
-                    class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 flex items-center gap-1.5">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Conforme
-                </span>
-                <a href="#" class="text-sm font-bold text-brand flex items-center gap-1 hover:gap-2 transition-all">
-                    Ver detalles <i class="ph ph-arrow-right"></i>
-                </a>
-            </div>
-        </section>
+                <!-- Gestión de Alertas -->
+                <button
+                    class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 flex items-center gap-5 hover:shadow-soft hover:-translate-y-1 transition-all group text-left">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-lavender/30 text-slate flex items-center justify-center text-2xl group-hover:bg-lavender transition-colors shrink-0">
+                        <i class="ph-fill ph-shield-warning"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-slate mb-0.5">Gestión de alertas</h3>
+                        <p class="text-xs text-slate/40">Monitorizar lotes retirados por AEMPS</p>
+                    </div>
+                    <i
+                        class="ph ph-arrow-right text-slate/20 ml-auto text-xl group-hover:text-brand group-hover:translate-x-1 transition-all"></i>
+                </button>
+            </section>
 
     </main>
 
