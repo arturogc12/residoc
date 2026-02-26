@@ -170,59 +170,43 @@
     </style>
 </head>
 
-<body class="selection:bg-mint selection:text-slate min-h-screen flex">
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
 
-    <!-- ===================== SIDEBAR ===================== -->
-    <aside
-        class="fixed left-0 top-0 bottom-0 w-[78px] bg-slate flex flex-col items-center py-6 z-50 rounded-r-[28px] shadow-float">
-        <!-- Logo -->
-        <div class="w-10 h-10 rounded-full bg-mint flex items-center justify-center text-slate font-bold text-lg mb-8 cursor-pointer hover:scale-110 transition-transform"
+    <!-- ===================== TOP NAVBAR ===================== -->
+    <nav
+        class="fixed top-0 left-0 right-0 h-20 bg-transparent border-b border-slate/5 flex items-center px-8 z-50 backdrop-blur-sm">
+        <div class="flex items-center gap-3 cursor-pointer hover:scale-105 transition-transform"
             onclick="window.location.href='index.html'">
-            R
+            <div
+                class="w-10 h-10 rounded-full bg-mint flex items-center justify-center text-slate font-bold text-lg shadow-sm">
+                R
+            </div>
+            <span class="text-xl font-bold tracking-tight text-slate">Residoc</span>
         </div>
 
-        <!-- Nav Icons -->
-        <nav class="flex flex-col items-center gap-2 flex-1">
-            <a href="#" data-tooltip="Dashboard"
-                class="sidebar-item w-12 h-12 rounded-2xl bg-white/10 text-cream flex items-center justify-center text-xl hover:bg-white/20 transition-all">
-                <i class="ph-fill ph-house"></i>
-            </a>
-            <a href="#" data-tooltip="Clientes"
-                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
-                <i class="ph ph-users"></i>
-            </a>
-            <a href="#" data-tooltip="Lotes"
-                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
-                <i class="ph ph-package"></i>
-            </a>
-            <a href="#" data-tooltip="Reportes"
-                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
-                <i class="ph ph-chart-bar"></i>
-            </a>
-            <a href="#" data-tooltip="Alertas"
-                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all relative">
-                <i class="ph ph-bell"></i>
-                <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full pulse-ring"></span>
-            </a>
-        </nav>
+        <div class="ml-12 flex items-center gap-6">
+            <a href="#" class="text-sm font-bold text-slate border-b-2 border-brand pb-1">Dashboard</a>
+            <a href="#" class="text-sm font-medium text-slate/40 hover:text-slate transition-colors">Clientes</a>
+            <a href="#" class="text-sm font-medium text-slate/40 hover:text-slate transition-colors">Lotes</a>
+            <a href="#" class="text-sm font-medium text-slate/40 hover:text-slate transition-colors">Reportes</a>
+        </div>
 
-        <!-- User Avatar -->
-        <div class="mt-auto flex flex-col items-center gap-3">
-            <a href="#" data-tooltip="Configuración"
-                class="sidebar-item w-12 h-12 rounded-2xl text-cream/50 flex items-center justify-center text-xl hover:bg-white/10 hover:text-cream transition-all">
-                <i class="ph ph-gear"></i>
-            </a>
-            <div class="relative cursor-pointer group">
+        <div class="ml-auto flex items-center gap-4">
+            <button
+                class="relative w-10 h-10 flex items-center justify-center text-slate/40 hover:text-slate transition-colors">
+                <i class="ph ph-bell text-xl"></i>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div
+                class="w-10 h-10 rounded-full border-2 border-slate/5 overflow-hidden cursor-pointer hover:border-mint transition-colors">
                 <img src="https://ui-avatars.com/api/?name=Elena+R&background=E2C2FF&color=4A4E69&bold=true"
-                    alt="Dra. Elena"
-                    class="w-10 h-10 rounded-full border-2 border-cream/20 group-hover:border-mint transition-colors">
-                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-slate"></span>
+                    class="w-full h-full object-cover">
             </div>
         </div>
-    </aside>
+    </nav>
 
     <!-- ===================== MAIN CONTENT ===================== -->
-    <main class="ml-[78px] flex-1 p-8 max-w-[1400px] mx-auto w-full">
+    <main class="flex-1 p-8 pt-28 max-w-[1400px] mx-auto w-full">
 
         <!-- ===== HEADER ===== -->
         <header class="flex items-center justify-between mb-10 fade-in-up">
@@ -477,7 +461,7 @@
             <div class="flex flex-col gap-5">
                 <!-- Inverse Search Card -->
                 <div
-                    class="bg-gradient-to-br from-slate to-[#2a2f3d] text-white p-7 rounded-[28px] shadow-float relative overflow-hidden flex-1">
+                    class="bg-gradient-to-br from-slate to-[#2a2f3d] text-white p-7 rounded-[28px] shadow-float relative overflow-hidden flex-1 group">
                     <div class="absolute top-0 right-0 w-40 h-40 bg-brand/10 rounded-full blur-3xl"></div>
                     <div class="absolute bottom-0 left-0 w-32 h-32 bg-mint/10 rounded-full blur-2xl"></div>
 
@@ -487,7 +471,7 @@
                                 <i class="ph-fill ph-shield-warning text-mint"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-base">Buscador Inverso</h3>
+                                <h3 class="font-bold text-base">Buscador inverso</h3>
                                 <p class="text-xs text-white/50">Localiza clientes por lote</p>
                             </div>
                         </div>

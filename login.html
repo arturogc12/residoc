@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión | Residoc</title>
+    <title>Iniciar sesión | Residoc</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Outfit -->
@@ -61,7 +61,30 @@
     </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-[#daebfc] via-cream to-[#f0f6fc]">
+<!-- Navbar -->
+<nav class="fixed w-full top-0 z-50 bg-transparent border-b border-white/10 transition-all">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+            <div
+                class="w-8 h-8 rounded-full bg-slate text-cream flex items-center justify-center font-bold text-xl shadow-sm">
+                <i class="ph ph-fingerprint"></i>
+            </div>
+            <span class="text-2xl font-bold tracking-tight text-slate">Residoc</span>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <a href="index.html#pricing"
+                class="text-sm font-medium text-slate/60 hover:text-slate transition-colors">Precios</a>
+            <a href="index.html"
+                class="bg-black text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-black/80 transition flex items-center gap-2">
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div
+    class="min-h-screen w-full flex items-center justify-center p-6 bg-gradient-to-br from-[#daebfc] via-cream to-[#f0f6fc]">
 
     <!-- Background Decor -->
     <div class="absolute top-20 left-10 w-64 h-64 bg-mint/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
@@ -133,7 +156,7 @@
                 <!-- Submit -->
                 <button type="submit"
                     class="w-full bg-slate text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate/90 hover:-translate-y-1 transition-all shadow-lg active:scale-95 group">
-                    Iniciar Sesión
+                    Iniciar sesión
                     <i class="ph ph-arrow-right inline-block ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </button>
             </form>
@@ -167,6 +190,7 @@
         </p>
     </div>
 
+</div>
 </body>
 
 </html>
