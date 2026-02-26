@@ -289,7 +289,7 @@
                     </a>
                 </div>
 
-                <div class="px-4 sm:px-7 pb-3">
+                <div id="activityContainer" class="px-4 sm:px-7 pb-3">
                     <!-- Table Header (hidden on mobile) -->
                     <div
                         class="hidden sm:grid grid-cols-12 gap-4 text-xs font-bold text-slate/30 uppercase tracking-wider py-3 border-b border-slate/5">
@@ -719,7 +719,7 @@
 
             if (error || !data) return;
 
-            const container = document.querySelector('.px-7.pb-3');
+            const container = document.getElementById('activityContainer');
             // Remove all data rows (keep header)
             container.querySelectorAll('.data-row').forEach(r => r.remove());
 
