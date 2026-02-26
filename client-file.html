@@ -98,85 +98,69 @@
             </div>
         </header>
 
-        <!-- Basic Details -->
-        <div class="col-span-2 bg-white rounded-[32px] p-8 shadow-sm border border-slate/5 transition-all"
-            id="profileCard">
-            <div class="flex items-center gap-6 mb-8">
-                <img id="clientAvatar"
-                    src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69&bold=true&size=128"
-                    class="w-24 h-24 rounded-3xl object-cover shadow-sm flex-shrink-0">
-                <div class="flex-1 min-w-0">
-                    <!-- View mode -->
-                    <div id="profileViewMode">
-                        <div class="flex items-center gap-3 mb-2">
-                            <h2 class="text-xl font-bold text-slate" id="clientNameTitle">—</h2>
-                            <span
-                                class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-green-100">Activo</span>
+        <!-- ===== CLIENT INFO GRID ===== -->
+        <div class="mb-16 fade-in-up delay-100">
+            <!-- Basic Details -->
+            <div class="col-span-2 bg-white rounded-[32px] p-8 shadow-sm border border-slate/5 transition-all"
+                id="profileCard">
+                <div class="flex items-center gap-6 mb-8">
+                    <img id="clientAvatar"
+                        src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69&bold=true&size=128"
+                        class="w-24 h-24 rounded-3xl object-cover shadow-sm flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <!-- View mode -->
+                        <div id="profileViewMode">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h2 class="text-xl font-bold text-slate" id="clientNameTitle">—</h2>
+                                <span
+                                    class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-green-100">Activo</span>
+                            </div>
+                            <div class="flex items-center gap-4 text-sm text-slate/40" id="clientMeta">
+                                <span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i>
+                                    —</span>
+                                <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> —</span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-4 text-sm text-slate/40" id="clientMeta">
-                            <span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i> —</span>
-                            <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> —</span>
-                        </div>
-                    </div>
-                    <!-- Edit mode (hidden by default) -->
-                    <div id="profileEditMode" class="hidden space-y-3">
-                        <div>
-                            <label
-                                class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Nombre
-                                completo</label>
-                            <input id="inlineNameInput" type="text"
-                                class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 px-4 text-sm font-bold text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
-                        </div>
-                        <div>
-                            <label
-                                class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Teléfono</label>
-                            <div class="relative">
-                                <i
-                                    class="ph ph-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-slate/30 text-sm"></i>
-                                <input id="inlinePhoneInput" type="tel" placeholder="+34 600 000 000"
-                                    class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 pl-9 pr-4 text-sm font-medium text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
+                        <!-- Edit mode (hidden by default) -->
+                        <div id="profileEditMode" class="hidden space-y-3">
+                            <div>
+                                <label
+                                    class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Nombre
+                                    completo</label>
+                                <input id="inlineNameInput" type="text"
+                                    class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 px-4 text-sm font-bold text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
+                            </div>
+                            <div>
+                                <label
+                                    class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Teléfono</label>
+                                <div class="relative">
+                                    <i
+                                        class="ph ph-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-slate/30 text-sm"></i>
+                                    <input id="inlinePhoneInput" type="tel" placeholder="+34 600 000 000"
+                                        class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 pl-9 pr-4 text-sm font-medium text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="grid grid-cols-3 gap-6 pt-8 border-t border-slate/5">
-                <div>
-                    <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Última visita</p>
-                    <p class="text-sm font-bold text-slate" id="lastVisitDate">—</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Total servicios</p>
-                    <p class="text-sm font-bold text-slate" id="totalServices">—</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Cliente desde</p>
-                    <p class="text-sm font-bold text-slate" id="memberSince">—</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notes card -->
-        <div class="bg-white rounded-[32px] p-8 shadow-sm border border-slate/5" id="notesCard">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-bold text-slate">Notas del cliente</h3>
-            </div>
-            <!-- View mode -->
-            <div id="notesDisplayMode">
-                <div id="notesDisplay" class="p-4 bg-cream rounded-2xl border border-slate/5 min-h-[80px]">
-                    <p class="text-xs text-slate/40 italic">Sin notas. Haz clic en 'Editar perfil' para añadir.</p>
+                <div class="grid grid-cols-3 gap-6 pt-8 border-t border-slate/5">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Última visita</p>
+                        <p class="text-sm font-bold text-slate" id="lastVisitDate">—</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Total servicios
+                        </p>
+                        <p class="text-sm font-bold text-slate" id="totalServices">—</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Cliente desde</p>
+                        <p class="text-sm font-bold text-slate" id="memberSince">—</p>
+                    </div>
                 </div>
             </div>
-            <!-- Edit mode (hidden by default) -->
-            <div id="notesEditMode" class="hidden">
-                <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-2">Notas
-                    internas</label>
-                <textarea id="inlineNotesInput" rows="6" placeholder="Observaciones, alergias, preferencias..."
-                    class="w-full bg-cream border border-slate/10 rounded-2xl py-3 px-4 text-sm font-medium text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all resize-none"></textarea>
-            </div>
-        </div>
-        </div>
+        </div><!-- end client info -->
 
         <!-- ===== HISTORIAL DE SERVICIOS ===== -->
         <section class="fade-in-up delay-200">
@@ -402,9 +386,8 @@
             viewModeActions.classList.add('hidden');
             editModeActions.classList.remove('hidden');
 
-            // Ring highlight on cards
+            // Ring highlight on card
             document.getElementById('profileCard').classList.add('ring-2', 'ring-brand/10');
-            document.getElementById('notesCard').classList.add('ring-2', 'ring-brand/10');
 
             setTimeout(() => document.getElementById('inlineNameInput').focus(), 100);
         }
@@ -413,8 +396,6 @@
             // Show view fields, hide edit fields
             document.getElementById('profileViewMode').classList.remove('hidden');
             document.getElementById('profileEditMode').classList.add('hidden');
-            document.getElementById('notesDisplayMode').classList.remove('hidden');
-            document.getElementById('notesEditMode').classList.add('hidden');
 
             // Swap header buttons back
             viewModeActions.classList.remove('hidden');
@@ -422,7 +403,6 @@
 
             // Remove ring
             document.getElementById('profileCard').classList.remove('ring-2', 'ring-brand/10');
-            document.getElementById('notesCard').classList.remove('ring-2', 'ring-brand/10');
         }
 
         editProfileBtn.addEventListener('click', enterEditMode);
@@ -431,14 +411,13 @@
         saveProfileBtn.addEventListener('click', async () => {
             const name = document.getElementById('inlineNameInput').value.trim();
             const phone = document.getElementById('inlinePhoneInput').value.trim();
-            const notes = document.getElementById('inlineNotesInput').value.trim();
 
             saveProfileBtn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Guardando...';
             saveProfileBtn.disabled = true;
 
             const { error } = await supabase
                 .from('clients')
-                .update({ full_name: name, phone, notes })
+                .update({ full_name: name, phone })
                 .eq('id', clientId);
 
             saveProfileBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> Guardar cambios';
