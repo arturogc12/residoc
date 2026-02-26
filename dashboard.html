@@ -382,7 +382,7 @@
                 </button>
             </div>
 
-            <form id="newServiceForm" class="p-8 space-y-5">
+            <form id="newServiceForm" class="p-8 space-y-5 overflow-y-auto max-h-[75vh]">
                 <div class="space-y-2">
                     <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Nombre del
                         cliente</label>
@@ -421,7 +421,53 @@
                     </div>
                 </div>
 
-                <button type="submit"
+                <!-- ── Photo Upload ───────────────────────── -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Fotos del
+                        tratamiento</label>
+
+                    <!-- Upload buttons -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="btnCamera"
+                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-sm font-bold text-slate hover:bg-slate/5 transition-colors">
+                            <i class="ph ph-camera text-brand"></i> Cámara
+                        </button>
+                        <button type="button" id="btnGallery"
+                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-sm font-bold text-slate hover:bg-slate/5 transition-colors">
+                            <i class="ph ph-images text-brand"></i> Galería
+                        </button>
+                    </div>
+
+                    <!-- Hidden file inputs -->
+                    <input type="file" id="inputCamera" accept="image/*" capture="environment" class="hidden" multiple>
+                    <input type="file" id="inputGallery" accept="image/*" class="hidden" multiple>
+
+                    <!-- Preview area -->
+                    <div id="photoPreview" class="hidden flex gap-2 flex-wrap pt-1"></div>
+
+                    <!-- OCR Status -->
+                    <div id="ocrStatus" class="hidden items-center gap-2 text-xs text-slate/50 mt-1">
+                        <div class="w-3 h-3 rounded-full bg-lavender/60 animate-pulse"></div>
+                        <span>Leyendo número de lote con IA…</span>
+                    </div>
+                </div>
+
+                <!-- Batch number (auto-filled or manual) -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest">Número de
+                            lote</label>
+                        <span class="text-[9px] text-brand/60 font-bold uppercase tracking-widest"
+                            id="batchAutoLabel"></span>
+                    </div>
+                    <div class="relative">
+                        <i class="ph ph-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="text" id="custBatch" placeholder="Se completará con la foto o manualmente"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                </div>
+
+                <button type="submit" id="submitServiceBtn"
                     class="w-full bg-brand text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all active:scale-95">
                     Registrar y ver ficha
                 </button>
@@ -434,6 +480,9 @@
     <ul id="clientSuggestions"
         class="hidden fixed z-[200] bg-white border border-slate/10 rounded-2xl shadow-float overflow-hidden text-sm"
         style="min-width:300px"></ul>
+
+    <!-- Tesseract.js OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <script type="module">
         import { supabase } from './supabase.js';
@@ -466,12 +515,23 @@
         const suggestions = document.getElementById('clientSuggestions');
         let _generatedRegId = '';
 
+        const photoPreview = document.getElementById('photoPreview');
+        const ocrStatus = document.getElementById('ocrStatus');
+        const batchAutoLabel = document.getElementById('batchAutoLabel');
+        const custBatchInput = document.getElementById('custBatch');
+        let _selectedFiles = []; // accumulate selected photos
+
         window.openNewService = function () {
-            // Pre-generate reg id silently (not shown in modal)
             const randomId = Math.floor(10000 + Math.random() * 90000);
             _generatedRegId = `#RES-${randomId}`;
 
             newServiceForm.reset();
+            _selectedFiles = [];
+            photoPreview.innerHTML = '';
+            photoPreview.classList.add('hidden');
+            ocrStatus.classList.add('hidden');
+            ocrStatus.classList.remove('flex');
+            batchAutoLabel.textContent = '';
             hideSuggestions();
             newServiceModal.classList.remove('hidden');
             newServiceModal.classList.add('flex');
@@ -536,6 +596,68 @@
             if (!suggestions.contains(e.target) && e.target !== custNameInput) hideSuggestions();
         });
 
+        // ── Photo Handling ────────────────────────────────────────────────────
+        function addFilesToPreview(files) {
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                _selectedFiles.push(file);
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'relative';
+                    wrap.innerHTML = `
+                        <img src="${ev.target.result}" class="w-16 h-16 rounded-xl object-cover border border-slate/10">
+                        <button type="button" class="absolute -top-1.5 -right-1.5 bg-white border border-slate/10 rounded-full w-5 h-5 flex items-center justify-center text-slate/40 hover:text-brand shadow-sm remove-photo">
+                            <i class="ph ph-x text-[10px]"></i>
+                        </button>
+                    `;
+                    wrap.querySelector('.remove-photo').onclick = () => {
+                        _selectedFiles = _selectedFiles.filter(f => f !== file);
+                        wrap.remove();
+                        if (_selectedFiles.length === 0) photoPreview.classList.add('hidden');
+                    };
+                    photoPreview.appendChild(wrap);
+                    photoPreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+                // Run OCR asynchronously
+                runOCR(file);
+            }
+        }
+
+        async function runOCR(file) {
+            if (custBatchInput.value.trim()) return; // don't overwrite manual entry
+            ocrStatus.classList.remove('hidden');
+            ocrStatus.classList.add('flex');
+
+            try {
+                const { data: { text } } = await Tesseract.recognize(file, 'spa+eng', {
+                    logger: () => { }
+                });
+                // Look for batch-like patterns: letters+digits, eg L-2024-99X, LOT:ABC123, etc.
+                const match = text.match(/\b([A-Z]{1,4}[-\/]?\d{3,}[-\/]?[A-Z0-9]{0,6})\b/i);
+                if (match && !custBatchInput.value.trim()) {
+                    custBatchInput.value = match[1].toUpperCase();
+                    batchAutoLabel.textContent = '✓ Detectado con IA';
+                }
+            } catch (err) {
+                console.warn('OCR failed:', err);
+            } finally {
+                ocrStatus.classList.add('hidden');
+                ocrStatus.classList.remove('flex');
+            }
+        }
+
+        document.getElementById('btnCamera').addEventListener('click', () =>
+            document.getElementById('inputCamera').click());
+        document.getElementById('btnGallery').addEventListener('click', () =>
+            document.getElementById('inputGallery').click());
+        document.getElementById('inputCamera').addEventListener('change', e =>
+            addFilesToPreview(Array.from(e.target.files)));
+        document.getElementById('inputGallery').addEventListener('change', e =>
+            addFilesToPreview(Array.from(e.target.files)));
+
         // ── Recent Activity ───────────────────────────────────────────────────
         async function fetchRecentActivity() {
             const { data, error } = await supabase
@@ -593,33 +715,57 @@
             const name = custNameInput.value.trim();
             const dni = custDniInput.value.trim();
             const type = document.getElementById('custService').value;
+            const batch = custBatchInput.value.trim() || null;
 
-            // 1. Upsert client (find or create)
+            const submitBtn = document.getElementById('submitServiceBtn');
+            submitBtn.textContent = 'Guardando...';
+            submitBtn.disabled = true;
+
+            // 1. Upsert client
             let { data: existing } = await supabase
-                .from('clients')
-                .select('id')
-                .eq('dni', dni)
-                .maybeSingle();
+                .from('clients').select('id').eq('dni', dni).maybeSingle();
 
             let clientId;
             if (existing) {
                 clientId = existing.id;
             } else {
                 const { data: created } = await supabase
-                    .from('clients')
-                    .insert({ full_name: name, dni })
-                    .select('id')
-                    .single();
+                    .from('clients').insert({ full_name: name, dni }).select('id').single();
                 clientId = created.id;
             }
 
             // 2. Insert treatment
-            await supabase.from('treatments').insert({
+            const { data: treatment } = await supabase.from('treatments').insert({
                 client_id: clientId,
                 type,
-                batch_number: 'L-2025-' + Math.floor(Math.random() * 900 + 100),
-                registration_id: _generatedRegId
-            });
+                batch_number: batch,
+                registration_id: _generatedRegId,
+                photo_urls: []
+            }).select('id').single();
+
+            // 3. Upload photos to Supabase Storage
+            const uploadedUrls = [];
+            if (_selectedFiles.length > 0 && treatment) {
+                for (const file of _selectedFiles) {
+                    const ext = file.name.split('.').pop();
+                    const path = `${clientId}/${treatment.id}/${Date.now()}.${ext}`;
+                    const { data: uploaded } = await supabase.storage
+                        .from('treatment-photos')
+                        .upload(path, file, { upsert: true });
+                    if (uploaded) {
+                        const { data: { publicUrl } } = supabase.storage
+                            .from('treatment-photos')
+                            .getPublicUrl(path);
+                        uploadedUrls.push(publicUrl);
+                    }
+                }
+                // Update treatment with photo URLs
+                if (uploadedUrls.length > 0) {
+                    await supabase.from('treatments')
+                        .update({ photo_urls: uploadedUrls })
+                        .eq('id', treatment.id);
+                }
+            }
 
             window.location.href = `client-file.html?id=${clientId}`;
         });

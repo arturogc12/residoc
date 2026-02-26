@@ -155,9 +155,10 @@
                     <div
                         class="grid grid-cols-12 gap-4 text-[10px] font-bold text-slate/30 uppercase tracking-widest py-4">
                         <div class="col-span-2">Fecha</div>
-                        <div class="col-span-4">Tratamiento</div>
+                        <div class="col-span-3">Tratamiento</div>
                         <div class="col-span-3">Lote / Producto</div>
                         <div class="col-span-2">ID Registro</div>
+                        <div class="col-span-1 text-center">Fotos</div>
                         <div class="col-span-1 text-right">Acción</div>
                     </div>
 
@@ -167,6 +168,29 @@
             </div>
         </section>
     </main>
+
+    <!-- ===================== PHOTO VIEWER MODAL ===================== -->
+    <div id="photoModal" class="fixed inset-0 z-[200] bg-slate/80 backdrop-blur-sm hidden items-center justify-center"
+        onclick="this.classList.add('hidden');this.classList.remove('flex')">
+        <div class="relative max-w-4xl w-full mx-4" onclick="event.stopPropagation()">
+            <button
+                onclick="document.getElementById('photoModal').classList.add('hidden');document.getElementById('photoModal').classList.remove('flex')"
+                class="absolute -top-12 right-0 text-white/60 hover:text-white text-3xl transition-colors">
+                <i class="ph ph-x"></i>
+            </button>
+            <!-- prev / next -->
+            <button id="photoPrev"
+                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 text-white/60 hover:text-white text-3xl">
+                <i class="ph ph-caret-left"></i>
+            </button>
+            <button id="photoNext"
+                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 text-white/60 hover:text-white text-3xl">
+                <i class="ph ph-caret-right"></i>
+            </button>
+            <img id="photoViewerImg" src="" class="w-full max-h-[80vh] object-contain rounded-3xl shadow-float">
+            <div id="photoCounter" class="text-center text-white/40 text-sm mt-4"></div>
+        </div>
+    </div>
 
     <!-- ===================== EDIT PROFILE MODAL ===================== -->
     <div id="editProfileModal"
@@ -288,9 +312,10 @@
                 const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
                 const row = document.createElement('div');
                 row.className = 'grid grid-cols-12 gap-4 items-center py-4 border-t border-slate/5 hover:bg-cream/50 transition-colors rounded-2xl px-2 group';
+                const photos = item.photo_urls || [];
                 row.innerHTML = `
                     <div class="col-span-2 text-sm font-bold text-slate">${date}</div>
-                    <div class="col-span-4 flex items-center gap-3">
+                    <div class="col-span-3 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-lavender/20 text-slate flex items-center justify-center">
                             <i class="ph ph-eyedropper"></i>
                         </div>
@@ -300,11 +325,46 @@
                         <span class="text-xs font-mono text-slate/50">${item.batch_number || '—'}</span>
                     </div>
                     <div class="col-span-2 text-xs font-mono text-brand font-bold">${item.registration_id}</div>
+                    <div class="col-span-1 text-center">
+                        ${photos.length > 0
+                        ? `<button class="view-photos-btn text-xs bg-lavender/20 text-slate px-2 py-1.5 rounded-lg font-bold flex items-center gap-1 mx-auto hover:bg-lavender/40 transition-colors" data-photos='${JSON.stringify(photos)}'>
+                                <i class="ph ph-images"></i> ${photos.length}
+                               </button>`
+                        : `<span class="text-xs text-slate/20">—</span>`
+                    }
+                    </div>
                     <div class="col-span-1 text-right">
                         <i class="ph ph-dots-three-outline-vertical text-slate/20 group-hover:text-slate transition-colors"></i>
                     </div>
                 `;
                 historyContainer.appendChild(row);
+            });
+
+            // ── Photo Viewer ───────────────────────────────────────────────────
+            let _photoList = [], _photoIdx = 0;
+
+            function openPhotoViewer(photos, startIndex = 0) {
+                _photoList = photos;
+                _photoIdx = startIndex;
+                showPhoto();
+                const modal = document.getElementById('photoModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function showPhoto() {
+                document.getElementById('photoViewerImg').src = _photoList[_photoIdx];
+                document.getElementById('photoCounter').textContent = `${_photoIdx + 1} / ${_photoList.length}`;
+            }
+
+            document.getElementById('photoPrev').onclick = e => { e.stopPropagation(); _photoIdx = (_photoIdx - 1 + _photoList.length) % _photoList.length; showPhoto(); };
+            document.getElementById('photoNext').onclick = e => { e.stopPropagation(); _photoIdx = (_photoIdx + 1) % _photoList.length; showPhoto(); };
+
+            document.getElementById('historyContainer').addEventListener('click', e => {
+                const btn = e.target.closest('.view-photos-btn');
+                if (!btn) return;
+                const photos = JSON.parse(btn.dataset.photos);
+                openPhotoViewer(photos, 0);
             });
             // ── Render notes ──────────────────────────────────────────────────
             currentClient = client;
