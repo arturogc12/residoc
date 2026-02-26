@@ -188,7 +188,7 @@
 
             <div class="flex items-center gap-3 sm:gap-4">
                 <!-- Inline Search -->
-                <div class="relative flex-1 sm:flex-none sm:w-80">
+                <div class="relative flex-1 sm:flex-none sm:w-80 z-50">
                     <div
                         class="bg-white shadow-sm rounded-2xl px-4 sm:px-5 py-1 flex items-center gap-3 border border-slate/5 hover:shadow-soft hover:border-slate/10 transition-all min-h-[44px]">
                         <i class="ph ph-magnifying-glass text-lg text-slate/30"></i>
@@ -205,13 +205,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Notifications -->
-                <button
-                    class="relative w-12 h-12 min-w-[44px] min-h-[44px] bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate/50 hover:text-slate hover:shadow-soft transition-all">
-                    <i class="ph ph-bell text-xl"></i>
-                    <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
             </div>
         </header>
 
@@ -230,7 +223,7 @@
                         <i class="ph ph-trend-up text-sm"></i> +12%
                     </div>
                 </div>
-                <div class="text-3xl font-bold text-slate mb-1">247</div>
+                <div class="text-3xl font-bold text-slate mb-1" id="kpiClients">—</div>
                 <p class="text-sm text-slate/40 font-medium">Clientes activos</p>
             </div>
 
@@ -247,7 +240,7 @@
                         <i class="ph ph-trend-up text-sm"></i> +8%
                     </div>
                 </div>
-                <div class="text-3xl font-bold text-slate mb-1">89</div>
+                <div class="text-3xl font-bold text-slate mb-1" id="kpiServices">—</div>
                 <p class="text-sm text-slate/40 font-medium">Servicios este mes</p>
             </div>
 
@@ -261,7 +254,7 @@
                     </div>
                     <span class="text-xs font-bold text-slate/30 bg-cream px-2.5 py-1 rounded-lg">100% ✓</span>
                 </div>
-                <div class="text-3xl font-bold text-slate mb-1">412</div>
+                <div class="text-3xl font-bold text-slate mb-1" id="kpiBatches">—</div>
                 <p class="text-sm text-slate/40 font-medium">Lotes registrados</p>
             </div>
 
@@ -832,16 +825,40 @@
         document.addEventListener('keydown', e => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
-                searchModal.classList.contains('hidden') ? window.openSearch() : window.closeSearch();
+                inlineSearchInput.focus();
             }
             if (e.key === 'Escape') {
-                window.closeSearch();
+                inlineSearchDropdown.classList.add('hidden');
                 window.closeNewService();
             }
         });
 
+        // ── KPI Stats from Supabase ──────────────────────────────────────────
+        async function fetchKPIs() {
+            // Total clients
+            const { count: clientCount } = await supabase
+                .from('clients').select('*', { count: 'exact', head: true });
+            document.getElementById('kpiClients').textContent = clientCount ?? 0;
+
+            // Services this month
+            const now = new Date();
+            const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+            const { count: monthServices } = await supabase
+                .from('treatments').select('*', { count: 'exact', head: true })
+                .gte('created_at', firstOfMonth);
+            document.getElementById('kpiServices').textContent = monthServices ?? 0;
+
+            // Unique batches
+            const { data: batches } = await supabase
+                .from('treatments').select('batch_number')
+                .not('batch_number', 'is', null);
+            const uniqueBatches = new Set((batches || []).map(b => b.batch_number)).size;
+            document.getElementById('kpiBatches').textContent = uniqueBatches;
+        }
+
         // ── Init ─────────────────────────────────────────────────────────────
         fetchRecentActivity();
+        fetchKPIs();
     </script>
 
 </body>
