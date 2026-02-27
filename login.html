@@ -214,6 +214,13 @@
             Al registrarte aceptas nuestros <a href="#" class="underline hover:text-slate transition-colors">Términos de
                 Uso</a>.
         </p>
+
+        <!-- ── DEV QUICK ACCESS (quitar en producción) ── -->
+        <button id="devLoginBtn"
+            class="mt-4 w-full border border-dashed border-amber-300 bg-amber-50/60 text-amber-700 py-3 rounded-2xl text-sm font-bold hover:bg-amber-100 transition-colors flex items-center justify-center gap-2">
+            <i class="ph ph-lightning text-lg"></i>
+            Acceso rápido de prueba (test@test.com)
+        </button>
     </div>
 
     <script type="module">
@@ -356,6 +363,13 @@
                 options: { redirectTo: window.location.origin + '/login.html' }
             });
             if (error) showError('loginError', error.message);
+        });
+
+        // ── DEV QUICK LOGIN ──────────────────────────────────────────────────
+        document.getElementById('devLoginBtn').addEventListener('click', async () => {
+            document.getElementById('email').value = 'test@test.com';
+            document.getElementById('password').value = 'test1234';
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
         });
     </script>
     </body>
