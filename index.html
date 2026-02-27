@@ -122,132 +122,128 @@
         </div>
     </nav>
 
-    <section
-        class="pt-32 pb-32 px-6 overflow-hidden relative bg-gradient-to-b from-[#daebfc] to-[#eef5fd] lg:min-h-[90vh] flex flex-col justify-center">
-        <!-- Decorativa de fondo -->
-        <!-- <div class="absolute top-20 left-10 w-64 h-64 bg-mint/30 rounded-full blur-3xl -z-10"></div> -->
-        <!-- <div class="absolute bottom-10 right-20 w-80 h-80 bg-lavender/30 rounded-full blur-3xl -z-10"></div> -->
+    <section id="hero"
+        class="pt-32 pb-48 px-6 overflow-hidden relative bg-gradient-to-b from-[#daebfc] to-[#eef5fd] min-h-[95vh] flex flex-col items-center justify-center text-center">
 
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+        <div class="max-w-4xl mx-auto fade-in-up">
+            <!-- Badge Superior -->
+            <div
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white shadow-sm text-sm font-medium mb-12 text-slate/70">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                Las inspecciones crecieron un 30% en 2025
+            </div>
 
-            <!-- Texto -->
-            <div class="max-w-xl fade-in-up md:pl-8">
-                <div
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white shadow-sm text-sm font-medium mb-12 text-slate/70">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    Las inspecciones crecieron un 30% en 2025
+            <!-- Titulo Centrado -->
+            <h1 class="text-6xl md:text-[85px] font-bold leading-[1] mb-8 tracking-tight text-[#1a1c23]">
+                ¿Cuánto te costaría una
+                <br>
+                <span class="text-brand">inspección hoy?</span>
+            </h1>
+
+            <!-- Descripción Centrada -->
+            <p class="text-xl md:text-[22px] text-slate/60 mb-12 leading-relaxed font-light max-w-2xl mx-auto">
+                No tener el lote registrado no es un descuido, es una infracción grave.
+                Garantiza el cumplimiento legal de tu centro sin fricción operativa.
+            </p>
+
+            <!-- Acciones Centradas -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+                <a href="#"
+                    class="bg-black text-white px-10 py-4 rounded-xl font-medium text-[16px] hover:-translate-y-1 transition flex items-center justify-center gap-2 shadow-lg">
+                    Empezar gratis ahora <i class="ph ph-arrow-right"></i>
+                </a>
+                <a href="#como-funciona"
+                    class="bg-white/50 text-[#2c3e50] border border-slate/10 font-semibold px-10 py-4 rounded-xl text-[16px] hover:bg-white transition flex items-center justify-center gap-2">
+                    Ver cómo funciona <i class="ph ph-play-circle text-xl"></i>
+                </a>
+            </div>
+
+            <!-- Prueba Social Centrada (Estilo Holded) -->
+            <div class="flex items-center justify-center gap-4 text-sm text-slate/50 mb-20">
+                <div class="flex items-center gap-1 text-yellow-400">
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star-half"></i>
+                </div>
+                <span class="font-medium text-slate">Excelente</span>
+                <span class="w-1 h-1 rounded-full bg-slate/20"></span>
+                <span>+2.500 reseñas en Trustpilot</span>
+            </div>
+        </div>
+
+        <!-- Dashboard Mockup Central -->
+        <div class="max-w-5xl w-full mx-auto relative fade-in-up delay-200 px-4">
+            <!-- Marco de Navegador / PC -->
+            <div
+                class="relative z-10 bg-white rounded-2xl shadow-float border border-slate/10 overflow-hidden group hover:scale-[1.01] transition-all duration-700">
+                <!-- Barra de Título del Navegador -->
+                <div class="bg-slate/5 border-b border-slate/10 px-4 py-3 flex items-center justify-between">
+                    <div class="flex gap-1.5" id="browserControls">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#FF5F57]"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#27C93F]"></div>
+                    </div>
+                    <div
+                        class="flex items-center gap-2 bg-white/50 px-3 py-1 rounded-md border border-slate/5 text-[10px] text-slate/40 font-medium">
+                        <i class="ph ph-lock-key text-[#27C93F]"></i> app.residoc.io
+                    </div>
+                    <div class="w-10"></div>
                 </div>
 
-                <h1 class="text-6xl md:text-[80px] font-bold leading-[1.05] mb-8 tracking-tight text-[#1a1c23]">
-                    ¿Cuánto te costaría una
-                    <br>
-                    <span class="text-brand">
-                        inspección hoy?
-                    </span>
-                </h1>
-
-                <p class="text-xl md:text-[22px] text-slate/60 mb-10 leading-relaxed font-light max-w-md">
-                    No tener el lote registrado no es un descuido, es una infracción grave según la normativa.
-                    Cumplimiento legal garantizado sin fricción operativa.
-                </p>
-
-
-
-
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="#"
-                        class="bg-black text-white px-8 py-3.5 rounded-xl font-medium text-[15px] hover:-translate-y-0.5 transition flex items-center justify-center gap-2 shadow-sm">
-                        Prueba gratuita de 14 días <i class="ph ph-arrow-right"></i>
-                    </a>
-                    <a href="#como-funciona"
-                        class="bg-[#d2e3f5] text-[#2c3e50] font-semibold px-8 py-3.5 rounded-xl text-[15px] hover:bg-[#c2d7ed] transition flex items-center justify-center gap-2">
-                        Ver cómo funciona <i class="ph ph-arrow-right font-bold"></i>
-                    </a>
+                <!-- Imagen del Dashboard -->
+                <div class="relative aspect-video overflow-hidden">
+                    <img src="./assets/dashboard_mockup.png" alt="Residoc Dashboard" class="w-full h-auto object-cover">
+                    <!-- Overlay suave -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-none"></div>
                 </div>
             </div>
 
-            <!-- Dashboard Mockup Ilustrativo -->
-            <div class="relative fade-in-up delay-200">
-                <!-- Fondo patrón puntos -->
-                <div class="absolute inset-0 z-0 opacity-20"
-                    style="background-image: radial-gradient(#4A4E69 1px, transparent 1px); background-size: 20px 20px;">
-                </div>
-
-                <!-- Ventana Dashboard -->
-                <div class="relative z-10 bg-white rounded-[32px] p-2 shadow-float border border-slate/5 flex">
-                    <!-- Sidebar -->
-                    <div class="w-16 bg-slate rounded-[24px] flex flex-col items-center py-6 gap-6 text-cream/70">
-                        <div
-                            class="w-8 h-8 rounded-full bg-mint flex items-center justify-center text-slate font-bold mb-4">
-                            R</div>
-                        <i class="ph-fill ph-house text-2xl text-cream"></i>
-                        <i class="ph ph-users text-2xl hover:text-cream cursor-pointer transition"></i>
-                        <i class="ph ph-package text-2xl hover:text-cream cursor-pointer transition"></i>
-                        <i class="ph ph-chart-bar text-2xl hover:text-cream cursor-pointer transition"></i>
-                        <div class="mt-auto">
-                            <img src="https://ui-avatars.com/api/?name=Doc+A&background=E2C2FF&color=4A4E69" alt="User"
-                                class="w-8 h-8 rounded-full border-2 border-slate">
-                        </div>
-                    </div>
-
-                    <!-- Main Content Panel -->
-                    <div class="flex-1 bg-cream/30 rounded-[24px] ml-2 p-6 overflow-hidden">
-                        <div class="flex justify-between items-center mb-6">
-                            <div>
-                                <h3 class="font-bold text-lg">Hola, Dra. Elena</h3>
-                            </div>
-                            <!-- Barra de búsqueda estilo Spotlight -->
-                            <div
-                                class="bg-white shadow-sm rounded-full px-4 py-2 flex items-center gap-2 text-sm text-slate/50 border border-slate/10 w-64">
-                                <i class="ph ph-magnifying-glass"></i>
-                                <span>Buscar cliente o lote...</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <!-- Tarjeta de Estado -->
-                            <div
-                                class="bg-white rounded-2xl p-4 shadow-sm border border-slate/5 col-span-2 relative overflow-hidden">
-                                <div class="absolute right-0 top-0 w-32 h-32 bg-mint/10 rounded-bl-full -z-10"></div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="text-sm font-medium">Buscador Inverso Activo</span>
-                                    <i class="ph ph-shield-check text-xl text-mint"></i>
-                                </div>
-                                <div class="text-3xl font-bold flex items-end gap-2">
-                                    100% <span class="text-sm text-slate/50 font-normal mb-1">Lotes verificados</span>
-                                </div>
-
-                                <div class="mt-4 flex gap-2">
-                                    <div class="flex-1 h-1.5 bg-mint rounded-full"></div>
-                                    <div class="flex-1 h-1.5 bg-mint/30 rounded-full"></div>
-                                </div>
-                            </div>
-
-                            <!-- Cliente Reciente -->
-                            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate/5 relative">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <img src="https://ui-avatars.com/api/?name=Maria+G&background=B8D8D8&color=4A4E69"
-                                        class="w-8 h-8 rounded-full">
-                                    <div>
-                                        <div class="text-sm font-bold">María Gómez</div>
-                                        <div class="text-xs text-slate/50">Hace 45 min</div>
-                                    </div>
-                                </div>
-                                <div
-                                    class="text-xs bg-lavender/30 text-slate px-2 py-1 rounded-md inline-flex items-center gap-1 font-medium">
-                                    <i class="ph ph-eyedropper text-lavender"></i> Ácido Hialurónico
-                                </div>
-                                <div class="mt-2 text-[10px] text-slate/50 flex items-center gap-1">
-                                    <i class="ph ph-barcode"></i> Lote: L-2024-99X
-                                </div>
-                            </div>
-                        </div>
+            <!-- Badge de Ley Circulante (Flotante) -->
+            <div class="absolute -top-12 -right-12 z-20 w-32 h-32 flex items-center justify-center animate-spin-slow">
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
+                        fill="transparent" />
+                    <text class="text-[8px] font-bold uppercase tracking-[0.1em] fill-slate/40">
+                        <textPath xlink:href="#circlePath">
+                            Cumple Ley 7/2022 • RD 192/2023 • Trazabilidad Total •
+                        </textPath>
+                    </text>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div
+                        class="w-16 h-16 rounded-full bg-brand text-white flex items-center justify-center shadow-lg transform -rotate-12 group-hover:rotate-0 transition-transform">
+                        <i class="ph-fill ph-check-circle text-3xl"></i>
                     </div>
                 </div>
             </div>
+
+            <!-- Texto Complementario del Badge -->
+            <div
+                class="absolute -top-4 -right-24 z-30 hidden lg:block bg-white px-4 py-2 rounded-xl shadow-xl border border-slate/10 pointer-events-none fade-in-up">
+                <p class="text-[11px] font-bold text-slate leading-tight uppercase">Sigue la normativa<br><span
+                        class="text-brand">Vigente 2025</span></p>
+            </div>
         </div>
-        </div>
+
+        <style>
+            .animate-spin-slow {
+                animation: spin 12s linear infinite;
+            }
+
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
     </section>
+
 
 
     <!-- Core Features / How it works -->
