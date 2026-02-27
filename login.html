@@ -196,16 +196,39 @@
             }
         });
 
-        // Email login (placeholder for actual implementation)
+        // Email login (Functional implementation)
         const loginForm = document.querySelector('form');
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const submitBtnText = submitBtn.innerHTML;
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // For now, let's just show a message that they should use Google
-            // or implement real Supabase email auth here if requested.
-            alert('Por ahora use el botón de Google para mayor seguridad.');
+            try {
+                // Set loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin mr-2"></i> Iniciando sesión...';
+
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+
+                if (error) throw error;
+
+                if (data.session) {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Error al iniciar sesión: ' + (error.message === 'Invalid login credentials' ? 'Credenciales inválidas' : error.message));
+
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = submitBtnText;
+            }
         });
     </script>
     </body>
