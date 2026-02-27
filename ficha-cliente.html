@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residoc | Ficha de cliente</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase Client -->
+    <script type="module" src="./supabase.js"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#4A90E2',
+                        slate: '#2D3436',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        cream: '#F9F7F2',
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+                        'float': '0 20px 50px -12px rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F9F7F2;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="mainNav"></nav>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+
+        <!-- ===== HEADER (Back to Dashboard) ===== -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-10 gap-4 fade-in-up">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <button onclick="window.location.href='dashboard.html'"
+                    class="w-12 h-12 min-w-[44px] min-h-[44px] bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate hover:text-brand hover:shadow-soft transition-all group">
+                    <i class="ph ph-arrow-left text-xl group-hover:-translate-x-1 transition-transform"></i>
+                </button>
+                <div>
+                    <p class="text-sm text-slate/40 font-medium mb-1">Ficha de cliente</p>
+                    <h1 class="text-xl sm:text-3xl font-bold text-slate tracking-tight" id="clientNameHeader">
+                        Cargando...</h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3" id="headerActions">
+                <!-- View mode -->
+                <div id="viewModeActions" class="flex items-center gap-3">
+                    <button id="editProfileBtn"
+                        class="bg-white px-4 sm:px-5 py-3 rounded-2xl shadow-sm border border-slate/5 text-sm font-bold text-slate hover:shadow-soft transition-all flex items-center gap-2 min-h-[44px]">
+                        <i class="ph ph-note-pencil"></i> <span class="hidden sm:inline">Editar perfil</span><span
+                            class="sm:hidden">Editar</span>
+                    </button>
+                    <button id="cfOpenServiceBtn"
+                        class="bg-brand text-white px-4 sm:px-5 py-3 rounded-2xl shadow-sm font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all flex items-center gap-2 min-h-[44px]">
+                        <i class="ph ph-plus"></i> <span class="hidden sm:inline">Nuevo servicio</span><span
+                            class="sm:hidden">Nuevo</span>
+                    </button>
+                </div>
+                <!-- Edit mode (hidden by default) -->
+                <div id="editModeActions" class="hidden flex items-center gap-3">
+                    <button id="cancelEditBtn"
+                        class="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate/5 text-sm font-bold text-slate hover:shadow-soft transition-all flex items-center gap-2">
+                        <i class="ph ph-x"></i> Cancelar
+                    </button>
+                    <button id="saveProfileBtn"
+                        class="bg-brand text-white px-5 py-3 rounded-2xl shadow-sm font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <i class="ph ph-floppy-disk"></i> Guardar cambios
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== CLIENT INFO GRID ===== -->
+        <div class="mb-16 fade-in-up delay-100">
+            <!-- Basic Details -->
+            <div class="col-span-2 bg-white rounded-[32px] p-8 shadow-sm border border-slate/5 transition-all"
+                id="profileCard">
+                <div class="flex items-center gap-6 mb-8">
+                    <img id="clientAvatar"
+                        src="https://ui-avatars.com/api/?name=Loading&background=B8D8D8&color=4A4E69&bold=true&size=128"
+                        class="w-16 sm:w-24 h-16 sm:h-24 rounded-2xl sm:rounded-3xl object-cover shadow-sm flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <!-- View mode -->
+                        <div id="profileViewMode">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h2 class="text-xl font-bold text-slate" id="clientNameTitle">—</h2>
+                                <span
+                                    class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-green-100">Activo</span>
+                            </div>
+                            <div class="flex items-center gap-4 text-sm text-slate/40" id="clientMeta">
+                                <span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i>
+                                    —</span>
+                                <span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> —</span>
+                            </div>
+                        </div>
+                        <!-- Edit mode (hidden by default) -->
+                        <div id="profileEditMode" class="hidden space-y-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label
+                                        class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Nombre
+                                        completo</label>
+                                    <input id="inlineNameInput" type="text"
+                                        class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 px-4 text-sm font-bold text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
+                                </div>
+                                <div>
+                                    <label
+                                        class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Teléfono</label>
+                                    <input id="inlinePhoneInput" type="tel"
+                                        class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 px-4 text-sm font-medium text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label
+                                        class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Fecha
+                                        Nacimiento</label>
+                                    <input id="inlineBirthInput" type="date"
+                                        class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 px-4 text-sm font-medium text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
+                                </div>
+                                <div>
+                                    <label
+                                        class="text-[10px] font-bold text-slate/30 uppercase tracking-widest block mb-1">Dirección</label>
+                                    <input id="inlineAddressInput" type="text" placeholder="Calle, ciudad, CP"
+                                        class="w-full bg-cream border border-slate/10 rounded-xl py-2.5 px-4 text-sm font-medium text-slate outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-slate/5">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Última visita</p>
+                        <p class="text-sm font-bold text-slate" id="lastVisitDate">—</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Total servicios
+                        </p>
+                        <p class="text-sm font-bold text-slate" id="totalServices">—</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Cliente desde</p>
+                        <p class="text-sm font-bold text-slate" id="memberSince">—</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HISTORIAL DE SERVICIOS ===== -->
+        <section class="fade-in-up delay-200">
+            <div class="bg-white rounded-[32px] shadow-sm border border-slate/5 overflow-hidden">
+                <div class="px-8 py-7 flex items-center justify-between border-b border-slate/5">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate">Historial de tratamientos</h2>
+                        <p class="text-sm text-slate/40 mt-0.5">Trazabilidad completa por servicio</p>
+                    </div>
+                    <button id="exportPdfBtn"
+                        class="text-sm font-bold text-brand flex items-center gap-2 hover:gap-3 transition-all">
+                        Exportar historial (PDF) <i class="ph ph-file-pdf"></i>
+                    </button>
+                </div>
+
+                <div class="px-8 pb-4">
+                    <!-- Table Header -->
+                    <div
+                        class="grid grid-cols-12 gap-4 text-[10px] font-bold text-slate/30 uppercase tracking-widest py-4">
+                        <div class="col-span-2">Fecha</div>
+                        <div class="col-span-4">Tratamiento</div>
+                        <div class="col-span-4">Lote / Producto</div>
+                        <div class="col-span-1 text-center">Fotos</div>
+                        <div class="col-span-1 text-right">Acción</div>
+                    </div>
+
+                    <!-- History Rows will be injected by JS -->
+                    <div class="space-y-1" id="historyContainer"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== PHOTO VIEWER MODAL ===================== -->
+    <div id="photoModal" class="fixed inset-0 z-[200] bg-slate/80 backdrop-blur-sm hidden items-center justify-center"
+        onclick="this.classList.add('hidden');this.classList.remove('flex')">
+        <div class="relative max-w-4xl w-full mx-4" onclick="event.stopPropagation()">
+            <button
+                onclick="document.getElementById('photoModal').classList.add('hidden');document.getElementById('photoModal').classList.remove('flex')"
+                class="absolute -top-12 right-0 text-white/60 hover:text-white text-3xl transition-colors">
+                <i class="ph ph-x"></i>
+            </button>
+            <button id="photoPrev"
+                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 text-white/60 hover:text-white text-3xl"><i
+                    class="ph ph-caret-left"></i></button>
+            <button id="photoNext"
+                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 text-white/60 hover:text-white text-3xl"><i
+                    class="ph ph-caret-right"></i></button>
+            <img id="photoViewerImg" src="" class="w-full max-h-[80vh] object-contain rounded-3xl shadow-float">
+            <div id="photoCounter" class="text-center text-white/40 text-sm mt-4"></div>
+        </div>
+    </div>
+
+    <!-- ===================== NEW SERVICE MODAL ===================== -->
+    <div id="cfNewServiceModal"
+        class="fixed inset-0 z-[100] bg-slate/20 backdrop-blur-sm hidden items-start justify-center pt-[10vh]">
+        <div
+            class="bg-white rounded-[32px] shadow-float w-full max-w-lg mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
+            <div class="px-8 py-6 border-b border-slate/5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate">Nuevo servicio</h2>
+                    <p class="text-xs text-slate/40 mt-1" id="cfServiceClientLabel">Registrar tratamiento</p>
+                </div>
+                <button id="cfCloseService"
+                    class="text-slate/20 hover:text-slate transition-colors text-2xl min-w-[44px] min-h-[44px] flex items-center justify-center"><i
+                        class="ph ph-x"></i></button>
+            </div>
+            <form id="cfNewServiceForm" class="p-8 space-y-5 overflow-y-auto max-h-[75vh]">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Tipo de
+                        servicio</label>
+                    <div class="relative">
+                        <i class="ph ph-eyedropper absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <select id="cfServiceType" required
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate appearance-none">
+                            <option value="">Selecciona un servicio...</option>
+                            <option>Ácido Hialurónico</option>
+                            <option>Botox</option>
+                            <option>Microblading</option>
+                            <option>Micropigmentación</option>
+                            <option>Peeling Químico</option>
+                            <option>Mesoterapia</option>
+                            <option>Plasma Rico en Plaquetas</option>
+                            <option>Tatuaje</option>
+                            <option>Láser</option>
+                            <option>Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Producto /
+                            Marca</label>
+                        <input type="text" id="cfProductName" placeholder="Ej: Juvederm"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Caducidad</label>
+                        <input type="date" id="cfProductExpiry"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Ciclo
+                        Esterilización (si aplica)</label>
+                    <input type="text" id="cfSterilization" placeholder="Nº de ciclo o autoclave"
+                        class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                </div>
+                <!-- Photos -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Evidencia clínica
+                        (Fotos)</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="cfBtnCamera"
+                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-xs font-bold text-slate hover:bg-slate/5 transition-colors min-h-[44px]"><i
+                                class="ph ph-camera text-brand"></i> Cámara</button>
+                        <button type="button" id="cfBtnGallery"
+                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-xs font-bold text-slate hover:bg-slate/5 transition-colors min-h-[44px]"><i
+                                class="ph ph-images text-brand"></i> Galería</button>
+                    </div>
+                    <input type="file" id="cfInputCamera" accept="image/*" capture="environment" class="hidden"
+                        multiple>
+                    <input type="file" id="cfInputGallery" accept="image/*" class="hidden" multiple>
+                    <div id="cfPhotoPreview" class="hidden flex gap-2 flex-wrap pt-1"></div>
+                    <div id="cfOcrStatus" class="hidden items-center gap-2 text-xs text-slate/50 mt-1">
+                        <div class="w-3 h-3 rounded-full bg-lavender/60 animate-pulse"></div><span>Leyendo
+                            lote...</span>
+                    </div>
+                </div>
+
+                <!-- Consent Form Photo -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Consentimiento
+                        Formado (Firma)</label>
+                    <button type="button" id="cfBtnConsent"
+                        class="w-full flex items-center justify-center gap-2 py-3.5 bg-brand/5 border border-brand/10 rounded-2xl text-xs font-bold text-brand hover:bg-brand/10 transition-colors">
+                        <i class="ph ph-signature"></i> Subir foto del documento firmado
+                    </button>
+                    <input type="file" id="cfInputConsent" accept="image/*" capture="environment" class="hidden">
+                    <div id="cfConsentPreview" class="hidden pt-1"></div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Número de
+                        lote</label>
+                    <div class="relative">
+                        <i class="ph ph-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="text" id="cfBatchInput" placeholder="Foto, escáner o manual"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                </div>
+                <button type="submit" id="cfSubmitBtn"
+                    class="w-full bg-brand text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all active:scale-95 min-h-[44px]">Registrar
+                    servicio</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tesseract.js OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        let currentCompanyId = null;
+        let currentClient = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id');
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                console.log("Acceso sin sesión permitido (bypass temporal).");
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                fetchClientData();
+                return;
+            }
+            const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
+            if (!profile) { window.location.href = 'onboarding.html'; return; }
+            currentCompanyId = profile.company_id;
+            fetchClientData();
+        }
+
+        async function fetchClientData() {
+            if (!clientId) return;
+            const { data: client } = await supabase.from('clients').select('*').eq('id', clientId).eq('company_id', currentCompanyId).single();
+            if (!client) { document.getElementById('clientNameHeader').textContent = 'No encontrado'; return; }
+            currentClient = client;
+            document.getElementById('clientNameHeader').textContent = client.full_name;
+            document.getElementById('clientNameTitle').textContent = client.full_name;
+            document.getElementById('clientAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(client.full_name)}&background=B8D8D8&color=4A4E69&bold=true&size=128`;
+            document.getElementById('clientMeta').innerHTML = `<span class="flex items-center gap-1.5"><i class="ph ph-identification-card"></i> ${client.dni}</span><span class="flex items-center gap-1.5"><i class="ph ph-phone"></i> ${client.phone || '—'}</span>`;
+            document.getElementById('memberSince').textContent = new Date(client.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            const { data: treatments } = await supabase.from('treatments').select('*').eq('client_id', clientId).eq('company_id', currentCompanyId).order('created_at', { ascending: false });
+            document.getElementById('totalServices').textContent = treatments?.length || 0;
+            document.getElementById('lastVisitDate').textContent = treatments?.length > 0 ? new Date(treatments[0].created_at).toLocaleDateString() : '—';
+
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = '';
+            treatments?.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center py-4 border-t border-slate/5 hover:bg-cream/50 transition-colors rounded-2xl px-2 group';
+
+                const date = new Date(item.created_at).toLocaleDateString();
+                const productInfo = item.product_name ? `<div class="text-[10px] text-slate/40 italic">${item.product_name} ${item.product_brand || ''}</div>` : '';
+                const expiryInfo = item.product_expiry ? `<div class="text-[10px] text-amber-600/60 font-medium">CAD: ${new Date(item.product_expiry).toLocaleDateString()}</div>` : '';
+
+                row.innerHTML = `<div class="col-span-2 text-sm font-bold text-slate">${date}</div>
+                    <div class="col-span-4 min-w-0">
+                        <div class="text-sm font-bold text-slate truncate hover:text-brand cursor-pointer" onclick="window.location.href='listado-servicios.html?type=${encodeURIComponent(item.type)}'">${item.type}</div>
+                        ${productInfo}
+                    </div>
+                    <div class="col-span-4">
+                        <div class="font-mono text-xs text-slate underline decoration-slate/10 hover:text-brand cursor-pointer" onclick="window.location.href='ficha-lotes.html?batch=${encodeURIComponent(item.batch_number)}'">${item.batch_number || '—'}</div>
+                        ${expiryInfo}
+                    </div>
+                    <div class="col-span-1 text-center">${item.photo_urls?.length > 0 ? `<button class="view-photos-btn text-brand" data-photos='${JSON.stringify(item.photo_urls)}'><i class="ph ph-images"></i> ${item.photo_urls.length}</button>` : '—'}</div>
+                    <div class="col-span-1 text-right flex justify-end gap-2">
+                        ${item.consent_photo_url ? `<i class="ph ph-signature-bold text-brand" title="Firma OK"></i>` : ''}
+                        <i class="ph ph-dots-three-outline text-slate/20"></i>
+                    </div>`;
+                container.appendChild(row);
+            });
+        }
+
+        checkSession();
+
+        // ── Inline Edit ───────────────────────────────────────────────────────
+        document.getElementById('editProfileBtn').onclick = () => {
+            document.getElementById('inlineNameInput').value = currentClient?.full_name || '';
+            document.getElementById('inlinePhoneInput').value = currentClient?.phone || '';
+            document.getElementById('inlineBirthInput').value = currentClient?.birth_date || '';
+            document.getElementById('inlineAddressInput').value = currentClient?.address || '';
+            document.getElementById('profileViewMode').classList.add('hidden');
+            document.getElementById('profileEditMode').classList.remove('hidden');
+            document.getElementById('viewModeActions').classList.add('hidden');
+            document.getElementById('editModeActions').classList.remove('hidden');
+        };
+        document.getElementById('cancelEditBtn').onclick = () => {
+            document.getElementById('profileViewMode').classList.remove('hidden');
+            document.getElementById('profileEditMode').classList.add('hidden');
+            document.getElementById('viewModeActions').classList.remove('hidden');
+            document.getElementById('editModeActions').classList.add('hidden');
+        };
+        document.getElementById('saveProfileBtn').onclick = async () => {
+            const name = document.getElementById('inlineNameInput').value.trim();
+            const phone = document.getElementById('inlinePhoneInput').value.trim();
+            const birth_date = document.getElementById('inlineBirthInput').value || null;
+            const address = document.getElementById('inlineAddressInput').value.trim() || null;
+
+            await supabase.from('clients').update({
+                full_name: name,
+                phone,
+                birth_date,
+                address
+            }).eq('id', clientId).eq('company_id', currentCompanyId);
+
+            fetchClientData();
+            document.getElementById('cancelEditBtn').click();
+        };
+
+        // ── New Service ───────────────────────────────────────────────────────
+        const cfModal = document.getElementById('cfNewServiceModal');
+        const cfForm = document.getElementById('cfNewServiceForm');
+        let cfSelectedFiles = [];
+        document.getElementById('cfOpenServiceBtn').onclick = () => { cfModal.classList.remove('hidden'); cfModal.classList.add('flex'); };
+        document.getElementById('cfCloseService').onclick = () => { cfModal.classList.add('hidden'); cfModal.classList.remove('flex'); };
+
+        document.getElementById('cfBtnCamera').onclick = () => document.getElementById('cfInputCamera').click();
+        document.getElementById('cfBtnGallery').onclick = () => document.getElementById('cfInputGallery').click();
+
+        function handleCfFiles(files) {
+            const preview = document.getElementById('cfPhotoPreview');
+            for (const file of files) {
+                cfSelectedFiles.push(file);
+                const thumb = document.createElement('div');
+                thumb.className = 'w-16 h-16 rounded-xl overflow-hidden border border-slate/10';
+                thumb.innerHTML = `<img src="${URL.createObjectURL(file)}" class="w-full h-full object-cover">`;
+                preview.appendChild(thumb);
+            }
+            preview.classList.remove('hidden');
+            if (cfSelectedFiles.length === 1) {
+                Tesseract.recognize(cfSelectedFiles[0], 'eng').then(({ data }) => {
+                    const match = data.text.match(/[A-Z0-9]{2,}[-/][A-Z0-9]{2,}/i);
+                    if (match) document.getElementById('cfBatchInput').value = match[0];
+                });
+            }
+        }
+        document.getElementById('cfInputCamera').onchange = e => handleCfFiles(e.target.files);
+        document.getElementById('cfInputGallery').onchange = e => handleCfFiles(e.target.files);
+
+        // Consent photo logic
+        let cfConsentFile = null;
+        document.getElementById('cfBtnConsent').onclick = () => document.getElementById('cfInputConsent').click();
+        document.getElementById('cfInputConsent').onchange = e => {
+            if (e.target.files.length > 0) {
+                cfConsentFile = e.target.files[0];
+                const preview = document.getElementById('cfConsentPreview');
+                preview.innerHTML = `<div class="w-16 h-16 rounded-xl overflow-hidden border border-brand/20"><img src="${URL.createObjectURL(cfConsentFile)}" class="w-full h-full object-cover"></div>`;
+                preview.classList.remove('hidden');
+            }
+        };
+
+        cfForm.onsubmit = async e => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('cfSubmitBtn');
+            submitBtn.disabled = true; submitBtn.textContent = 'Guardando...';
+
+            try {
+                // Upload treatment photos
+                const urls = [];
+                for (const file of cfSelectedFiles) {
+                    const path = `${clientId}/${Date.now()}_${file.name}`;
+                    const { error } = await supabase.storage.from('treatment-photos').upload(path, file);
+                    if (!error) urls.push(supabase.storage.from('treatment-photos').getPublicUrl(path).data.publicUrl);
+                }
+
+                // Upload consent photo if exists
+                let consentUrl = null;
+                if (cfConsentFile) {
+                    const path = `${clientId}/consent_${Date.now()}_${cfConsentFile.name}`;
+                    const { error } = await supabase.storage.from('treatment-photos').upload(path, cfConsentFile);
+                    if (!error) consentUrl = supabase.storage.from('treatment-photos').getPublicUrl(path).data.publicUrl;
+                }
+
+                const { data: { user } } = await supabase.auth.getUser();
+
+                const { error } = await supabase.from('treatments').insert({
+                    client_id: clientId,
+                    company_id: currentCompanyId,
+                    technician_id: user?.id || null,
+                    type: document.getElementById('cfServiceType').value,
+                    batch_number: document.getElementById('cfBatchInput').value,
+                    product_name: document.getElementById('cfProductName').value,
+                    product_expiry: document.getElementById('cfProductExpiry').value || null,
+                    sterilization_cycle: document.getElementById('cfSterilization').value,
+                    registration_id: `#RES-${Math.floor(Math.random() * 90000)}`,
+                    photo_urls: urls,
+                    consent_photo_url: consentUrl
+                });
+
+                if (error) throw error;
+
+                cfModal.classList.add('hidden');
+                cfForm.reset();
+                cfSelectedFiles = [];
+                cfConsentFile = null;
+                document.getElementById('cfPhotoPreview').innerHTML = '';
+                document.getElementById('cfConsentPreview').innerHTML = '';
+                fetchClientData();
+            } catch (err) {
+                console.error(err);
+                alert('Error al guardar el servicio: ' + err.message);
+            } finally {
+                submitBtn.disabled = false; submitBtn.textContent = 'Registrar Servicio';
+            }
+        };
+
+        // Photo Viewer logic
+        document.getElementById('historyContainer').onclick = e => {
+            const btn = e.target.closest('.view-photos-btn');
+            if (!btn) return;
+            const photos = JSON.parse(btn.dataset.photos);
+            document.getElementById('photoViewerImg').src = photos[0];
+            document.getElementById('photoModal').classList.remove('hidden');
+            document.getElementById('photoModal').classList.add('flex');
+        };
+
+        // ── PDF Export ────────────────────────────────────────────────────────
+        document.getElementById('exportPdfBtn').onclick = () => {
+            const element = document.querySelector('main');
+            const opt = {
+                margin: 10,
+                filename: `Historial_${currentClient.full_name.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Hide buttons during export
+            const actions = document.getElementById('headerActions');
+            const backBtn = document.querySelector('header button');
+            const exportBtn = document.getElementById('exportPdfBtn');
+
+            actions.style.display = 'none';
+            backBtn.style.display = 'none';
+            exportBtn.style.display = 'none';
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                actions.style.display = 'flex';
+                backBtn.style.display = 'flex';
+                exportBtn.style.display = 'flex';
+            });
+        };
+    </script>
+    <!-- Navigation Logic -->
+    <script src="./navigation.js"></script>
+</body>
+
+</html>

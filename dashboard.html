@@ -173,8 +173,8 @@
 </head>
 
 <body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
-
-
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="mainNav"></nav>
 
     <!-- ===================== MAIN CONTENT ===================== -->
     <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
@@ -183,26 +183,29 @@
         <header
             class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4 fade-in-up relative z-50">
             <div>
-                <p class="text-sm text-slate/40 font-medium mb-1">26 de febrero, 2026</p>
-                <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight">Hola, Dra. Elena 👋</h1>
+                <p class="text-sm text-slate/40 font-medium mb-1" id="todayDate"></p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight" id="userGreeting">Hola 👋</h1>
             </div>
 
             <div class="flex items-center gap-3 sm:gap-4">
                 <!-- Inline Search -->
-                <div class="relative flex-1 sm:flex-none sm:w-80 z-50">
+                <div class="relative flex-1 sm:flex-none sm:w-80 z-50 group">
                     <div
-                        class="bg-white shadow-sm rounded-2xl px-4 sm:px-5 py-1 flex items-center gap-3 border border-slate/5 hover:shadow-soft hover:border-slate/10 transition-all min-h-[44px]">
-                        <i class="ph ph-magnifying-glass text-lg text-slate/30"></i>
+                        class="bg-white/80 backdrop-blur-xl shadow-sm rounded-2xl px-4 sm:px-5 py-1 flex items-center gap-3 border border-slate/5 group-focus-within:border-brand/30 group-focus-within:shadow-[0_0_20px_rgba(74,144,226,0.1)] transition-all min-h-[44px]">
+                        <i
+                            class="ph ph-magnifying-glass text-lg text-slate/30 group-focus-within:text-brand transition-colors"></i>
                         <input type="text" id="inlineSearchInput" placeholder="Buscar cliente o lote..."
                             autocomplete="off"
-                            class="flex-1 outline-none text-sm font-medium placeholder:text-slate/25 text-slate bg-transparent py-2">
+                            class="flex-1 outline-none text-sm font-bold placeholder:text-slate/25 text-slate bg-transparent py-2">
                     </div>
                     <!-- Dropdown results -->
                     <div id="inlineSearchDropdown"
-                        class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-float border border-slate/10 overflow-hidden z-[200] max-h-[360px] overflow-y-auto">
-                        <div id="inlineSearchResults" class="p-2"></div>
-                        <div class="px-4 py-2.5 bg-cream/50 border-t border-slate/5 text-xs text-slate/30">
-                            Busca por nombre, DNI, teléfono o lote
+                        class="hidden absolute top-full left-0 right-0 mt-3 bg-white border border-slate/10 rounded-3xl shadow-float overflow-hidden z-[200] max-h-[420px] w-full">
+                        <div id="inlineSearchResults" class="overflow-y-auto max-h-[360px]"></div>
+                        <div
+                            class="px-5 py-3 bg-slate-900 text-[10px] text-white/40 uppercase font-bold tracking-widest flex items-center justify-between border-t border-white/5">
+                            <span>Búsqueda Inteligente</span>
+                            <i class="ph ph-sparkle text-brand"></i>
                         </div>
                     </div>
                 </div>
@@ -212,8 +215,8 @@
         <!-- ===== KPI CARDS ===== -->
         <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 mb-8">
             <!-- KPI 1: Clientes Activos -->
-            <div
-                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-100 hover:shadow-soft transition-shadow group">
+            <div onclick="window.location.href='listado-clientes.html'"
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-100 hover:shadow-soft transition-shadow group cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="w-11 h-11 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-xl group-hover:bg-brand group-hover:text-white transition-colors">
@@ -229,8 +232,8 @@
             </div>
 
             <!-- KPI 2: Servicios este mes -->
-            <div
-                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-200 hover:shadow-soft transition-shadow group">
+            <div onclick="window.location.href='listado-servicios.html'"
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-200 hover:shadow-soft transition-shadow group cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="w-11 h-11 rounded-2xl bg-mint/30 text-slate flex items-center justify-center text-xl group-hover:bg-mint transition-colors">
@@ -246,8 +249,8 @@
             </div>
 
             <!-- KPI 3: Lotes registrados -->
-            <div
-                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-300 hover:shadow-soft transition-shadow group">
+            <div onclick="window.location.href='listado-lotes.html'"
+                class="bg-white p-6 rounded-[28px] shadow-sm border border-slate/5 fade-in-up delay-300 hover:shadow-soft transition-shadow group cursor-pointer">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="w-11 h-11 rounded-2xl bg-lavender/30 text-slate flex items-center justify-center text-xl group-hover:bg-lavender transition-colors">
@@ -259,39 +262,38 @@
                 <p class="text-sm text-slate/40 font-medium">Lotes registrados</p>
             </div>
 
-            <!-- KPI 4: Nuevo Servicio (Action Card) -->
-            <div onclick="openNewService()"
+            <!-- KPI 4: Nuevo Cliente (Action Card) -->
+            <div onclick="openNewClient()"
                 class="bg-brand text-white p-5 sm:p-6 rounded-[28px] shadow-sm border border-brand/10 fade-in-up delay-400 hover:shadow-float hover:-translate-y-1 transition-all cursor-pointer group min-h-[44px]">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-2xl bg-white/20 text-white flex items-center justify-center text-xl group-hover:bg-white group-hover:text-brand transition-all">
-                        <i class="ph-fill ph-plus-circle"></i>
+                        <i class="ph-fill ph-user-plus"></i>
                     </div>
                 </div>
-                <div class="text-lg sm:text-xl font-bold mb-1">Nuevo servicio</div>
-                <p class="text-sm text-white/60 font-medium">Registrar tratamiento</p>
+                <div class="text-lg sm:text-xl font-bold mb-1">Nuevo cliente</div>
+                <p class="text-sm text-white/60 font-medium">Registrar cliente</p>
             </div>
 
         </section>
 
-        <!-- ===== MAIN GRID: Activity ===== -->
-        <section class="mb-8 fade-in-up delay-500">
+        <!-- ===== MAIN GRID: Activity + Trazabilidad ===== -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8 fade-in-up delay-500">
 
-            <!-- ACTIVIDAD RECIENTE (Full width) -->
-            <div class="bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden w-full">
+            <!-- ACTIVIDAD RECIENTE (2/3) -->
+            <div class="lg:col-span-2 bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden">
                 <div
                     class="px-4 sm:px-7 pt-5 sm:pt-7 pb-3 sm:pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-slate">Actividad reciente</h2>
                         <p class="text-sm text-slate/40 mt-0.5">Últimos servicios registrados</p>
                     </div>
-                    <a href="#" class="text-sm font-bold text-brand flex items-center gap-1 hover:gap-2 transition-all">
+                    <a href="listado-servicios.html"
+                        class="text-sm font-bold text-brand flex items-center gap-1 hover:gap-2 transition-all">
                         Ver todo <i class="ph ph-arrow-right"></i>
                     </a>
                 </div>
-
                 <div id="activityContainer" class="px-4 sm:px-7 pb-3">
-                    <!-- Table Header (hidden on mobile) -->
                     <div
                         class="hidden sm:grid grid-cols-12 gap-4 text-xs font-bold text-slate/30 uppercase tracking-wider py-3 border-b border-slate/5">
                         <div class="col-span-4">Cliente</div>
@@ -299,124 +301,183 @@
                         <div class="col-span-3">Lote</div>
                         <div class="col-span-2 text-right">Fecha</div>
                     </div>
-
-                    <!-- Rows will be injected by JS -->
                 </div>
             </div>
+
+            <!-- PANEL DE CONTROL / AVISOS (1/3) -->
+            <div id="alertsSection"
+                class="bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden flex flex-col">
+                <div class="px-5 pt-5 pb-3 flex items-start justify-between gap-2 border-b border-slate/5 mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-slate/5 flex items-center justify-center flex-shrink-0">
+                            <i class="ph-fill ph-bell text-slate/40 text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-slate">Panel de Control <span id="alertsBadge"></span>
+                            </h2>
+                            <p class="text-xs text-slate/40 mt-0.5">Pendiente de revisión</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="alertsContainer" class="px-5 pb-5 space-y-2 flex-1">
+                    <!-- injected by JS -->
+                    <div class="py-8 text-center text-slate/20">
+                        <i class="ph ph-check-circle text-3xl mb-2 block"></i>
+                        <p class="text-xs font-bold">Todo al día</p>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
     </main>
 
-
-    <!-- ===================== NEW SERVICE MODAL ===================== -->
-    <div id="newServiceModal" class="fixed inset-0 z-[100] search-overlay hidden items-start justify-center pt-[10vh]">
+    <!-- ===================== RESIDUOS MODAL ===================== -->
+    <div id="residuosModal" class="fixed inset-0 z-[100] search-overlay hidden items-center justify-center">
         <div
-            class="bg-white rounded-[32px] shadow-float w-full max-w-lg mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
+            class="bg-white rounded-[32px] shadow-float w-full max-w-md mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
             <div class="px-8 py-6 border-b border-slate/5 flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-bold text-slate">Nuevo servicio</h2>
-                    <p class="text-xs text-slate/40 mt-1">Registra un nuevo tratamiento</p>
+                    <h2 class="text-xl font-bold text-slate">Residuos Biosanitarios</h2>
+                    <p class="text-xs text-slate/40 mt-1">Registro de retirada &mdash; Clase III</p>
                 </div>
-                <button onclick="closeNewService()" class="text-slate/20 hover:text-slate transition-colors text-2xl">
+                <button onclick="closeResiduosModal()"
+                    class="text-slate/20 hover:text-slate transition-colors text-2xl">
                     <i class="ph ph-x"></i>
                 </button>
             </div>
-
-            <form id="newServiceForm" class="p-8 space-y-5 overflow-y-auto max-h-[75vh]">
+            <form id="residuosForm" class="p-8 space-y-5">
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Nombre del
-                        cliente</label>
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Gestor
+                        autorizado</label>
                     <div class="relative">
-                        <i class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
-                        <input type="text" id="custName" required placeholder="Ej: María Gómez"
+                        <i class="ph ph-truck absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="text" id="residuosGestor" required placeholder="Nombre del gestor"
                             class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
                     </div>
                 </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Fecha de
+                        retirada</label>
+                    <div class="relative">
+                        <i class="ph ph-calendar absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="date" id="residuosDate" required
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Albarán / DCS
+                        (foto)</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="document.getElementById('residuosCamera').click()"
+                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-sm font-bold text-slate hover:bg-slate/5 transition-colors">
+                            <i class="ph ph-camera text-brand"></i> Cámara
+                        </button>
+                        <button type="button" onclick="document.getElementById('residuosGallery').click()"
+                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-sm font-bold text-slate hover:bg-slate/5 transition-colors">
+                            <i class="ph ph-images text-brand"></i> Galería
+                        </button>
+                    </div>
+                    <input type="file" id="residuosCamera" accept="image/*" capture="environment" class="hidden">
+                    <input type="file" id="residuosGallery" accept="image/*" class="hidden">
+                    <div id="residuosPhotoPreview" class="hidden flex gap-2 flex-wrap pt-1"></div>
+                </div>
+                <button type="submit" id="residuosSubmitBtn"
+                    class="w-full bg-amber-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-amber-600 transition-all active:scale-95">
+                    Registrar retirada
+                </button>
+            </form>
+        </div>
+    </div>
 
+    <!-- ===================== AUDIT-READY MODAL ===================== -->
+    <div id="auditModal" class="fixed inset-0 z-[100] search-overlay hidden items-center justify-center">
+        <div
+            class="bg-white rounded-[32px] shadow-float w-full max-w-md mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
+            <div class="px-8 py-6 border-b border-slate/5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate">Exportación Flash</h2>
+                    <p class="text-xs text-slate/40 mt-1">Genera el expediente completo para inspección</p>
+                </div>
+                <button onclick="closeAuditModal()" class="text-slate/20 hover:text-slate transition-colors text-2xl">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="p-8 space-y-4">
+                <div class="bg-cream rounded-2xl p-5 space-y-3">
+                    <p class="text-xs font-bold text-slate/40 uppercase tracking-widest">El ZIP incluirá:</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3 text-sm font-medium text-slate">
+                            <div class="w-6 h-6 rounded-lg bg-brand/10 flex items-center justify-center">
+                                <i class="ph ph-barcode text-brand text-xs"></i>
+                            </div> Histórico de lotes
+                        </div>
+                        <div class="flex items-center gap-3 text-sm font-medium text-slate">
+                            <div class="w-6 h-6 rounded-lg bg-mint/30 flex items-center justify-center">
+                                <i class="ph ph-certificate text-slate text-xs"></i>
+                            </div> Certificados de técnicos y contratos
+                        </div>
+                        <div class="flex items-center gap-3 text-sm font-medium text-slate">
+                            <div class="w-6 h-6 rounded-lg bg-amber-50 flex items-center justify-center">
+                                <i class="ph ph-biohazard text-amber-500 text-xs"></i>
+                            </div> Registros de residuos biosanitarios
+                        </div>
+                    </div>
+                </div>
+                <button onclick="exportAuditZip()"
+                    class="w-full bg-slate text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center gap-2"
+                    id="auditExportBtn">
+                    <i class="ph ph-download-simple"></i> Generar ZIP (Un clic)
+                </button>
+                <p class="text-center text-xs text-slate/30">Para su uso exclusivo ante inspección de Sanidad</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===================== NEW CLIENT MODAL ===================== -->
+    <div id="newClientModal" class="fixed inset-0 z-[100] search-overlay hidden items-center justify-center">
+        <div
+            class="bg-white rounded-[32px] shadow-float w-full max-w-md mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
+            <div class="px-8 py-6 border-b border-slate/5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate">Nuevo cliente</h2>
+                    <p class="text-xs text-slate/40 mt-1">Registra un nuevo cliente en el centro</p>
+                </div>
+                <button onclick="closeNewClient()" class="text-slate/20 hover:text-slate transition-colors text-2xl">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <form id="newClientForm" class="p-8 space-y-5">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Nombre y
+                        apellidos</label>
+                    <div class="relative">
+                        <i class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="text" id="ncName" required placeholder="Ej: María García López"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+                </div>
                 <div class="space-y-2">
                     <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">DNI /
                         Identificación</label>
                     <div class="relative">
                         <i class="ph ph-identification-card absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
-                        <input type="text" id="custDni" required placeholder="Ej: 12345678A"
+                        <input type="text" id="ncDni" required placeholder="Ej: 12345678A"
                             class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
                     </div>
                 </div>
-
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Tipo de
-                        servicio</label>
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Teléfono</label>
                     <div class="relative">
-                        <i class="ph ph-eyedropper absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
-                        <select id="custService" required
-                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate appearance-none">
-                            <option value="" disabled selected>Selecciona un servicio</option>
-                            <option value="Ácido Hialurónico">Ácido Hialurónico</option>
-                            <option value="Tatuaje">Tatuaje</option>
-                            <option value="Microblading">Microblading</option>
-                            <option value="Peeling Químico">Peeling Químico</option>
-                        </select>
-                        <i
-                            class="ph ph-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-slate/30 pointer-events-none"></i>
+                        <i class="ph ph-phone absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                        <input type="tel" id="ncPhone" placeholder="Ej: +34 600 000 000"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
                     </div>
                 </div>
-
-                <!-- ── Photo Upload ───────────────────────── -->
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Fotos del
-                        tratamiento</label>
-
-                    <!-- Upload buttons -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <button type="button" id="btnCamera"
-                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-sm font-bold text-slate hover:bg-slate/5 transition-colors">
-                            <i class="ph ph-camera text-brand"></i> Cámara
-                        </button>
-                        <button type="button" id="btnGallery"
-                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-sm font-bold text-slate hover:bg-slate/5 transition-colors">
-                            <i class="ph ph-images text-brand"></i> Galería
-                        </button>
-                    </div>
-
-                    <!-- Hidden file inputs -->
-                    <input type="file" id="inputCamera" accept="image/*" capture="environment" class="hidden" multiple>
-                    <input type="file" id="inputGallery" accept="image/*" class="hidden" multiple>
-
-                    <!-- Preview area -->
-                    <div id="photoPreview" class="hidden flex gap-2 flex-wrap pt-1"></div>
-
-                    <!-- OCR Status -->
-                    <div id="ocrStatus" class="hidden items-center gap-2 text-xs text-slate/50 mt-1">
-                        <div class="w-3 h-3 rounded-full bg-lavender/60 animate-pulse"></div>
-                        <span>Leyendo número de lote con IA…</span>
-                    </div>
-                </div>
-
-                <!-- Batch number (auto-filled or manual) -->
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between px-1">
-                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest">Número de
-                            lote</label>
-                        <span class="text-[9px] text-brand/60 font-bold uppercase tracking-widest"
-                            id="batchAutoLabel"></span>
-                    </div>
-                    <div class="flex gap-2">
-                        <div class="relative flex-1">
-                            <i class="ph ph-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
-                            <input type="text" id="custBatch" placeholder="Foto, escáner o manual"
-                                class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
-                        </div>
-                        <button type="button" id="btnScanBarcode"
-                            class="min-w-[44px] min-h-[44px] bg-brand/10 text-brand rounded-2xl border border-brand/20 flex items-center justify-center hover:bg-brand hover:text-white transition-all"
-                            title="Escanear código de barras">
-                            <i class="ph ph-qr-code text-xl"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <button type="submit" id="submitServiceBtn"
+                <button type="submit" id="ncSubmitBtn"
                     class="w-full bg-brand text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all active:scale-95">
-                    Registrar y ver ficha
+                    Crear cliente y ver ficha
                 </button>
             </form>
         </div>
@@ -454,31 +515,243 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
+        let currentCompanyId = null;
+
+        // ── Session Protection ───────────────────────────────────────────────
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                console.log("Sesión no detectada, pero el acceso está permitido (bypass temporal).");
+                const mockName = localStorage.getItem('residoc_mock_name') || 'Dra. Elena';
+                document.getElementById('userGreeting').textContent = `Hola, ${mockName} 👋`;
+                // Use default company id for existing data if no session
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                initDashboard();
+                return;
+            }
+
+            // Check if user has a profile/company
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*, companies(*)')
+                .eq('id', session.user.id)
+                .single();
+
+            if (!profile || !profile.companies) {
+                window.location.href = 'onboarding.html';
+                return;
+            }
+
+            currentCompanyId = profile.company_id;
+
+            // Update greeting with user's name
+            const userName = profile.full_name || session.user.user_metadata.full_name || session.user.email;
+            document.getElementById('userGreeting').textContent = `Hola, ${userName} 👋`;
+
+            initDashboard();
+        }
+
+        function initDashboard() {
+            // Dynamic date
+            const todayEl = document.getElementById('todayDate');
+            if (todayEl) {
+                const now = new Date();
+                todayEl.textContent = now.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            fetchKPIs();
+            fetchRecentActivity();
+            fetchAlerts();
+        }
+
+        // ── Widget: Panel de Control (Alertas Unificadas) ────────────────────
+        async function fetchAlerts() {
+            const container = document.getElementById('alertsContainer');
+            const badge = document.getElementById('alertsBadge');
+            const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+            // 1. Fetch Traceability (Red)
+            const { data: tracData } = await supabase
+                .from('treatments')
+                .select('id, type, created_at, registration_id, clients(id, full_name)')
+                .eq('company_id', currentCompanyId)
+                .lt('created_at', cutoff)
+                .is('batch_number', null)
+                .order('created_at', { ascending: true })
+                .limit(3);
+
+            // 2. Fetch Waste Photos (Amber)
+            const { data: wasteData } = await supabase
+                .from('waste_records')
+                .select('*')
+                .eq('company_id', currentCompanyId)
+                .or('photo_urls.is.null,photo_urls.eq.{}')
+                .order('pickup_date', { ascending: false })
+                .limit(3);
+
+            // 3. Fetch Incomplete Clients (Orange) - > 7 days without address or birth_date
+            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            const { data: incompleteClients } = await supabase
+                .from('clients')
+                .select('id, full_name, created_at')
+                .eq('company_id', currentCompanyId)
+                .lt('created_at', weekAgo)
+                .or('address.is.null,birth_date.is.null')
+                .limit(3);
+
+            const allAlerts = [];
+            if (tracData) tracData.forEach(i => allAlerts.push({ ...i, _type: 'traceability' }));
+            if (wasteData) wasteData.forEach(i => allAlerts.push({ ...i, _type: 'waste' }));
+            if (incompleteClients) incompleteClients.forEach(i => allAlerts.push({ ...i, _type: 'incomplete' }));
+
+            if (allAlerts.length === 0) {
+                badge.textContent = '';
+                container.innerHTML = `
+                    <div class="py-8 text-center text-slate/20">
+                        <i class="ph ph-check-circle text-3xl mb-2 block"></i>
+                        <p class="text-xs font-bold">Todo al día</p>
+                    </div>`;
+                return;
+            }
+
+            badge.textContent = `(${allAlerts.length})`;
+            container.innerHTML = '';
+
+            allAlerts.forEach(item => {
+                const row = document.createElement('div');
+
+                if (item._type === 'traceability') {
+                    const hoursAgo = Math.floor((Date.now() - new Date(item.created_at)) / 3600000);
+                    const clientName = item.clients?.full_name || 'Cliente...';
+                    row.className = 'flex items-center justify-between py-3 px-4 bg-red-50/60 rounded-2xl border border-red-100 gap-3';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-red-600 flex-shrink-0">
+                                <i class="ph ph-warning text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-slate truncate">${clientName}</p>
+                                <p class="text-xs text-slate/40">+${hoursAgo}h · Sin lote</p>
+                            </div>
+                        </div>
+                        <a href="ficha-cliente.html?id=${item.clients?.id}"
+                            class="text-xs font-bold text-red-500 border border-red-200 px-3 py-1.5 rounded-xl hover:bg-red-50 transition-colors">
+                            Fix
+                        </a>`;
+                } else if (item._type === 'waste') {
+                    const dateStr = item.pickup_date ? new Date(item.pickup_date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : '—';
+                    row.className = 'flex items-center justify-between py-3 px-4 bg-amber-50/60 rounded-2xl border border-amber-100 gap-3';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
+                                <i class="ph ph-biohazard text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-slate truncate">${item.gestor_name || 'Gestor'}</p>
+                                <p class="text-xs text-slate/40">${dateStr} · Sin foto</p>
+                            </div>
+                        </div>
+                        <a href="residuos.html"
+                            class="text-xs font-bold text-amber-600 border border-amber-200 px-3 py-1.5 rounded-xl hover:bg-amber-50 transition-colors">
+                            Foto
+                        </a>`;
+                } else {
+                    // Incomplete Profile
+                    row.className = 'flex items-center justify-between py-3 px-4 bg-orange-50/60 rounded-2xl border border-orange-100 gap-3';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 flex-shrink-0">
+                                <i class="ph ph-user-focus text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-slate truncate">${item.full_name}</p>
+                                <p class="text-xs text-slate/40">Ficha incompleta (>1 sem)</p>
+                            </div>
+                        </div>
+                        <a href="ficha-cliente.html?id=${item.id}"
+                            class="text-xs font-bold text-orange-600 border border-orange-200 px-3 py-1.5 rounded-xl hover:bg-orange-50 transition-colors">
+                            Ver
+                        </a>`;
+                }
+                container.appendChild(row);
+            });
+        }
+
+        // ── Nuevo Cliente Modal ───────────────────────────────────────────────
+        window.openNewClient = function () {
+            document.getElementById('newClientForm').reset();
+            const m = document.getElementById('newClientModal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+            setTimeout(() => document.getElementById('ncName').focus(), 80);
+        };
+        window.closeNewClient = function () {
+            const m = document.getElementById('newClientModal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+        };
+
+        document.getElementById('newClientForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('ncSubmitBtn');
+            btn.disabled = true; btn.textContent = 'Creando...';
+            const name = document.getElementById('ncName').value.trim();
+            const dni = document.getElementById('ncDni').value.trim();
+            const phone = document.getElementById('ncPhone').value.trim() || null;
+
+            // Check for existing client by DNI
+            let { data: existing } = await supabase.from('clients')
+                .select('id').eq('dni', dni).eq('company_id', currentCompanyId).maybeSingle();
+            let clientId = existing?.id;
+
+            if (!clientId) {
+                const { data: created, error } = await supabase.from('clients')
+                    .insert({ full_name: name, dni, phone, company_id: currentCompanyId })
+                    .select('id').single();
+                if (error) { btn.disabled = false; btn.textContent = 'Crear cliente y ver ficha'; alert('Error al crear el cliente.'); return; }
+                clientId = created.id;
+            }
+            window.location.href = `ficha-cliente.html?id=${clientId}`;
+        };
+
+
+        checkSession();
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+            });
+        }
+
         // ── Barcode / QR Scanner ─────────────────────────────────────────────
         let html5QrCode = null;
-
-        document.getElementById('btnScanBarcode').addEventListener('click', () => {
-            const modal = document.getElementById('scannerModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            html5QrCode = new Html5Qrcode('scannerReader');
-            html5QrCode.start(
-                { facingMode: 'environment' },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                (decodedText) => {
-                    // Success — fill batch field
-                    document.getElementById('custBatch').value = decodedText;
-                    document.getElementById('batchAutoLabel').textContent = '✓ Escaneado';
+        const btnScanBarcode = document.getElementById('btnScanBarcode');
+        if (btnScanBarcode) {
+            btnScanBarcode.addEventListener('click', () => {
+                const modal = document.getElementById('scannerModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+                html5QrCode = new Html5Qrcode('scannerReader');
+                html5QrCode.start(
+                    { facingMode: 'environment' },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    (decodedText) => {
+                        const batchInput = document.getElementById('custBatch');
+                        const batchLabel = document.getElementById('batchAutoLabel');
+                        if (batchInput) batchInput.value = decodedText;
+                        if (batchLabel) batchLabel.textContent = '✓ Escaneado';
+                        stopScanner();
+                    },
+                    () => { }
+                ).catch(err => {
+                    console.error('Scanner error:', err);
+                    alert('No se pudo acceder a la cámara.');
                     stopScanner();
-                },
-                () => { /* ignore scan failures */ }
-            ).catch(err => {
-                console.error('Scanner error:', err);
-                alert('No se pudo acceder a la cámara. Asegúrate de dar permisos.');
-                stopScanner();
+                });
             });
-        });
+        }
 
         function stopScanner() {
             const modal = document.getElementById('scannerModal');
@@ -489,7 +762,9 @@
             modal.classList.remove('flex');
         }
 
-        document.getElementById('closeScannerBtn').addEventListener('click', stopScanner);
+        if (document.getElementById('closeScannerBtn')) {
+            document.getElementById('closeScannerBtn').addEventListener('click', stopScanner);
+        }
 
         // ── Inline Search ─────────────────────────────────────────────────────
         const inlineSearchInput = document.getElementById('inlineSearchInput');
@@ -497,147 +772,154 @@
         const inlineSearchResults = document.getElementById('inlineSearchResults');
         let _searchTimeout = null;
 
-        inlineSearchInput.addEventListener('input', () => {
-            clearTimeout(_searchTimeout);
-            const q = inlineSearchInput.value.trim();
-            if (q.length < 2) {
+        if (inlineSearchInput) {
+            inlineSearchInput.addEventListener('input', () => {
+                const q = inlineSearchInput.value.trim();
+                clearTimeout(_searchTimeout);
+                if (q.length < 2) {
+                    inlineSearchDropdown?.classList.add('hidden');
+                    return;
+                }
+                showSearchLoading();
+                _searchTimeout = setTimeout(() => {
+                    runInlineSearch(q);
+                }, 300);
+            });
+        }
+
+        // Click outside to close
+        document.addEventListener('click', (e) => {
+            if (!inlineSearchInput.contains(e.target) && !inlineSearchDropdown.contains(e.target)) {
                 inlineSearchDropdown.classList.add('hidden');
-                return;
             }
-            _searchTimeout = setTimeout(() => runInlineSearch(q), 250);
         });
 
+        // Show results on focus if they exist
         inlineSearchInput.addEventListener('focus', () => {
-            if (inlineSearchInput.value.trim().length >= 2) {
+            if (inlineSearchResults.children.length > 0 && inlineSearchInput.value.trim().length >= 2) {
                 inlineSearchDropdown.classList.remove('hidden');
             }
         });
 
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.relative') || !e.target.closest('#inlineSearchInput')?.parentElement) {
-                if (!inlineSearchDropdown.contains(e.target) && e.target !== inlineSearchInput) {
-                    inlineSearchDropdown.classList.add('hidden');
-                }
-            }
-        });
+        function showSearchLoading() {
+            inlineSearchDropdown.classList.remove('hidden');
+            inlineSearchResults.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-slate/30 gap-4">
+                    <div class="w-8 h-8 border-2 border-brand/20 border-t-brand rounded-full animate-spin"></div>
+                    <p class="text-xs font-bold uppercase tracking-wider">Buscando...</p>
+            `;
+        }
 
         async function runInlineSearch(query) {
+            if (!currentCompanyId) return;
+
             const q = `%${query}%`;
+            const normalize = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+            const searchTerm = normalize(query);
 
-            const [{ data: clients }, { data: batchTreatments }, { data: typeTreatments }] = await Promise.all([
-                supabase
-                    .from('clients')
-                    .select('id, full_name, dni, phone')
-                    .or(`full_name.ilike.${q},dni.ilike.${q},phone.ilike.${q}`)
-                    .limit(5),
-                supabase
-                    .from('treatments')
-                    .select('batch_number, type, clients(id, full_name)')
-                    .ilike('batch_number', q)
-                    .limit(4),
-                supabase
-                    .from('treatments')
-                    .select('type')
-                    .ilike('type', q)
-                    .limit(10)
-            ]);
+            try {
+                // Fetch broadly to handle accent-insensitivity in JS
+                const responses = await Promise.all([
+                    supabase.from('clients').select('id, full_name, dni, phone')
+                        .eq('company_id', currentCompanyId).limit(50),
+                    supabase.from('treatments').select('batch_number, type, clients(id, full_name)')
+                        .eq('company_id', currentCompanyId).limit(50),
+                    supabase.from('treatments').select('type')
+                        .eq('company_id', currentCompanyId).limit(50)
+                ]);
 
-            inlineSearchResults.innerHTML = '';
-            let hasResults = false;
+                // Filter clients in JS (truly accent-insensitive)
+                let clients = (responses[0].data || []).filter(c =>
+                    normalize(c.full_name).includes(searchTerm) ||
+                    normalize(c.dni || '').includes(searchTerm) ||
+                    normalize(c.phone || '').includes(searchTerm)
+                ).slice(0, 5);
+                const batchTreatments = responses[1].data || [];
+                // Filter treatments in JS (accent-insensitive for types/batches)
+                let batchResults = (responses[1].data || []).filter(t =>
+                    normalize(t.batch_number || '').includes(searchTerm) ||
+                    normalize(t.type || '').includes(searchTerm)
+                );
 
-            // ── Client results ────────────────────────────────────────────────
-            if (clients && clients.length > 0) {
-                hasResults = true;
-                const label = document.createElement('div');
-                label.className = 'px-3 pt-2 pb-1 text-[10px] font-bold text-slate/30 uppercase tracking-widest';
-                label.textContent = 'Clientes';
-                inlineSearchResults.appendChild(label);
+                let typeResults = (responses[2].data || []).filter(t =>
+                    normalize(t.type || '').includes(searchTerm)
+                );
 
-                clients.forEach(c => {
-                    const item = document.createElement('a');
-                    item.href = `client-file.html?id=${c.id}`;
-                    item.className = 'flex items-center gap-3 p-3 rounded-xl hover:bg-cream/80 transition-colors cursor-pointer';
-                    item.innerHTML = `
-                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(c.full_name)}&background=B8D8D8&color=4A4E69&bold=true&size=36"
-                             class="w-9 h-9 rounded-full flex-shrink-0">
-                        <div class="flex-1 min-w-0">
-                            <div class="text-sm font-bold text-slate truncate">${c.full_name}</div>
-                            <div class="text-xs text-slate/40">${c.dni}${c.phone ? ' · ' + c.phone : ''}</div>
-                        </div>
-                        <i class="ph ph-arrow-right text-slate/20"></i>`;
-                    inlineSearchResults.appendChild(item);
-                });
-            }
+                inlineSearchResults.innerHTML = '';
+                let hasResults = false;
 
-            // ── Batch results (deduplicated by batch_number) ──────────────────
-            if (batchTreatments && batchTreatments.length > 0) {
-                hasResults = true;
-                const uniqueBatches = new Map();
-                batchTreatments.forEach(t => {
-                    if (!uniqueBatches.has(t.batch_number)) {
-                        uniqueBatches.set(t.batch_number, { batch: t.batch_number, type: t.type, client: t.clients?.full_name });
-                    }
-                });
-
-                const label = document.createElement('div');
-                label.className = 'px-3 pt-3 pb-1 text-[10px] font-bold text-slate/30 uppercase tracking-widest border-t border-slate/5 mt-1';
-                label.textContent = 'Lotes';
-                inlineSearchResults.appendChild(label);
-
-                uniqueBatches.forEach(b => {
-                    const item = document.createElement('a');
-                    item.href = `batch-file.html?batch=${encodeURIComponent(b.batch)}`;
-                    item.className = 'flex items-center gap-3 p-3 rounded-xl hover:bg-cream/80 transition-colors cursor-pointer';
-                    item.innerHTML = `
-                        <div class="w-9 h-9 rounded-full bg-lavender/30 flex items-center justify-center flex-shrink-0">
-                            <i class="ph ph-barcode text-slate/50"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="text-sm font-bold text-slate font-mono truncate">${b.batch}</div>
-                            <div class="text-xs text-slate/40">${b.type || ''}${b.client ? ' · ' + b.client : ''}</div>
-                        </div>
-                        <i class="ph ph-arrow-right text-slate/20"></i>`;
-                    inlineSearchResults.appendChild(item);
-                });
-            }
-
-            // ── Category (treatment type) results ─────────────────────────────
-            if (typeTreatments && typeTreatments.length > 0) {
-                const uniqueTypes = [...new Set(typeTreatments.map(t => t.type).filter(Boolean))];
-                if (uniqueTypes.length > 0) {
+                if (clients.length > 0) {
                     hasResults = true;
                     const label = document.createElement('div');
-                    label.className = 'px-3 pt-3 pb-1 text-[10px] font-bold text-slate/30 uppercase tracking-widest border-t border-slate/5 mt-1';
-                    label.textContent = 'Categorías';
+                    label.className = 'px-5 pt-4 pb-1 text-[10px] font-bold text-slate/30 uppercase tracking-widest';
+                    label.textContent = 'Clientes';
                     inlineSearchResults.appendChild(label);
-
-                    uniqueTypes.forEach(type => {
+                    clients.forEach(c => {
                         const item = document.createElement('a');
-                        item.href = `treatment-file.html?type=${encodeURIComponent(type)}`;
-                        item.className = 'flex items-center gap-3 p-3 rounded-xl hover:bg-cream/80 transition-colors cursor-pointer';
-                        item.innerHTML = `
-                            <div class="w-9 h-9 rounded-full bg-lavender/20 flex items-center justify-center flex-shrink-0">
-                                <i class="ph ph-eyedropper text-lavender text-sm"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-bold text-slate truncate">${type}</div>
-                                <div class="text-xs text-slate/40">Ver todas las aplicaciones</div>
-                            </div>
-                            <i class="ph ph-arrow-right text-slate/20"></i>`;
+                        item.href = `ficha-cliente.html?id=${c.id}`;
+                        item.className = 'flex items-center gap-4 py-3 px-5 hover:bg-brand/5 transition-all cursor-pointer group';
+                        item.innerHTML = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(c.full_name)}&background=B8D8D8&color=4A4E69&bold=true&size=40" class="w-9 h-9 rounded-full flex-shrink-0 shadow-sm transition-transform group-hover:scale-110">
+                            <div class="flex-1 min-w-0"><div class="text-[13px] font-bold text-slate truncate group-hover:text-brand transition-colors">${c.full_name}</div><div class="text-[10px] text-slate/40 uppercase font-bold tracking-wider mt-0.5">${c.dni}</div></div>
+                            <i class="ph ph-caret-right text-slate/20 group-hover:text-brand group-hover:translate-x-1 transition-all"></i>`;
                         inlineSearchResults.appendChild(item);
                     });
                 }
-            }
 
-            if (!hasResults) {
-                inlineSearchResults.innerHTML = `
-                    <div class="px-4 py-6 text-center text-sm text-slate/30">
-                        <i class="ph ph-magnifying-glass text-2xl block mb-2"></i>
-                        Sin resultados para "${query}"
-                    </div>`;
-            }
+                if (batchResults.length > 0) {
+                    const uniqueBatches = new Map();
+                    batchResults.forEach(t => { if (t.batch_number && !uniqueBatches.has(t.batch_number)) uniqueBatches.set(t.batch_number, t); });
 
-            inlineSearchDropdown.classList.remove('hidden');
+                    if (uniqueBatches.size > 0) {
+                        hasResults = true;
+                        const label = document.createElement('div');
+                        label.className = 'px-5 pt-4 pb-1 text-[10px] font-bold text-slate/30 uppercase tracking-widest border-t border-slate/5 mt-1';
+                        label.textContent = 'Lotes';
+                        inlineSearchResults.appendChild(label);
+                        uniqueBatches.forEach(b => {
+                            const item = document.createElement('a');
+                            item.href = `ficha-lotes.html?batch=${encodeURIComponent(b.batch_number)}`;
+                            item.className = 'flex items-center gap-4 py-3 px-5 hover:bg-brand/5 transition-all cursor-pointer group';
+                            item.innerHTML = `<div class="w-9 h-9 rounded-full bg-slate-900 flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-110"><i class="ph ph-barcode text-white text-lg"></i></div>
+                                <div class="flex-1 min-w-0"><div class="text-[13px] font-bold text-slate font-mono truncate group-hover:text-brand transition-colors">${b.batch_number}</div><div class="text-[10px] text-slate/40 uppercase font-bold tracking-wider mt-0.5">${b.type || 'Lote'}</div></div>
+                                <i class="ph ph-caret-right text-slate/20 group-hover:text-brand group-hover:translate-x-1 transition-all"></i>`;
+                            inlineSearchResults.appendChild(item);
+                        });
+                    }
+                }
+
+                if (typeResults.length > 0) {
+                    const uniqueTypes = [...new Set(typeResults.map(t => t.type).filter(Boolean))];
+                    if (uniqueTypes.length > 0) {
+                        hasResults = true;
+                        const label = document.createElement('div');
+                        label.className = 'px-5 pt-4 pb-1 text-[10px] font-bold text-slate/30 uppercase tracking-widest border-t border-slate/5 mt-1';
+                        label.textContent = 'Categorías';
+                        inlineSearchResults.appendChild(label);
+                        uniqueTypes.forEach(type => {
+                            const item = document.createElement('a');
+                            item.href = `ficha-servicio.html?type=${encodeURIComponent(type)}`;
+                            item.className = 'flex items-center gap-4 py-3 px-5 hover:bg-brand/5 transition-all cursor-pointer group';
+                            item.innerHTML = `<div class="w-9 h-9 rounded-full bg-lavender/30 flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-110"><i class="ph ph-eyedropper text-slate/60 text-lg"></i></div>
+                                <div class="flex-1 min-w-0"><div class="text-[13px] font-bold text-slate truncate group-hover:text-brand transition-colors">${type}</div><div class="text-[10px] text-slate/40 uppercase font-bold tracking-wider mt-0.5">Servicio</div></div>
+                                <i class="ph ph-caret-right text-slate/20 group-hover:text-brand group-hover:translate-x-1 transition-all"></i>`;
+                            inlineSearchResults.appendChild(item);
+                        });
+                    }
+                }
+
+                if (!hasResults) {
+                    inlineSearchResults.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-12 text-slate/30 gap-2">
+                            <i class="ph ph-magnifying-glass text-3xl opacity-20"></i>
+                            <p class="text-sm font-medium">No se encontraron resultados</p>
+                        </div>
+                    `;
+                }
+                inlineSearchDropdown.classList.remove('hidden');
+            } catch (err) {
+                console.error('Search error:', err);
+                if (inlineSearchResults) inlineSearchResults.innerHTML = `<div class="px-4 py-6 text-center text-sm text-red-500 font-bold">Error en la búsqueda</div>`;
+            }
         }
 
         // ── New Service Modal ─────────────────────────────────────────────────
@@ -647,25 +929,14 @@
         const custDniInput = document.getElementById('custDni');
         const suggestions = document.getElementById('clientSuggestions');
         let _generatedRegId = '';
-
-        const photoPreview = document.getElementById('photoPreview');
-        const ocrStatus = document.getElementById('ocrStatus');
-        const batchAutoLabel = document.getElementById('batchAutoLabel');
-        const custBatchInput = document.getElementById('custBatch');
-        let _selectedFiles = []; // accumulate selected photos
+        let _selectedFiles = [];
 
         window.openNewService = function () {
-            const randomId = Math.floor(10000 + Math.random() * 90000);
-            _generatedRegId = `#RES-${randomId}`;
-
+            _generatedRegId = `#RES-${Math.floor(10000 + Math.random() * 90000)}`;
             newServiceForm.reset();
             _selectedFiles = [];
-            photoPreview.innerHTML = '';
-            photoPreview.classList.add('hidden');
-            ocrStatus.classList.add('hidden');
-            ocrStatus.classList.remove('flex');
-            batchAutoLabel.textContent = '';
-            hideSuggestions();
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('photoPreview').classList.add('hidden');
             newServiceModal.classList.remove('hidden');
             newServiceModal.classList.add('flex');
             setTimeout(() => custNameInput.focus(), 100);
@@ -673,277 +944,165 @@
         window.closeNewService = function () {
             newServiceModal.classList.add('hidden');
             newServiceModal.classList.remove('flex');
-            hideSuggestions();
         };
 
         // ── Client Autocomplete ───────────────────────────────────────────────
-        function hideSuggestions() {
-            suggestions.classList.add('hidden');
-            suggestions.innerHTML = '';
-        }
-
-        let debounceTimer;
-        custNameInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
+        custNameInput.addEventListener('input', async () => {
             const q = custNameInput.value.trim();
-            if (q.length < 2) { hideSuggestions(); return; }
-
-            debounceTimer = setTimeout(async () => {
-                const { data } = await supabase
-                    .from('clients')
-                    .select('id,full_name,dni')
-                    .ilike('full_name', `%${q}%`)
-                    .limit(5);
-
-                if (!data || data.length === 0) { hideSuggestions(); return; }
-
-                const rect = custNameInput.getBoundingClientRect();
-                suggestions.style.top = (rect.bottom + window.scrollY + 6) + 'px';
-                suggestions.style.left = rect.left + 'px';
-                suggestions.style.width = rect.width + 'px';
-
-                suggestions.innerHTML = data.map(c =>
-                    `<li class="px-4 py-3 hover:bg-cream cursor-pointer flex items-center gap-3 border-b border-slate/5 last:border-0"
-                         data-id="${c.id}" data-name="${c.full_name}" data-dni="${c.dni}">
-                         <i class="ph ph-user text-brand"></i>
-                         <div>
-                             <div class="font-bold text-slate text-sm">${c.full_name}</div>
-                             <div class="text-xs text-slate/40">${c.dni}</div>
-                         </div>
-                     </li>`
-                ).join('');
-
-                suggestions.classList.remove('hidden');
-            }, 250);
+            if (q.length < 2) { suggestions.classList.add('hidden'); return; }
+            const { data } = await supabase.from('clients').select('id,full_name,dni')
+                .eq('company_id', currentCompanyId)
+                .ilike('full_name', `%${q}%`).limit(5);
+            if (!data || data.length === 0) { suggestions.classList.add('hidden'); return; }
+            const rect = custNameInput.getBoundingClientRect();
+            suggestions.style.top = `${rect.bottom + window.scrollY + 6}px`;
+            suggestions.style.left = `${rect.left}px`;
+            suggestions.style.width = `${rect.width}px`;
+            suggestions.innerHTML = data.map(c => `
+                <li class="px-5 py-3.5 hover:bg-brand/5 cursor-pointer border-b border-slate/5 last:border-0 transition-all group" data-id="${c.id}" data-name="${c.full_name}" data-dni="${c.dni}">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate text-sm group-hover:text-brand transition-colors">${c.full_name}</div>
+                            <div class="text-[10px] text-slate/40 uppercase font-bold mt-0.5 tracking-wider">${c.dni}</div>
+                        </div>
+                        <i class="ph ph-plus-circle text-slate/20 group-hover:text-brand transition-colors text-lg"></i>
+                    </div>
+                </li>`).join('');
+            suggestions.classList.remove('hidden');
         });
 
         suggestions.addEventListener('click', e => {
-            const li = e.target.closest('li[data-id]');
+            const li = e.target.closest('li');
             if (!li) return;
             custNameInput.value = li.dataset.name;
             custDniInput.value = li.dataset.dni;
-            hideSuggestions();
-        });
-
-        document.addEventListener('click', e => {
-            if (!suggestions.contains(e.target) && e.target !== custNameInput) hideSuggestions();
+            suggestions.classList.add('hidden');
         });
 
         // ── Photo Handling ────────────────────────────────────────────────────
-        function addFilesToPreview(files) {
+        function addFiles(files) {
+            const preview = document.getElementById('photoPreview');
             for (const file of files) {
-                if (!file.type.startsWith('image/')) continue;
                 _selectedFiles.push(file);
                 const reader = new FileReader();
                 reader.onload = ev => {
                     const wrap = document.createElement('div');
                     wrap.className = 'relative';
-                    wrap.innerHTML = `
-                        <img src="${ev.target.result}" class="w-16 h-16 rounded-xl object-cover border border-slate/10">
-                        <button type="button" class="absolute -top-1.5 -right-1.5 bg-white border border-slate/10 rounded-full w-5 h-5 flex items-center justify-center text-slate/40 hover:text-brand shadow-sm remove-photo">
-                            <i class="ph ph-x text-[10px]"></i>
-                        </button>
-                    `;
-                    wrap.querySelector('.remove-photo').onclick = () => {
-                        _selectedFiles = _selectedFiles.filter(f => f !== file);
-                        wrap.remove();
-                        if (_selectedFiles.length === 0) photoPreview.classList.add('hidden');
-                    };
-                    photoPreview.appendChild(wrap);
-                    photoPreview.classList.remove('hidden');
+                    wrap.innerHTML = `<img src="${ev.target.result}" class="w-16 h-16 rounded-xl object-cover border border-slate/10">`;
+                    preview.appendChild(wrap);
+                    preview.classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
-
-                // Run OCR asynchronously
                 runOCR(file);
             }
         }
-
         async function runOCR(file) {
-            if (custBatchInput.value.trim()) return; // don't overwrite manual entry
-            ocrStatus.classList.remove('hidden');
-            ocrStatus.classList.add('flex');
-
+            const status = document.getElementById('ocrStatus');
+            status.classList.remove('hidden'); status.classList.add('flex');
             try {
-                const { data: { text } } = await Tesseract.recognize(file, 'spa+eng', {
-                    logger: () => { }
-                });
-                // Look for batch-like patterns: letters+digits, eg L-2024-99X, LOT:ABC123, etc.
+                const { data: { text } } = await Tesseract.recognize(file, 'spa+eng');
                 const match = text.match(/\b([A-Z]{1,4}[-\/]?\d{3,}[-\/]?[A-Z0-9]{0,6})\b/i);
-                if (match && !custBatchInput.value.trim()) {
-                    custBatchInput.value = match[1].toUpperCase();
-                    batchAutoLabel.textContent = '✓ Detectado con IA';
+                if (match && !document.getElementById('custBatch').value) {
+                    document.getElementById('custBatch').value = match[1].toUpperCase();
+                    document.getElementById('batchAutoLabel').textContent = '✓ Detectado con IA';
                 }
-            } catch (err) {
-                console.warn('OCR failed:', err);
-            } finally {
-                ocrStatus.classList.add('hidden');
-                ocrStatus.classList.remove('flex');
-            }
+            } finally { status.classList.add('hidden'); status.classList.remove('flex'); }
         }
-
-        document.getElementById('btnCamera').addEventListener('click', () =>
-            document.getElementById('inputCamera').click());
-        document.getElementById('btnGallery').addEventListener('click', () =>
-            document.getElementById('inputGallery').click());
-        document.getElementById('inputCamera').addEventListener('change', e =>
-            addFilesToPreview(Array.from(e.target.files)));
-        document.getElementById('inputGallery').addEventListener('change', e =>
-            addFilesToPreview(Array.from(e.target.files)));
+        document.getElementById('btnCamera').onclick = () => document.getElementById('inputCamera').click();
+        document.getElementById('btnGallery').onclick = () => document.getElementById('inputGallery').click();
+        document.getElementById('inputCamera').onchange = e => addFiles(e.target.files);
+        document.getElementById('inputGallery').onchange = e => addFiles(e.target.files);
 
         // ── Recent Activity ───────────────────────────────────────────────────
         async function fetchRecentActivity() {
-            const { data, error } = await supabase
-                .from('treatments')
-                .select('*, clients(full_name, dni)')
-                .order('created_at', { ascending: false })
-                .limit(5);
-
+            const { data, error } = await supabase.from('treatments').select('*, clients(full_name, dni)')
+                .eq('company_id', currentCompanyId).order('created_at', { ascending: false }).limit(10);
             if (error || !data) return;
-
             const container = document.getElementById('activityContainer');
-            // Remove all data rows (keep header)
             container.querySelectorAll('.data-row').forEach(r => r.remove());
-
-            if (data.length === 0) {
-                const empty = document.createElement('p');
-                empty.className = 'text-sm text-slate/30 py-8 text-center data-row';
-                empty.textContent = 'Aún no hay servicios registrados';
-                container.appendChild(empty);
-                return;
-            }
-
             data.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
                 const row = document.createElement('div');
-                row.className = 'data-row grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 cursor-pointer group';
-                row.onclick = () => window.location.href = `client-file.html?id=${item.client_id}`;
-                row.innerHTML = `
-                    <div class="col-span-4 flex items-center gap-3">
+                row.className = 'data-row grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 hover:bg-cream/50 transition-colors rounded-xl px-1 group cursor-pointer';
+
+                // Entity Links
+                const clientLink = `ficha-cliente.html?id=${item.client_id}`;
+                const lotLink = item.batch_number ? `ficha-lotes.html?batch=${encodeURIComponent(item.batch_number)}` : '#';
+
+                row.innerHTML = `<div class="col-span-4 flex items-center gap-3">
                         <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(item.clients.full_name)}&background=B8D8D8&color=4A4E69&bold=true" class="w-9 h-9 rounded-full">
                         <div>
-                            <div class="text-sm font-bold text-slate group-hover:text-brand transition-colors">${item.clients.full_name}</div>
-                            <div class="text-xs text-slate/40">DNI: ${item.clients.dni}</div>
+                            <a href="${clientLink}" class="text-sm font-bold text-slate hover:text-brand block transition-colors">${item.clients.full_name}</a>
+                            <div class="text-xs text-slate/40">${item.clients.dni}</div>
                         </div>
                     </div>
                     <div class="col-span-3">
-                        <a href="treatment-file.html?type=${encodeURIComponent(item.type)}"
-                           class="text-xs bg-lavender/20 text-slate px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5 hover:bg-lavender/40 transition-colors">
-                            <i class="ph ph-eyedropper text-lavender"></i> ${item.type}
-                        </a>
+                        <a href="listado-servicios.html?type=${encodeURIComponent(item.type)}" class="text-xs bg-lavender/20 text-slate px-3 py-1.5 rounded-lg font-medium hover:bg-brand hover:text-white transition-all cursor-pointer inline-block">${item.type}</a>
                     </div>
                     <div class="col-span-3">
-                        <span class="text-xs text-slate/50 font-mono flex items-center gap-1.5">
-                            <i class="ph ph-barcode"></i> ${item.batch_number || '—'}
-                        </span>
+                        ${item.batch_number ? `<a href="${lotLink}" class="font-mono text-xs text-slate hover:text-brand underline decoration-slate/10 transition-colors">${item.batch_number}</a>` : '<span class="text-slate/20">—</span>'}
                     </div>
-                    <div class="col-span-2 text-right text-xs text-slate/40 font-medium">${date}</div>
-                `;
+                    <div class="col-span-2 text-right text-xs text-slate/40">${date}</div>`;
+
+                // Allow row click to go to client file but don't interfere with specific links
+                row.onclick = (e) => {
+                    if (e.target.tagName !== 'A') {
+                        window.location.href = clientLink;
+                    }
+                };
                 container.appendChild(row);
             });
         }
 
         // ── Form Submit ───────────────────────────────────────────────────────
-        newServiceForm.addEventListener('submit', async e => {
+        newServiceForm.onsubmit = async (e) => {
             e.preventDefault();
+            const submitBtn = document.getElementById('submitServiceBtn');
+            submitBtn.disabled = true; submitBtn.textContent = 'Guardando...';
             const name = custNameInput.value.trim();
             const dni = custDniInput.value.trim();
             const type = document.getElementById('custService').value;
-            const batch = custBatchInput.value.trim() || null;
+            const batch = document.getElementById('custBatch').value.trim() || null;
 
-            const submitBtn = document.getElementById('submitServiceBtn');
-            submitBtn.textContent = 'Guardando...';
-            submitBtn.disabled = true;
-
-            // 1. Upsert client
-            let { data: existing } = await supabase
-                .from('clients').select('id').eq('dni', dni).maybeSingle();
-
-            let clientId;
-            if (existing) {
-                clientId = existing.id;
-            } else {
-                const { data: created } = await supabase
-                    .from('clients').insert({ full_name: name, dni }).select('id').single();
+            let { data: existing } = await supabase.from('clients').select('id').eq('dni', dni).eq('company_id', currentCompanyId).maybeSingle();
+            let clientId = existing?.id;
+            if (!clientId) {
+                const { data: created } = await supabase.from('clients').insert({ full_name: name, dni, company_id: currentCompanyId }).select('id').single();
                 clientId = created.id;
             }
 
-            // 2. Insert treatment
             const { data: treatment } = await supabase.from('treatments').insert({
-                client_id: clientId,
-                type,
-                batch_number: batch,
-                registration_id: _generatedRegId,
-                photo_urls: []
+                client_id: clientId, company_id: currentCompanyId, type, batch_number: batch, registration_id: _generatedRegId, photo_urls: []
             }).select('id').single();
 
-            // 3. Upload photos to Supabase Storage
-            const uploadedUrls = [];
-            if (_selectedFiles.length > 0 && treatment) {
+            if (treatment && _selectedFiles.length > 0) {
+                const urls = [];
                 for (const file of _selectedFiles) {
-                    const ext = file.name.split('.').pop();
-                    const path = `${clientId}/${treatment.id}/${Date.now()}.${ext}`;
-                    const { data: uploaded } = await supabase.storage
-                        .from('treatment-photos')
-                        .upload(path, file, { upsert: true });
-                    if (uploaded) {
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('treatment-photos')
-                            .getPublicUrl(path);
-                        uploadedUrls.push(publicUrl);
-                    }
+                    const path = `${clientId}/${treatment.id}/${Date.now()}.${file.name.split('.').pop()}`;
+                    await supabase.storage.from('treatment-photos').upload(path, file);
+                    const { data: { publicUrl } } = supabase.storage.from('treatment-photos').getPublicUrl(path);
+                    urls.push(publicUrl);
                 }
-                // Update treatment with photo URLs
-                if (uploadedUrls.length > 0) {
-                    await supabase.from('treatments')
-                        .update({ photo_urls: uploadedUrls })
-                        .eq('id', treatment.id);
-                }
+                await supabase.from('treatments').update({ photo_urls: urls }).eq('id', treatment.id);
             }
+            window.location.href = `ficha-cliente.html?id=${clientId}`;
+        };
 
-            window.location.href = `client-file.html?id=${clientId}`;
-        });
-
-        // ── Keyboard shortcuts ────────────────────────────────────────────────
-        document.addEventListener('keydown', e => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                inlineSearchInput.focus();
-            }
-            if (e.key === 'Escape') {
-                inlineSearchDropdown.classList.add('hidden');
-                window.closeNewService();
-            }
-        });
-
-        // ── KPI Stats from Supabase ──────────────────────────────────────────
+        // ── KPI Stats ────────────────────────────────────────────────────────
         async function fetchKPIs() {
-            // Total clients
-            const { count: clientCount } = await supabase
-                .from('clients').select('*', { count: 'exact', head: true });
-            document.getElementById('kpiClients').textContent = clientCount ?? 0;
-
-            // Services this month
-            const now = new Date();
-            const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-            const { count: monthServices } = await supabase
-                .from('treatments').select('*', { count: 'exact', head: true })
-                .gte('created_at', firstOfMonth);
-            document.getElementById('kpiServices').textContent = monthServices ?? 0;
-
-            // Unique batches
-            const { data: batches } = await supabase
-                .from('treatments').select('batch_number')
-                .not('batch_number', 'is', null);
-            const uniqueBatches = new Set((batches || []).map(b => b.batch_number)).size;
-            document.getElementById('kpiBatches').textContent = uniqueBatches;
+            const firstOfMonth = new Date(); firstOfMonth.setDate(1); firstOfMonth.setHours(0, 0, 0, 0);
+            const [cCount, sCount, bCount] = await Promise.all([
+                supabase.from('clients').select('*', { count: 'exact', head: true }).eq('company_id', currentCompanyId),
+                supabase.from('treatments').select('*', { count: 'exact', head: true }).eq('company_id', currentCompanyId).gte('created_at', firstOfMonth.toISOString()),
+                supabase.rpc('count_distinct_batches_by_company', { comp_id: currentCompanyId })
+            ]);
+            document.getElementById('kpiClients').textContent = cCount.count ?? 0;
+            document.getElementById('kpiServices').textContent = sCount.count ?? 0;
+            document.getElementById('kpiBatches').textContent = bCount.data ?? 0;
         }
-
-        // ── Init ─────────────────────────────────────────────────────────────
-        fetchRecentActivity();
-        fetchKPIs();
     </script>
-
+    <!-- Navigation Logic -->
+    <script src="./navigation.js"></script>
 </body>
 
 </html>

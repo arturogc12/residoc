@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Supabase Client -->
+    <script type="module" src="./supabase.js"></script>
 
     <script>
         tailwind.config = {
@@ -149,7 +151,7 @@
 
             <!-- Social Links -->
             <div class="grid grid-cols-2 gap-4">
-                <button
+                <button id="googleLoginBtn"
                     class="bg-white border border-slate/5 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-slate/5 transition-colors shadow-sm">
                     <i class="ph-fill ph-google-logo text-brand"></i>
                     <span class="text-sm font-bold text-slate">Google</span>
@@ -169,7 +171,43 @@
         </p>
     </div>
 
-</div>
-</body>
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        // Check if already logged in
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+        checkSession();
+
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        googleLoginBtn.addEventListener('click', async () => {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + '/dashboard.html'
+                }
+            });
+            if (error) {
+                alert('Error al iniciar sesión con Google: ' + error.message);
+            }
+        });
+
+        // Email login (placeholder for actual implementation)
+        const loginForm = document.querySelector('form');
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // For now, let's just show a message that they should use Google
+            // or implement real Supabase email auth here if requested.
+            alert('Por ahora use el botón de Google para mayor seguridad.');
+        });
+    </script>
+    </body>
 
 </html>

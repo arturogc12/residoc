@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modo Inspección | Residoc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script type="module" src="./supabase.js"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        cream: '#F9F7F2', mint: '#B8D8D8', lavender: '#E2C2FF',
+                        slate: '#353b48', brand: { DEFAULT: '#3972B6', dark: '#2d5a92' }
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(74,78,105,0.08)',
+                        'float': '0 30px 60px -20px rgba(74,78,105,0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F9F7F2;
+            color: #4A4E69;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+
+        /* Print styles */
+        @media print {
+
+            nav,
+            button,
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            .print-section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
+    <nav id="mainNav"></nav>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1200px] mx-auto w-full">
+
+        <!-- HEADER -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 fade-in-up">
+            <div>
+                <p class="text-sm text-slate/40 font-medium mb-1">Audit-Ready</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-slate flex items-center justify-center">
+                        <i class="ph-fill ph-shield-check text-mint text-xl"></i>
+                    </span>
+                    Modo Inspección
+                </h1>
+                <p class="text-slate/40 text-sm mt-1">Vista de solo lectura · Exportación de expediente para Sanidad</p>
+            </div>
+            <div class="flex gap-3 no-print">
+                <button onclick="exportPDF()"
+                    class="bg-brand text-white px-5 py-3 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                    <i class="ph ph-file-pdf"></i> Exportar PDF
+                </button>
+                <button onclick="window.print()"
+                    class="bg-white border border-slate/10 text-slate px-5 py-3 rounded-2xl font-bold text-sm hover:shadow-soft transition-all flex items-center gap-2">
+                    <i class="ph ph-printer"></i> Imprimir
+                </button>
+            </div>
+        </header>
+
+        <!-- AUDIT BANNER -->
+        <div class="bg-slate rounded-[24px] p-6 mb-8 fade-in-up delay-100 relative overflow-hidden">
+            <div class="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/5"></div>
+            <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/5"></div>
+            <div class="relative flex flex-col sm:flex-row sm:items-start gap-8">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2 h-2 rounded-full bg-mint animate-pulse"></span>
+                        <span class="text-xs font-bold text-mint/70 uppercase tracking-widest">Identificación del
+                            Centro</span>
+                    </div>
+                    <p class="text-white font-bold text-2xl mb-1" id="centerName">Cargando...</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 mt-4 text-white/60 text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-identification-card text-mint/40"></i>
+                            <span>CIF: <span id="centerCif" class="text-white/80 font-medium">—</span></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-shield-check text-mint/40"></i>
+                            <span>Reg. Sanitario: <span id="centerSanitary"
+                                    class="text-white/80 font-medium">—</span></span>
+                        </div>
+                        <div class="flex items-center gap-2 col-span-1 sm:col-span-2">
+                            <i class="ph ph-map-pin text-mint/40"></i>
+                            <span id="centerAddress" class="text-white/80 font-medium">—</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-6 sm:border-l sm:border-white/10 sm:pl-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white" id="auditClients">—</div>
+                        <div class="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">Clientes</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white" id="auditServices">—</div>
+                        <div class="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">Servicios</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white" id="auditBatches">—</div>
+                        <div class="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">Lotes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTIONS GRID -->
+        <div class="space-y-6">
+
+            <!-- ÚLTIMOS SERVICIOS -->
+            <section
+                class="bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden fade-in-up delay-100 print-section"
+                id="servicesSection">
+                <div class="px-6 sm:px-8 pt-6 pb-4 flex items-center justify-between border-b border-slate/5">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate flex items-center gap-2">
+                            <i class="ph-fill ph-calendar-check text-brand"></i> Últimos servicios registrados
+                        </h2>
+                        <p class="text-sm text-slate/40 mt-0.5">Trazabilidad completa — últimos 30 días</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate/30 bg-cream px-3 py-1.5 rounded-lg"
+                        id="servicesCount">—</span>
+                </div>
+                <div class="px-4 sm:px-8 pb-4">
+                    <div
+                        class="hidden sm:grid grid-cols-12 gap-4 text-[10px] font-bold text-slate/30 uppercase tracking-widest py-3 border-b border-slate/5">
+                        <div class="col-span-2">Fecha / Hora</div>
+                        <div class="col-span-2">Cliente</div>
+                        <div class="col-span-2">Servicio / Producto</div>
+                        <div class="col-span-2">Lote / Caducidad</div>
+                        <div class="col-span-2">Operario</div>
+                        <div class="col-span-2 text-right">Evidencia</div>
+                    </div>
+                    <div id="servicesContainer"></div>
+                </div>
+            </section>
+
+            <!-- LOTES -->
+            <section
+                class="bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden fade-in-up delay-200 print-section"
+                id="lotesSection">
+                <div class="px-6 sm:px-8 pt-6 pb-4 flex items-center justify-between border-b border-slate/5">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate flex items-center gap-2">
+                            <i class="ph-fill ph-package text-lavender"></i> Lotes de productos utilizados
+                        </h2>
+                        <p class="text-sm text-slate/40 mt-0.5">Trazabilidad de materiales</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate/30 bg-cream px-3 py-1.5 rounded-lg"
+                        id="lotesCount">—</span>
+                </div>
+                <div class="px-4 sm:px-8 pb-4">
+                    <div
+                        class="hidden sm:grid grid-cols-12 gap-4 text-xs font-bold text-slate/30 uppercase tracking-wider py-3 border-b border-slate/5">
+                        <div class="col-span-4">Nº Lote</div>
+                        <div class="col-span-4">Tipo de servicio</div>
+                        <div class="col-span-4 text-right">Último uso</div>
+                    </div>
+                    <div id="lotesContainer"></div>
+                </div>
+            </section>
+
+            <!-- RESIDUOS BIOSANITARIOS -->
+            <section
+                class="bg-white rounded-[28px] shadow-sm border border-slate/5 overflow-hidden fade-in-up delay-300 print-section"
+                id="residuosSection">
+                <div class="px-6 sm:px-8 pt-6 pb-4 flex items-center justify-between border-b border-slate/5">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate flex items-center gap-2">
+                            <i class="ph-fill ph-biohazard text-amber-500"></i> Residuos Biosanitarios Clase III
+                        </h2>
+                        <p class="text-sm text-slate/40 mt-0.5">Registros de retirada por gestor autorizado</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate/30 bg-cream px-3 py-1.5 rounded-lg"
+                        id="residuosCount">—</span>
+                </div>
+                <div class="px-4 sm:px-8 pb-4">
+                    <div
+                        class="hidden sm:grid grid-cols-12 gap-4 text-xs font-bold text-slate/30 uppercase tracking-wider py-3 border-b border-slate/5">
+                        <div class="col-span-4">Gestor autorizado</div>
+                        <div class="col-span-3">Fecha retirada</div>
+                        <div class="col-span-3">Albarán</div>
+                        <div class="col-span-2 text-right">Clase</div>
+                    </div>
+                    <div id="residuosContainer">
+                        <div class="py-8 text-center text-slate/30 text-sm">Sin registros de residuos todavía.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SELLO AUDIT -->
+            <div
+                class="bg-cream rounded-[24px] p-6 border border-slate/5 text-center fade-in-up delay-300 print-section">
+                <i class="ph ph-seal-check text-4xl text-brand/20 mb-2 block"></i>
+                <p class="text-xs font-bold text-slate/30 uppercase tracking-widest">Sello de trazabilidad</p>
+                <p class="text-sm text-slate/50 mt-1" id="auditSeal">Expediente generado automáticamente por Residoc</p>
+                <p class="text-xs text-slate/30 mt-0.5 font-mono" id="auditTimestamp"></p>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        let currentCompanyId = null;
+        let companyName = 'Centro Médico';
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                loadAll();
+            } else {
+                const { data: profile } = await supabase.from('profiles')
+                    .select('company_id, companies(*)')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profile) {
+                    currentCompanyId = profile.company_id;
+                    const c = profile.companies;
+                    document.getElementById('centerName').textContent = c.name;
+                    document.getElementById('centerCif').textContent = c.cif || '—';
+                    document.getElementById('centerSanitary').textContent = c.registro_sanitario || '—';
+                    document.getElementById('centerAddress').textContent = c.address || c.location || '—';
+                    document.getElementById('auditSeal').textContent = `Expediente de ${c.name} (CIF: ${c.cif || '—'}) · Autenticado por Residoc`;
+                }
+                loadAll();
+            }
+        }
+
+        async function loadAll() {
+            const now = new Date();
+            const exportDateStr = now.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            document.getElementById('exportDate').textContent = exportDateStr;
+            document.getElementById('auditTimestamp').textContent = `Timestamp: ${now.toISOString()}`;
+            document.getElementById('centerName').textContent = companyName;
+            document.getElementById('auditSeal').textContent = `Expediente de ${companyName} · Generado automáticamente por Residoc`;
+
+            const thirtyDaysAgo = new Date(now - 30 * 86400000).toISOString();
+
+            const [treatments, residuos, clients] = await Promise.all([
+                supabase.from('treatments')
+                    .select('*, clients(full_name, dni), profiles(full_name, enabling_title)')
+                    .eq('company_id', currentCompanyId)
+                    .gte('created_at', thirtyDaysAgo)
+                    .order('created_at', { ascending: false }),
+                supabase.from('waste_records').select('*').eq('company_id', currentCompanyId).order('pickup_date', { ascending: false }),
+                supabase.from('clients').select('*', { count: 'exact', head: true }).eq('company_id', currentCompanyId)
+            ]);
+
+            const data = treatments.data || [];
+            document.getElementById('auditClients').textContent = clients.count ?? 0;
+            document.getElementById('auditServices').textContent = data.length;
+
+            // Unique batches
+            const uniqueBatches = [...new Set(data.map(t => t.batch_number).filter(Boolean))];
+            document.getElementById('auditBatches').textContent = uniqueBatches.length;
+
+            // Services table
+            document.getElementById('servicesCount').textContent = `${data.length} registros`;
+            const sc = document.getElementById('servicesContainer');
+            sc.innerHTML = '';
+            if (data.length === 0) {
+                sc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin servicios en los últimos 30 días.</div>';
+            } else {
+                data.forEach(item => {
+                    const d = document.createElement('div');
+                    d.className = 'grid grid-cols-12 gap-4 items-start py-4 border-b border-slate/5 text-sm print-section';
+                    const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const time = new Date(item.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+                    const technician = item.profiles?.full_name || '—';
+                    const techTitle = item.profiles?.enabling_title || '';
+
+                    d.innerHTML = `
+                        <div class="col-span-2">
+                            <div class="font-bold text-slate">${date}</div>
+                            <div class="text-[10px] text-slate/30 font-mono">${time}</div>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="font-bold text-slate">${item.clients?.full_name || '—'}</div>
+                            <div class="text-[10px] text-slate/40 font-mono">${item.clients?.dni || '—'}</div>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="text-xs font-bold text-slate mb-0.5">${item.type}</div>
+                            <div class="text-[10px] text-slate/50 italic">${item.product_name || '—'}</div>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="text-[10px] font-bold text-brand uppercase tracking-widest">${item.batch_number || 'S/N'}</div>
+                            <div class="text-[10px] text-slate/40">CAD: ${item.product_expiry ? new Date(item.product_expiry).toLocaleDateString() : '—'}</div>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="text-xs font-bold text-slate">${technician}</div>
+                            <div class="text-[9px] text-slate/40 leading-tight">${techTitle}</div>
+                        </div>
+                        <div class="col-span-2 text-right flex flex-col items-end gap-1">
+                            ${item.consent_photo_url ? `<div class="text-[9px] font-bold text-brand flex items-center gap-1"><i class="ph ph-signature"></i> FIRMA OK</div>` : '<div class="text-[9px] text-slate/30">PEND. FIRMA</div>'}
+                            <div class="text-[9px] text-slate/30">${item.photo_urls?.length || 0} FOTOS</div>
+                        </div>`;
+                    sc.appendChild(d);
+                });
+            }
+
+            // Lotes table
+            document.getElementById('lotesCount').textContent = `${uniqueBatches.length} lotes`;
+            const lc = document.getElementById('lotesContainer');
+            lc.innerHTML = '';
+            if (uniqueBatches.length === 0) {
+                lc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin lotes registrados.</div>';
+            } else {
+                uniqueBatches.forEach(batch => {
+                    const items = data.filter(t => t.batch_number === batch);
+                    const lastUse = new Date(Math.max(...items.map(t => new Date(t.created_at)))).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const d = document.createElement('div');
+                    d.className = 'grid grid-cols-12 gap-4 items-center py-3 border-b border-slate/5 text-sm';
+                    d.innerHTML = `
+                        < div class="col-span-4 font-mono font-bold text-brand text-xs" > ${batch}</div >
+                        <div class="col-span-4 text-xs text-slate/60">${[...new Set(items.map(t => t.type))].join(', ')}</div>
+                        <div class="col-span-4 text-right text-xs text-slate/40">${lastUse}</div>`;
+                    lc.appendChild(d);
+                });
+            }
+
+            // Residuos table
+            const rd = residuos.data || [];
+            document.getElementById('residuosCount').textContent = `${rd.length} retiradas`;
+            const rc = document.getElementById('residuosContainer');
+            rc.innerHTML = '';
+            if (rd.length === 0) {
+                rc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin registros de residuos.</div>';
+            } else {
+                rd.forEach(r => {
+                    const date = r.pickup_date ? new Date(r.pickup_date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+                    const d = document.createElement('div');
+                    d.className = 'grid grid-cols-12 gap-4 items-center py-3 border-b border-slate/5 text-sm';
+                    d.innerHTML = `
+                        < div class="col-span-4 font-bold text-slate" > ${r.gestor_name || '—'}</div >
+                        <div class="col-span-3 text-slate/50">${date}</div>
+                        <div class="col-span-3 text-xs font-mono text-slate/40">${r.albaran || '—'}</div>
+                        <div class="col-span-2 text-right"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-lg border border-amber-100">${r.class || 'III'}</span></div>`;
+                    rc.appendChild(d);
+                });
+            }
+        }
+
+        // PDF Export
+        window.exportPDF = function () {
+            const element = document.getElementById('servicesSection').closest('div') || document.querySelector('main');
+            const options = {
+                margin: 10,
+                filename: `Expediente_Sanidad_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            const mainEl = document.querySelector('main');
+            const noprint = document.querySelectorAll('.no-print');
+            noprint.forEach(el => el.style.display = 'none');
+            html2pdf().set(options).from(mainEl).save().then(() => {
+                noprint.forEach(el => el.style.display = '');
+            });
+        };
+
+        checkSession();
+    </script>
+    <script src="./navigation.js"></script>
+</body>
+
+</html>

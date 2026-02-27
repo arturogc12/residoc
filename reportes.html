@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residoc | Generación de Informes</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script type="module" src="./supabase.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#4A90E2',
+                        slate: '#2D3436',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        cream: '#F9F7F2',
+                    },
+                    boxShadow: { 'soft': '0 10px 40px -10px rgba(0,0,0,0.05)', 'float': '0 20px 50px -12px rgba(0,0,0,0.1)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F9F7F2;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hide elements during PDF export */
+        .no-export {
+            display: block;
+        }
+
+        .exporting .no-export {
+            display: none !important;
+        }
+
+        .exporting .main-card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .exporting body {
+            background: white !important;
+        }
+
+        .shadow-float {
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .period-btn-active {
+            background-color: #1e293b !important;
+            color: white !important;
+            transform: scale(1.05);
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="mainNav"></nav>
+
+    <main id="exportArea" class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full mb-20">
+        <!-- ===== HEADER ===== -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4 fade-in-up">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white">
+                    <i class="ph ph-file-pdf text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-slate/40 font-medium mb-1">Centro Sanitario</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight">Generación de Informes</h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 no-export">
+                <button id="exportPdfBtn"
+                    class="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-float">
+                    <i class="ph ph-download-simple"></i>
+                    Exportar PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== FILTERS SECTION ===== -->
+        <section
+            class="bg-white rounded-[32px] shadow-soft border border-slate/5 p-6 mb-8 fade-in-up delay-100 no-export">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-2">Cliente</label>
+                    <input type="text" id="clientFilter" placeholder="Nombre o DNI..."
+                        class="w-full bg-cream/30 border border-slate/5 rounded-2xl py-3 px-5 outline-none focus:ring-2 focus:ring-brand/20 transition-all text-sm font-medium">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-2">Lote /
+                        Registro</label>
+                    <input type="text" id="batchFilter" placeholder="Nº Lote..."
+                        class="w-full bg-cream/30 border border-slate/5 rounded-2xl py-3 px-5 outline-none focus:ring-2 focus:ring-brand/20 transition-all text-sm font-medium">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-2">Servicio</label>
+                    <select id="typeFilter"
+                        class="w-full bg-cream/30 border border-slate/5 rounded-2xl py-3 px-5 outline-none focus:ring-2 focus:ring-brand/20 transition-all text-sm font-medium">
+                        <option value="">Todos los servicios</option>
+                        <option>Ácido Hialurónico</option>
+                        <option>Botox</option>
+                        <option>Microblading</option>
+                        <option>Micropigmentación</option>
+                        <option>Peeling Químico</option>
+                        <option>Mesoterapia</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-2">Motivo
+                        (Compliance)</label>
+                    <select id="reasonSelector"
+                        class="w-full bg-slate-900 text-white rounded-2xl py-3 px-5 outline-none focus:ring-2 focus:ring-brand/20 transition-all text-sm font-medium">
+                        <option value="Información Clínica">Información Clínica</option>
+                        <option value="Inspección Sanitaria">Inspección Sanitaria</option>
+                        <option value="Auditoría Interna">Auditoría Interna</option>
+                        <option value="Requerimiento Legal">Requerimiento Legal</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-slate/5 flex flex-col sm:flex-row gap-6 items-end justify-between">
+                <div class="flex flex-col gap-4 w-full">
+                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-2">Rango de Fechas /
+                        Accesos Rápidos</label>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div
+                            class="flex items-center gap-1 bg-cream/30 border border-slate/5 p-1 rounded-2xl shadow-sm">
+                            <button onclick="setQuickPeriod('month')" id="btnMonth"
+                                class="px-4 py-2 rounded-xl text-xs font-bold transition-all period-btn-active shadow-float">Mes</button>
+                            <button onclick="setQuickPeriod('quarter')" id="btnQuarter"
+                                class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate/60 hover:bg-white">Trimestre</button>
+                            <button onclick="setQuickPeriod('year')" id="btnYear"
+                                class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate/60 hover:bg-white hover:text-slate">Año</button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="date" id="dateFrom"
+                                class="bg-cream/30 border border-slate/5 rounded-xl py-2 px-4 outline-none text-xs font-bold text-slate focus:ring-2 focus:ring-brand/20 transition-all shadow-sm">
+                            <span class="text-slate/20 font-bold">—</span>
+                            <input type="date" id="dateTo"
+                                class="bg-cream/30 border border-slate/5 rounded-xl py-2 px-4 outline-none text-xs font-bold text-slate focus:ring-2 focus:ring-brand/20 transition-all shadow-sm">
+                        </div>
+                    </div>
+                </div>
+                <button id="applyFiltersBtn"
+                    class="w-full sm:w-auto bg-brand text-white px-10 py-3.5 rounded-2xl font-bold hover:bg-brand/90 transition-all shadow-lg hover:shadow-brand/20">
+                    Aplicar Filtros
+                </button>
+            </div>
+        </section>
+
+        <!-- ===== RESULTS TABLE ===== -->
+        <section
+            class="main-card bg-white rounded-[32px] shadow-soft border border-slate/5 overflow-hidden fade-in-up delay-200">
+            <div id="reportAuditHeader"
+                class="hidden px-8 py-6 bg-slate-900 text-white flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight">Informe Residoc</h2>
+                    <p id="auditReasonLabel" class="text-xs text-white/50 uppercase tracking-widest mt-1">MOTIVO:
+                        INSPECCIÓN SANITARIA</p>
+                </div>
+                <div class="text-right">
+                    <p id="auditDateLabel" class="text-xs font-bold font-mono">26/02/2026</p>
+                    <p class="text-[10px] text-white/30 uppercase font-bold mt-1">SISTEMA DE TRAZABILIDAD SEGURO</p>
+                </div>
+            </div>
+
+            <div class="px-8 py-5 border-b border-slate/5 bg-cream/30">
+                <div class="grid grid-cols-12 gap-4 text-[10px] font-bold text-slate/30 uppercase tracking-widest">
+                    <div class="col-span-2">Fecha</div>
+                    <div class="col-span-4">Cliente</div>
+                    <div class="col-span-3">Tratamiento</div>
+                    <div class="col-span-3">Lote</div>
+                </div>
+            </div>
+
+            <div id="resultsRows" class="divide-y divide-slate/5">
+                <!-- Results injected by JS -->
+                <p class="py-20 text-center text-slate/30 text-sm">Aplica los filtros para ver el resumen.</p>
+            </div>
+
+            <div id="reportFooter"
+                class="hidden px-8 py-6 border-t border-slate/5 bg-cream/10 text-[10px] text-slate/30 flex justify-between items-center font-bold uppercase tracking-widest">
+                <span>Generado automáticamente por Residoc Compliance</span>
+                <span>Firma Digital: #RES-${Math.floor(Math.random() * 999999)}</span>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        let currentCompanyId = null;
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                return;
+            }
+            const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
+            if (!profile) return;
+            currentCompanyId = profile.company_id;
+            setQuickPeriod('month');
+        }
+
+        window.setQuickPeriod = (period) => {
+            const now = new Date();
+            let start = new Date();
+            let end = new Date();
+
+            if (period === 'month') {
+                start.setDate(1);
+            } else if (period === 'quarter') {
+                const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
+                start.setMonth(quarterStartMonth);
+                start.setDate(1);
+            } else if (period === 'year') {
+                start.setMonth(0);
+                start.setDate(1);
+            }
+
+            document.getElementById('dateFrom').value = start.toISOString().split('T')[0];
+            document.getElementById('dateTo').value = end.toISOString().split('T')[0];
+
+            ['Month', 'Quarter', 'Year'].forEach(p => {
+                const btn = document.getElementById(`btn${p}`);
+                if (p.toLowerCase() === period) {
+                    btn.classList.add('period-btn-active', 'shadow-float');
+                    btn.classList.remove('text-slate/60', 'hover:bg-white');
+                } else {
+                    btn.style.backgroundColor = 'transparent';
+                    btn.classList.add('text-slate/60', 'hover:bg-white');
+                    btn.classList.remove('period-btn-active', 'shadow-float');
+                }
+            });
+
+            fetchFilteredData();
+        };
+
+        async function fetchFilteredData() {
+            const clientQuery = document.getElementById('clientFilter').value.toLowerCase();
+            const batchQuery = document.getElementById('batchFilter').value.toUpperCase();
+            const serviceType = document.getElementById('typeFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            const container = document.getElementById('resultsRows');
+            container.innerHTML = `<div class="py-20 flex justify-center"><i class="ph ph-circle-notch animate-spin text-3xl text-brand"></i></div>`;
+
+            let query = supabase.from('treatments')
+                .select('*, clients(id, full_name, dni)')
+                .eq('company_id', currentCompanyId)
+                .order('created_at', { ascending: false });
+
+            if (serviceType) query = query.eq('type', serviceType);
+            if (dateFrom) query = query.gte('created_at', dateFrom);
+            if (dateTo) query = query.lte('created_at', dateTo);
+
+            const { data: treatments, error } = await query;
+
+            if (error) {
+                container.innerHTML = `<p class="py-20 text-center text-red-400 text-sm">Error cargando datos: ${error.message}</p>`;
+                return;
+            }
+
+            // Client and Batch sub-filtering because of complex relations/DNI search
+            const filtered = treatments.filter(t => {
+                const clientMatch = !clientQuery || t.clients?.full_name.toLowerCase().includes(clientQuery) || t.clients?.dni.toLowerCase().includes(clientQuery);
+                const batchMatch = !batchQuery || t.batch_number?.toUpperCase().includes(batchQuery) || t.registration_id.includes(batchQuery);
+                return clientMatch && batchMatch;
+            });
+
+            renderResults(filtered);
+        }
+
+        function renderResults(list) {
+            const container = document.getElementById('resultsRows');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = `<p class="py-20 text-center text-slate/30 text-sm">No se encontraron servicios con esos criterios.</p>`;
+                return;
+            }
+
+            list.forEach(t => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center px-8 py-4 group';
+                row.innerHTML = `
+                    <div class="col-span-2 text-sm font-bold text-slate">${new Date(t.created_at).toLocaleDateString()}</div>
+                    <div class="col-span-4 text-sm font-bold text-slate">${t.clients?.full_name || '—'}</div>
+                    <div class="col-span-3 text-sm font-semibold text-slate/70">${t.type}</div>
+                    <div class="col-span-3 text-xs font-mono text-slate/40">${t.batch_number || '—'}</div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        document.getElementById('applyFiltersBtn').onclick = fetchFilteredData;
+
+        document.getElementById('exportPdfBtn').onclick = () => {
+            const element = document.getElementById('exportArea');
+            const reason = document.getElementById('reasonSelector').value;
+
+            // Prepare for export
+            document.body.classList.add('exporting');
+            document.getElementById('reportAuditHeader').classList.remove('hidden');
+            document.getElementById('reportFooter').classList.remove('hidden');
+            document.getElementById('auditReasonLabel').textContent = `MOTIVO: ${reason.toUpperCase()}`;
+            document.getElementById('auditDateLabel').textContent = new Date().toLocaleDateString();
+
+            const opt = {
+                margin: 0.5,
+                filename: `Reporte_Residoc_${reason.replace(' ', '_')}_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore UI
+                document.body.classList.remove('exporting');
+                document.getElementById('reportAuditHeader').classList.add('hidden');
+                document.getElementById('reportFooter').classList.add('hidden');
+            });
+        };
+
+        checkSession();
+    </script>
+    <script src="./navigation.js"></script>
+</body>
+
+</html>

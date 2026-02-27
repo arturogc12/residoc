@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido | Residoc Onboarding</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Supabase Client -->
+    <script type="module" src="./supabase.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#F9F7F2',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        slate: '#353b48',
+                        brand: {
+                            DEFAULT: '#3972B6',
+                            dark: '#2d5a92'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(74, 78, 105, 0.08)',
+                        'float': '0 30px 60px -20px rgba(74, 78, 105, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F9F7F2;
+            color: #4A4E69;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-inactive {
+            display: none;
+        }
+    </style>
+</head>
+
+<body
+    class="min-h-screen w-full flex items-center justify-center p-6 bg-gradient-to-br from-[#daebfc] via-cream to-[#f0f6fc]">
+
+    <!-- Background Decor -->
+    <div class="absolute top-20 left-10 w-64 h-64 bg-mint/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
+    <div class="absolute bottom-10 right-20 w-80 h-80 bg-lavender/20 rounded-full blur-3xl -z-10 animate-pulse"
+        style="animation-delay: 1s;"></div>
+
+    <div class="w-full max-w-lg fade-in-up">
+        <!-- Logo -->
+        <div class="flex items-center justify-center gap-2 mb-10">
+            <div
+                class="w-10 h-10 rounded-full bg-slate text-cream flex items-center justify-center font-bold text-2xl shadow-lg">
+                <i class="ph ph-fingerprint"></i>
+            </div>
+            <span class="text-3xl font-bold tracking-tight text-slate">Residoc</span>
+        </div>
+
+        <!-- Onboarding Card -->
+        <div
+            class="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-[40px] shadow-float border border-white/50 relative overflow-hidden">
+            <!-- Progress Bar -->
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-slate/5">
+                <div id="progressBar" class="h-full bg-brand transition-all duration-500" style="width: 33%"></div>
+            </div>
+
+            <form id="onboardingForm" class="space-y-8">
+
+                <!-- STEP 1: Personal Info -->
+                <div id="step1" class="space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate mb-2 tracking-tight">¡Hola! Empecemos.</h1>
+                        <p class="text-slate/50 font-light text-lg">Primero, dinos quién eres.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Tu nombre completo</label>
+                            <input type="text" id="ownerName" required
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="Ej: Dr. Alejandro García">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Título / Especialidad</label>
+                            <input type="text" id="enablingTitle"
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="Ej: Médico Estético - Colegiado 12345">
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="nextStep(2)"
+                        class="w-full bg-slate text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate/90 hover:-translate-y-1 transition-all shadow-lg flex items-center justify-center gap-2 group">
+                        Continuar
+                        <i class="ph ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+
+                <!-- STEP 2: Company Info -->
+                <div id="step2" class="step-inactive space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate mb-2 tracking-tight">Sobre tu centro</h1>
+                        <p class="text-slate/50 font-light text-lg">Configura tu perfil de empresa.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Nombre del centro</label>
+                                <input type="text" id="companyName" required
+                                    class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                    placeholder="Ej: Clínica Dental Innova">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">CIF / NIF</label>
+                                <input type="text" id="companyCif"
+                                    class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                    placeholder="B12345678">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Registro Sanitario</label>
+                            <input type="text" id="companySanitary"
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="Nº de Registro de Centro Sanitario">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Dirección completa</label>
+                            <input type="text" id="companyAddress"
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="Calle, Número, Planta, Código Postal, Ciudad">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Teléfono
+                                    comercial</label>
+                                <input type="tel" id="companyPhone"
+                                    class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                    placeholder="600 000 000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Localidad</label>
+                                <input type="text" id="companyLocation"
+                                    class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 px-5 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                    placeholder="Madrid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="button" onclick="nextStep(1)"
+                            class="flex-1 bg-slate/5 text-slate/60 py-5 rounded-2xl font-bold text-lg hover:bg-slate/10 transition-all">
+                            Atrás
+                        </button>
+                        <button type="button" onclick="nextStep(3)"
+                            class="flex-[2] bg-slate text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate/90 hover:-translate-y-1 transition-all shadow-lg flex items-center justify-center gap-2 group">
+                            Casi listo
+                            <i class="ph ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Finish -->
+                <div id="step3" class="step-inactive space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate mb-2 tracking-tight">Todo preparado.</h1>
+                        <p class="text-slate/50 font-light text-lg">Confirma los datos para empezar con Residoc.</p>
+                    </div>
+
+                    <div class="bg-brand/5 p-6 rounded-3xl border border-brand/10 space-y-4">
+                        <div class="flex items-start gap-4">
+                            <i class="ph ph-check-circle-fill text-brand text-2xl mt-1"></i>
+                            <div>
+                                <p class="text-xs font-bold text-brand uppercase tracking-widest">Resumen</p>
+                                <p class="text-slate/70 text-sm mt-1" id="finalSummary">Se creará el perfil para <span
+                                        class="font-bold text-slate">...</span> en el centro <span
+                                        class="font-bold text-slate">...</span>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="button" onclick="nextStep(2)"
+                            class="flex-1 bg-slate/5 text-slate/60 py-5 rounded-2xl font-bold text-lg hover:bg-slate/10 transition-all">
+                            Atrás
+                        </button>
+                        <button type="submit" id="submitBtn"
+                            class="flex-[2] bg-brand text-white py-5 rounded-2xl font-bold text-lg hover:bg-brand-dark hover:-translate-y-1 transition-all shadow-lg flex items-center justify-center gap-2 group">
+                            Finalizar configuración
+                            <i
+                                class="ph ph-rocket-launch group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        let currentStep = 1;
+
+        window.nextStep = (step) => {
+            // Validation
+            if (step > currentStep) {
+                if (currentStep === 1 && !document.getElementById('ownerName').value) return;
+                if (currentStep === 2 && !document.getElementById('companyName').value) return;
+            }
+
+            // UI Update
+            document.getElementById(`step${currentStep}`).classList.add('step-inactive');
+            document.getElementById(`step${step}`).classList.remove('step-inactive');
+            currentStep = step;
+
+            // Progress bar
+            const percent = (step / 3) * 100;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+
+            if (step === 3) {
+                const owner = document.getElementById('ownerName').value;
+                const company = document.getElementById('companyName').value;
+                document.getElementById('finalSummary').innerHTML = `Se creará el perfil para <span class="font-bold text-slate">${owner}</span> en el centro <span class="font-bold text-slate">${company}</span>.`;
+            }
+        };
+
+        const form = document.getElementById('onboardingForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin"></i> Configurando...';
+
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+
+                // DEVELOPMENT BYPASS: If no user, mock the process and redirect
+                if (!user) {
+                    const ownerName = document.getElementById('ownerName').value;
+                    console.log("Onboarding: No hay usuario activo. Realizando bypass para pruebas.");
+                    localStorage.setItem('residoc_mock_name', ownerName);
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                    return;
+                }
+
+                const ownerName = document.getElementById('ownerName').value;
+                const enablingTitle = document.getElementById('enablingTitle').value;
+                const companyName = document.getElementById('companyName').value;
+                const companyCif = document.getElementById('companyCif').value;
+                const companySanitary = document.getElementById('companySanitary').value;
+                const companyAddress = document.getElementById('companyAddress').value;
+                const companyPhone = document.getElementById('companyPhone').value;
+                const companyLocation = document.getElementById('companyLocation').value;
+
+                // 1. Create company
+                const { data: company, error: compErr } = await supabase
+                    .from('companies')
+                    .insert({
+                        name: companyName,
+                        owner_name: ownerName,
+                        phone: companyPhone,
+                        location: companyLocation,
+                        email: user.email,
+                        cif: companyCif,
+                        registro_sanitario: companySanitary,
+                        address: companyAddress
+                    })
+                    .select()
+                    .single();
+
+                if (compErr) throw compErr;
+
+                // 2. Create profile
+                const { error: profErr } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: user.id,
+                        company_id: company.id,
+                        full_name: ownerName,
+                        role: 'admin',
+                        enabling_title: enablingTitle
+                    });
+
+                if (profErr) throw profErr;
+
+                // Success
+                window.location.href = 'dashboard.html';
+
+            } catch (error) {
+                console.error('Error during onboarding:', error);
+                alert('Hubo un error al guardar los datos. Inténtalo de nuevo.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Finalizar configuración <i class="ph ph-rocket-launch"></i>';
+            }
+        });
+    </script>
+</body>
+
+</html>

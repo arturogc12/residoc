@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residoc | Listado de Clientes</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="./supabase.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#4A90E2',
+                        slate: '#2D3436',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        cream: '#F9F7F2',
+                    },
+                    boxShadow: { 'soft': '0 10px 40px -10px rgba(0,0,0,0.05)', 'float': '0 20px 50px -12px rgba(0,0,0,0.1)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F9F7F2;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="mainNav"></nav>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+        <!-- ===== HEADER ===== -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4 fade-in-up">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <button onclick="window.location.href='dashboard.html'"
+                    class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate hover:text-brand transition-all">
+                    <i class="ph ph-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <p class="text-sm text-slate/40 font-medium mb-1">Administración</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight">Clientes</h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="relative flex-1 sm:w-64 group">
+                    <i
+                        class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar cliente..."
+                        class="w-full bg-white border border-slate/5 rounded-2xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 transition-all text-sm font-bold shadow-sm hover:border-slate/10">
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== CLIENTS TABLE ===== -->
+        <section class="fade-in-up delay-100">
+            <div class="bg-white rounded-[32px] shadow-sm border border-slate/5 overflow-hidden">
+                <div class="px-8 py-5 border-b border-slate/5 bg-cream/30">
+                    <div class="grid grid-cols-12 gap-4 text-[10px] font-bold text-slate/30 uppercase tracking-widest">
+                        <div class="col-span-1">Avatar</div>
+                        <div class="col-span-3">Nombre Completo</div>
+                        <div class="col-span-2">DNI / ID</div>
+                        <div class="col-span-3">Teléfono</div>
+                        <div class="col-span-2">Fecha Registro</div>
+                        <div class="col-span-1 text-right">Ficha</div>
+                    </div>
+                </div>
+
+                <div id="clientsRows" class="divide-y divide-slate/5">
+                    <!-- Rows injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        let currentCompanyId = null;
+        let allClients = [];
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                fetchClients();
+                return;
+            }
+            const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
+            if (!profile) { window.location.href = 'onboarding.html'; return; }
+            currentCompanyId = profile.company_id;
+            fetchClients();
+        }
+
+        async function fetchClients() {
+            const { data: clients, error } = await supabase.from('clients')
+                .select('*')
+                .eq('company_id', currentCompanyId)
+                .order('full_name', { ascending: true });
+
+            if (error) return;
+            allClients = clients;
+            renderClients(allClients);
+        }
+
+        function renderClients(list) {
+            const container = document.getElementById('clientsRows');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = `<p class="py-20 text-center text-slate/30 text-sm">No se encontraron clientes.</p>`;
+                return;
+            }
+
+            list.forEach(c => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center px-8 py-4 hover:bg-cream/50 transition-colors group';
+                row.innerHTML = `
+                    <div class="col-span-1">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(c.full_name)}&background=B8D8D8&color=4A4E69&bold=true&size=40" class="w-10 h-10 rounded-full">
+                    </div>
+                    <div class="col-span-3">
+                        <a href="ficha-cliente.html?id=${c.id}" class="font-bold text-slate hover:text-brand transition-colors">${c.full_name}</a>
+                    </div>
+                    <div class="col-span-2 text-sm text-slate/50 font-mono">${c.dni}</div>
+                    <div class="col-span-3 text-sm text-slate/50">${c.phone || '—'}</div>
+                    <div class="col-span-2 text-sm text-slate/40">${new Date(c.created_at).toLocaleDateString()}</div>
+                    <div class="col-span-1 text-right">
+                        <a href="ficha-cliente.html?id=${c.id}" class="w-9 h-9 bg-slate/5 rounded-xl flex items-center justify-center text-slate hover:bg-brand hover:text-white transition-all ml-auto">
+                            <i class="ph ph-file-text"></i>
+                        </a>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            const filtered = allClients.filter(c =>
+                c.full_name.toLowerCase().includes(q) ||
+                c.dni.toLowerCase().includes(q) ||
+                (c.phone && c.phone.toLowerCase().includes(q))
+            );
+            renderClients(filtered);
+        });
+
+        checkSession();
+    </script>
+    <!-- Navigation Logic -->
+    <script src="./navigation.js"></script>
+</body>
+
+</html>

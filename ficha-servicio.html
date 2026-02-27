@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residoc | Ficha de tratamiento</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="./supabase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#4A90E2',
+                        slate: '#2D3436',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        cream: '#F9F7F2',
+                    },
+                    boxShadow: { 'soft': '0 10px 40px -10px rgba(0,0,0,0.05)', 'float': '0 20px 50px -12px rgba(0,0,0,0.1)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F9F7F2;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="mainNav"></nav>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+        <!-- ===== HEADER ===== -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-10 gap-4 fade-in-up">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <button onclick="window.location.href='dashboard.html'"
+                    class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate hover:text-brand transition-all">
+                    <i class="ph ph-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <p class="text-sm text-slate/40 font-medium mb-1">Tipo de tratamiento</p>
+                    <h1 class="text-xl sm:text-3xl font-bold text-slate tracking-tight" id="treatmentHeader">—</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="bg-lavender/30 text-slate px-4 py-2 rounded-2xl text-sm font-bold flex items-center gap-2">
+                    <i class="ph ph-eyedropper text-lavender"></i> <span id="treatmentBadge">—</span>
+                </div>
+                <button id="exportPdfBtn"
+                    class="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate/5 text-sm font-bold text-slate hover:shadow-soft transition-all flex items-center gap-2">
+                    <i class="ph ph-file-pdf"></i> Exportar
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== SUMMARY CARD ===== -->
+        <div class="mb-8 fade-in-up">
+            <div class="bg-white rounded-[32px] p-7 shadow-sm border border-slate/5 flex flex-wrap gap-8">
+                <div>
+                    <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Tipo</p>
+                    <p class="text-lg font-bold text-slate" id="summaryType">—</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Total aplicaciones</p>
+                    <p class="text-lg font-bold text-slate" id="summaryTotal">—</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Primera aplicación</p>
+                    <p class="text-lg font-bold text-slate" id="summaryFirst">—</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate/30 uppercase tracking-widest mb-1">Última aplicación</p>
+                    <p class="text-lg font-bold text-slate" id="summaryLast">—</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TABLE ===== -->
+        <section class="fade-in-up">
+            <div class="bg-white rounded-[32px] shadow-sm border border-slate/5 overflow-hidden">
+                <div class="px-8 py-7 border-b border-slate/5 font-bold text-slate">Historial de aplicaciones</div>
+                <div id="treatmentRows" class="p-4 space-y-1"></div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        let currentCompanyId = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const treatmentType = decodeURIComponent(urlParams.get('type') || '');
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                fetchData();
+                return;
+            }
+            const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
+            if (!profile) { window.location.href = 'onboarding.html'; return; }
+            currentCompanyId = profile.company_id;
+            fetchData();
+        }
+
+        async function fetchData() {
+            if (!treatmentType) return;
+            document.getElementById('treatmentHeader').textContent = treatmentType;
+            document.getElementById('treatmentBadge').textContent = treatmentType;
+            document.getElementById('summaryType').textContent = treatmentType;
+
+            const { data: treatments } = await supabase.from('treatments').select('*, clients(id, full_name, dni)')
+                .eq('type', treatmentType).eq('company_id', currentCompanyId).order('created_at', { ascending: false });
+
+            document.getElementById('summaryTotal').textContent = treatments?.length || 0;
+            if (treatments?.length > 0) {
+                document.getElementById('summaryFirst').textContent = new Date(treatments[treatments.length - 1].created_at).toLocaleDateString();
+                document.getElementById('summaryLast').textContent = new Date(treatments[0].created_at).toLocaleDateString();
+            }
+
+            const container = document.getElementById('treatmentRows');
+            container.innerHTML = '';
+            treatments?.forEach(t => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 px-2';
+                row.innerHTML = `<div class="col-span-4 font-bold text-slate hover:text-brand cursor-pointer" onclick="window.location.href='ficha-cliente.html?id=${t.clients?.id}'">${t.clients?.full_name || '—'}</div>
+                    <div class="col-span-4 font-mono text-xs text-slate/50 hover:text-brand cursor-pointer" onclick="window.location.href='ficha-lotes.html?batch=${encodeURIComponent(t.batch_number)}'">${t.batch_number || '—'}</div>
+                    <div class="col-span-4 text-right text-xs text-slate/40">${new Date(t.created_at).toLocaleDateString()}</div>`;
+                container.appendChild(row);
+            });
+        }
+        checkSession();
+
+        // ── PDF Export ────────────────────────────────────────────────────────
+        document.getElementById('exportPdfBtn').onclick = () => {
+            const element = document.querySelector('main');
+            const opt = {
+                margin: 10,
+                filename: `Reporte_${treatmentType.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const backBtn = document.querySelector('header button');
+            const exportBtn = document.getElementById('exportPdfBtn');
+
+            backBtn.style.display = 'none';
+            exportBtn.style.display = 'none';
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                backBtn.style.display = 'flex';
+                exportBtn.style.display = 'flex';
+            });
+        };
+    </script>
+    <!-- Navigation Logic -->
+    <script src="./navigation.js"></script>
+</body>
+
+</html>

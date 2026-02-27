@@ -1,100 +1,76 @@
-# **📑 Residoc: Documento Maestro de Arquitectura y Diseño**
+# **📑 Residoc: Documento Maestro de Arquitectura y Diseño (V4)**
 
 ## **1\. Visión General**
 
-**Residoc** es una aplicación de trazabilidad sanitaria de nicho para centros de estética y estudios de tatuaje. Su misión es vincular de forma inequívoca los lotes de productos (tintas, viales, agujas) con clientes específicos para garantizar la seguridad del paciente y cumplir con normativas legales.
-
-
----
-
-## **2\. Pilares de Funcionalidad (Core)**
-
-### **A. Dashboard y Buscador de Clientes**
-
-* **Interfaz:** Barra de búsqueda prominente y centralizada (estilo Spotlight/Notion).  
-* **Filtros:** Búsqueda por Nombre, DNI, Teléfono o Lote.  
-* **Navegación:** Acceso instantáneo a la Ficha de Cliente.
-
-
-### **B. Ficha de Cliente e Historial Visual**
-
-* **Resumen Técnico:** Lista cronológica de servicios realizados.  
-* **Detalle de Servicio:** Fecha, tipo de tratamiento y **vinculación al lote**.  
-* **Evidencia Gráfica:** Mapa corporal (SVG interactivo) con "pins" que marcan la zona tratada. Cada pin está enlazado a la información del producto utilizado.
-
-### **C. Buscador Inverso (Módulo de Seguridad)**
-
-* **Propósito:** Localizar clientes afectados por un lote defectuoso.  
-* **Lógica:** Introduces un "Número de Lote" $\\rightarrow$ Obtienes lista de clientes asociados \+ fechas de aplicación.
-
-### **D. Reporting y Exportación**
-
-* **Generador:** Filtros por rango de fechas y cliente.  
-* **Formato:** Exportación a PDF/CSV con validez legal para inspecciones de sanidad.
+**Residoc** es una plataforma de trazabilidad sanitaria "Audit-Ready". Su arquitectura está diseñada para que, ante una inspección de sanidad, el centro pueda demostrar la trazabilidad total (quién, qué, cuándo y dónde) en menos de un minuto.
 
 ---
 
-## **3\. Modelo de Datos (Esquema de Relaciones)**
+## **2\. Lógica de Compliance Regional (Dynamic Loading)**
 
-| Entidad | Campos Clave | Relación |
-| :---- | :---- | :---- |
-| **Cliente** | id, nombre, DNI, email | 1:N con Servicios |
-| **Lote (Producto)** | id\_lote, nombre\_producto, fabricante, caducidad | 1:N con Servicios |
-| **Servicio** | id\_servicio, fecha, id\_cliente, id\_lote, coords\_graficas | N:1 con Cliente y Lote |
+La aplicación no es estática; se adapta al marco legal de cada Comunidad Autónoma:
 
----
-
-## **4\. Identidad Visual (Concepto: Soft-Tech)**
-
-El diseño debe alejarse de la frialdad médica y acercarse a una estética moderna, limpia y acogedora.
-
-* **Estilo:** Minimalismo orgánico con bordes muy redondeados (Pill-shape) y espacios optimizados para lectura rápida.
-* **Tipografía única:** Todo el sistema visual usa **Outfit** (Sans-serif moderna) en distintos pesos para mantener una imagen puramente tecnológica y eliminar distracciones "editoriales".  
-* **Paleta de Colores (Pasteles):**  
-  * **Fondo:** \#F9F7F2 (Crema/Hueso).  
-  * **Acciones:** \#B8D8D8 (Verde Menta suave).  
-  * **Acentos:** \#E2C2FF (Lavanda).  
-  * **Texto:** \#4A4E69 (Gris azulado profundo).  
-* **UI Components:** Sombras muy suaves (Soft Shadows), llamadas a la acción directas ("Prueba gratuita de 14 días") y alto contraste en métricas clave.
+1. **Detección:** El sistema identifica el `CCAA_ID` en el perfil del centro tras el login.  
+2. **Inyección:** Supabase sirve las `regional_rules` correspondientes.  
+3. **Renderizado Condicional:** \* **Madrid:** Activa Libro de Mantenimiento de Bronceado.  
+   * **Cataluña:** Activa Registro específico para Autoridades Sanitarias.  
+   * **General:** Textos legales de Consentimiento Informado adaptados por zona.
 
 ---
 
-## **5\. Reglas de Negocio "Antigravity"**
+## **3\. Módulos de Control y Gestión (Dashboard)**
 
-1. **Trazabilidad Obligatoria:** No se puede cerrar un registro de servicio sin un lote asociado.
-2. **Integridad de Datos:** Los lotes no se eliminan, se archivan (para mantener el histórico legal).  
-3. **Privacidad:** Acceso restringido a datos sensibles de salud.
+El Dashboard es un **Centro de Mando de Cumplimiento**, no una herramienta de entrada de servicios.
+
+### **A. Widget de Trazabilidad Pendiente (Control 24h)**
+
+* **Función:** Localiza servicios estancados en Fase 1 (Legal pero sin datos técnicos).  
+* **Alerta Roja:** Los registros que superan las 24h sin completar la Fase 2 resaltan visualmente.  
+* **Responsabilidad:** Identifica nombre y apellido del operario que dejó el registro incompleto.
+
+
+### **B. Gestión de Residuos Biosanitarios (Clase III)**
+
+* **Registro de Retirada:** Formulario para documentar la recogida por gestor autorizado.  
+* **Evidencia:** Foto del albarán/DCS almacenada en Supabase Storage.
+
+### **C. Módulo "Audit-Ready" (Modo Inspección)**
+
+* **Acceso:** Panel simplificado de solo lectura para tablets.  
+* **Exportación Flash (Un clic):** Genera un ZIP con:  
+  1. Histórico de lotes.  
+  2. Certificados de técnicos y contratos.  
+  3. Registros de esterilización y residuos.
 
 ---
 
-## **6\. Stack Tecnológico Sugerido**
+## **4\. Operativa en Cabina (Ficha de Cliente)**
 
-* **Frontend:** Next.js (React) \+ Tailwind CSS.  
-* **Backend/DB:** Supabase (PostgreSQL) para relaciones sólidas y rapidez de despliegue.  
-* **Gráficos:** SVG interactivos para el mapa corporal.
+Único punto de entrada para servicios, diseñado para **Mobile-First**.
 
-# **7\. Ejemplo web:** https://www.trustkeith.co/?ref=saaspo.com
+### **Registro en Dos Tiempos**
 
-## **8. Navegación y UI**
-
-* **Botón home:** El logo de la app debe ser el botón home.
-* **Barra de navegación:** En la parte superior, transparente. Solo visible al inicio; desaparece al hacer scroll. Login y dashboard no tienen barra de navegación.
-* **Títulos:** Claros y descriptivos. Primera letra en mayúscula, el resto en minúscula.
-* **Clientes:** Los nombres de clientes siempre son enlaces a su ficha.
+1. **Fase 1: Aseguramiento Legal (Check-In):** Antes de tocar al cliente. Se crea el servicio y se sube la foto del **Consentimiento Firmado**. El servicio queda "blindado".  
+2. **Fase 2: Trazabilidad (Check-Out):** Al finalizar o al final de la jornada.  
+   * **Registro de Lotes:** Escaneo de tintas, agujas o viales usados.  
+   * **Mapa Corporal:** Pins en el SVG interactivo.  
+   * **Evidencia Visual:** Foto del resultado final ("Después").
 
 ---
 
-## **9. Diseño Mobile-First y Field-Ready**
+## **5\. Registro de Operarios e Inmutabilidad (Audit Trail)**
 
-La aplicación está diseñada prioritariamente para uso en móviles y tablets. El registro ocurre en el punto de atención al cliente, no en una oficina — la interfaz debe poder manejarse con una sola mano.
+Para eliminar el anonimato y cumplir con Sanidad:
 
-### **9.1. Adaptabilidad móvil**
+* **Sesión Activa:** Cada acción se vincula al `auth.uid()` del trabajador logueado.  
+* **Sello de Firma Digital:** Los informes incluyen: *"Documentado por: \[Nombre\] | ID: \[UUID\] | Timestamp inmutable"*.  
+* **Seguridad RLS:** Un operario solo edita sus borradores. Una vez cerrado el registro (Fase 2), es **inalterable** (Soporte legal ante inspección).
 
-* **Framework CSS:** Tailwind CSS con breakpoints desde 360px.
-* **Touch targets:** Mínimo 44×44px en todos los elementos interactivos para uso cómodo en movimiento.
-* **Optimización de carga:** Activos ligeros para funcionamiento óptimo en redes con cobertura limitada.
+---
 
-### **9.2. Integración de hardware**
+## **6\. Identidad Visual y Stack (Soft-Tech)**
 
-* **Escaneo de código de barras / QR:** Captura mediante la cámara del dispositivo (API nativa del navegador) para leer lotes de proveedores directamente.
-* **Captura de evidencias fotográficas:** Subida de fotos (albaranes, estado del lote, zona tratada) directamente a Supabase Storage desde la interfaz móvil.
+* **Stack:** Next.js \+ Tailwind \+ Supabase (RLS estricto para aislamiento de datos entre centros).  
+* **Paleta Pastel:** Fondo `#F9F7F2`, Menta `#B8D8D8`, Lavanda `#E2C2FF`.  
+* **UI:** Tipografía **Outfit** única. Sin barra de navegación en Dashboard. Nombres de clientes siempre son enlaces.
+

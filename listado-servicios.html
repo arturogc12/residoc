@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residoc | Listado de Servicios</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="./supabase.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#4A90E2',
+                        slate: '#2D3436',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        cream: '#F9F7F2',
+                    },
+                    boxShadow: { 'soft': '0 10px 40px -10px rgba(0,0,0,0.05)', 'float': '0 20px 50px -12px rgba(0,0,0,0.1)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F9F7F2;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .shadow-float {
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .period-btn-active {
+            background-color: #1e293b !important;
+            color: white !important;
+            transform: scale(1.05);
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="mainNav"></nav>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+        <!-- ===== HEADER ===== -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4 fade-in-up">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <button onclick="window.location.href='dashboard.html'"
+                    class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate hover:text-brand transition-all">
+                    <i class="ph ph-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <p class="text-sm text-slate/40 font-medium mb-1">Registro Clínico</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight">Tratamientos</h1>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-3">
+                <!-- Period Filter -->
+                <div class="flex items-center gap-1 bg-white border border-slate/5 p-1 rounded-2xl shadow-sm">
+                    <button onclick="setPeriod('month')" id="btnMonth"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all hover:bg-cream text-slate bg-white">Mes</button>
+                    <button onclick="setPeriod('quarter')" id="btnQuarter"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all hover:bg-cream text-slate bg-white">Trimestre</button>
+                    <button onclick="setPeriod('year')" id="btnYear"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all hover:bg-cream text-slate bg-white">Año</button>
+                    <button onclick="setPeriod('all')" id="btnAll"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all period-btn-active shadow-float">Todo</button>
+                </div>
+
+                <div class="relative min-w-[200px] w-full sm:w-auto">
+                    <select id="typeFilter"
+                        class="w-full bg-white border border-slate/5 rounded-2xl py-3 px-5 pr-10 outline-none focus:ring-2 focus:ring-brand/20 transition-all text-sm font-bold text-slate appearance-none shadow-sm hover:border-slate/10">
+                        <option value="">Todos los servicios</option>
+                        <option>Ácido Hialurónico</option>
+                        <option>Botox</option>
+                        <option>Microblading</option>
+                        <option>Micropigmentación</option>
+                        <option>Peeling Químico</option>
+                        <option>Mesoterapia</option>
+                    </select>
+                    <i
+                        class="ph ph-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-slate/30 pointer-events-none"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== SERVICES TABLE ===== -->
+        <section class="fade-in-up delay-100">
+            <div class="bg-white rounded-[32px] shadow-sm border border-slate/5 overflow-hidden">
+                <div class="px-8 py-5 border-b border-slate/5 bg-cream/30">
+                    <div class="grid grid-cols-12 gap-4 text-[10px] font-bold text-slate/30 uppercase tracking-widest">
+                        <div class="col-span-2">Fecha</div>
+                        <div class="col-span-3">Cliente</div>
+                        <div class="col-span-4">Tratamiento</div>
+                        <div class="col-span-3">Lote</div>
+                    </div>
+                </div>
+
+                <div id="servicesRows" class="divide-y divide-slate/5">
+                    <!-- Rows injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        let currentCompanyId = null;
+        let allTreatments = [];
+
+        let currentPeriod = 'all';
+
+        window.setPeriod = (period) => {
+            currentPeriod = period;
+
+            // UI Update: Toggle active states
+            ['Month', 'Quarter', 'Year', 'All'].forEach(p => {
+                const btn = document.getElementById(`btn${p}`);
+                if (p.toLowerCase() === period) {
+                    btn.classList.add('period-btn-active', 'shadow-float');
+                    btn.classList.remove('bg-white', 'text-slate', 'hover:bg-cream');
+                } else {
+                    btn.classList.add('text-slate', 'bg-white', 'hover:bg-cream');
+                    btn.classList.remove('period-btn-active', 'shadow-float');
+                }
+            });
+
+            fetchTreatments();
+        };
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                setPeriod('all');
+                return;
+            }
+            const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
+            if (!profile) { window.location.href = 'onboarding.html'; return; }
+            currentCompanyId = profile.company_id;
+            setPeriod('all');
+        }
+
+        async function fetchTreatments() {
+            let query = supabase.from('treatments')
+                .select('*, clients(id, full_name, dni)')
+                .eq('company_id', currentCompanyId)
+                .order('created_at', { ascending: false });
+
+            // Apply Period Filter
+            if (currentPeriod !== 'all') {
+                const now = new Date();
+                let startDate = new Date();
+
+                if (currentPeriod === 'month') {
+                    startDate.setDate(1);
+                    startDate.setHours(0, 0, 0, 0);
+                } else if (currentPeriod === 'quarter') {
+                    const currentMonth = now.getMonth();
+                    const quarterStartMonth = Math.floor(currentMonth / 3) * 3;
+                    startDate.setMonth(quarterStartMonth);
+                    startDate.setDate(1);
+                    startDate.setHours(0, 0, 0, 0);
+                } else if (currentPeriod === 'year') {
+                    startDate.setMonth(0);
+                    startDate.setDate(1);
+                    startDate.setHours(0, 0, 0, 0);
+                }
+
+                query = query.gte('created_at', startDate.toISOString());
+            }
+
+            const { data: treatments, error } = await query;
+
+            if (error) return;
+            allTreatments = treatments;
+
+            // Apply current treatment filter if any
+            const typeValue = document.getElementById('typeFilter').value;
+            const filtered = typeValue ? allTreatments.filter(t => t.type === typeValue) : allTreatments;
+            renderTreatments(filtered);
+        }
+
+        function renderTreatments(list) {
+            const container = document.getElementById('servicesRows');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = `<p class="py-20 text-center text-slate/30 text-sm">No se encontraron servicios en este periodo.</p>`;
+                return;
+            }
+
+            list.forEach(t => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center px-8 py-4 hover:bg-cream/50 transition-colors group cursor-pointer';
+                row.onclick = (e) => {
+                    // Prevent navigation if clicking on links within the row
+                    if (e.target.tagName === 'A') return;
+                    window.location.href = `ficha-servicio.html?type=${encodeURIComponent(t.type)}`;
+                };
+                row.innerHTML = `
+                    <div class="col-span-2 text-sm font-bold text-slate">${new Date(t.created_at).toLocaleDateString()}</div>
+                    <div class="col-span-3">
+                        <a href="ficha-cliente.html?id=${t.clients?.id}" class="font-bold text-slate hover:text-brand transition-colors">${t.clients?.full_name || '—'}</a>
+                    </div>
+                    <div class="col-span-4 text-sm font-semibold text-slate/70">
+                        <span class="hover:text-brand transition-colors">${t.type}</span>
+                    </div>
+                    <div class="col-span-3">
+                        <a href="ficha-lotes.html?batch=${encodeURIComponent(t.batch_number)}" class="text-xs font-mono text-slate/40 hover:text-brand transition-colors underline decoration-slate/10">${t.batch_number || '—'}</a>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        document.getElementById('typeFilter').addEventListener('change', (e) => {
+            const type = e.target.value;
+            const filtered = type ? allTreatments.filter(t => t.type === type) : allTreatments;
+            renderTreatments(filtered);
+        });
+
+        checkSession();
+    </script>
+    <!-- Navigation Logic -->
+    <script src="./navigation.js"></script>
+</body>
+
+</html>

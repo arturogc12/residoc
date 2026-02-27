@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residoc | Listado de Lotes</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="./supabase.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#4A90E2',
+                        slate: '#2D3436',
+                        mint: '#B8D8D8',
+                        lavender: '#E2C2FF',
+                        cream: '#F9F7F2',
+                    },
+                    boxShadow: { 'soft': '0 10px 40px -10px rgba(0,0,0,0.05)', 'float': '0 20px 50px -12px rgba(0,0,0,0.1)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F9F7F2;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .shadow-float {
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .period-btn-active {
+            background-color: #1e293b !important;
+            color: white !important;
+            transform: scale(1.05);
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-mint selection:text-slate min-h-screen flex flex-col">
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="mainNav"></nav>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+        <!-- ===== HEADER ===== -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-10 gap-4 fade-in-up">
+            <div class="flex items-center gap-4 sm:gap-6">
+                <button onclick="window.location.href='dashboard.html'"
+                    class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate/5 flex items-center justify-center text-slate hover:text-brand transition-all">
+                    <i class="ph ph-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <p class="text-sm text-slate/40 font-medium mb-1">Inventario & Trazabilidad</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate tracking-tight">Lotes</h1>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <!-- Period Filter -->
+                <div class="flex items-center gap-1 bg-white border border-slate/5 p-1 rounded-2xl shadow-sm">
+                    <button onclick="setPeriod('month')" id="btnMonth"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all hover:bg-cream text-slate bg-white">Mes</button>
+                    <button onclick="setPeriod('quarter')" id="btnQuarter"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all hover:bg-cream text-slate bg-white">Trimestre</button>
+                    <button onclick="setPeriod('year')" id="btnYear"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all hover:bg-cream text-slate bg-white">Año</button>
+                    <button onclick="setPeriod('all')" id="btnAll"
+                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all period-btn-active shadow-float">Todo</button>
+                </div>
+
+                <div class="relative flex-1 sm:w-64">
+                    <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar lote..."
+                        class="w-full bg-white border border-slate/5 rounded-2xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 transition-all text-sm font-bold shadow-sm hover:border-slate/10">
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== BATCHES TABLE ===== -->
+        <section class="fade-in-up delay-100">
+            <div class="bg-white rounded-[32px] shadow-sm border border-slate/5 overflow-hidden">
+                <div class="px-8 py-5 border-b border-slate/5 bg-cream/30">
+                    <div class="grid grid-cols-12 gap-4 text-[10px] font-bold text-slate/30 uppercase tracking-widest">
+                        <div class="col-span-4">Número de Lote</div>
+                        <div class="col-span-2 text-center">Aplicaciones</div>
+                        <div class="col-span-3">Última Aplicación</div>
+                        <div class="col-span-2 text-center">Tipos</div>
+                        <div class="col-span-1 text-right">Ficha</div>
+                    </div>
+                </div>
+
+                <div id="batchesRows" class="divide-y divide-slate/5">
+                    <!-- Rows injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        let currentCompanyId = null;
+        let allBatches = [];
+
+        let currentPeriod = 'all';
+
+        window.setPeriod = (period) => {
+            currentPeriod = period;
+
+            // UI Update: Toggle active states
+            ['Month', 'Quarter', 'Year', 'All'].forEach(p => {
+                const btn = document.getElementById(`btn${p}`);
+                if (p.toLowerCase() === period) {
+                    btn.classList.add('period-btn-active', 'shadow-float');
+                    btn.classList.remove('bg-white', 'text-slate', 'hover:bg-cream');
+                } else {
+                    btn.classList.add('text-slate', 'bg-white', 'hover:bg-cream');
+                    btn.classList.remove('period-btn-active', 'shadow-float');
+                }
+            });
+
+            fetchBatches();
+        };
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                currentCompanyId = '00000000-0000-0000-0000-000000000001';
+                setPeriod('all');
+                return;
+            }
+            const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
+            if (!profile) { window.location.href = 'onboarding.html'; return; }
+            currentCompanyId = profile.company_id;
+            setPeriod('all');
+        }
+
+        async function fetchBatches() {
+            let query = supabase.from('treatments')
+                .select('batch_number, type, created_at')
+                .eq('company_id', currentCompanyId)
+                .not('batch_number', 'is', null)
+                .order('created_at', { ascending: false });
+
+            // Apply Period Filter
+            if (currentPeriod !== 'all') {
+                const now = new Date();
+                let startDate = new Date();
+
+                if (currentPeriod === 'month') {
+                    startDate.setDate(1);
+                    startDate.setHours(0, 0, 0, 0);
+                } else if (currentPeriod === 'quarter') {
+                    const currentMonth = now.getMonth();
+                    const quarterStartMonth = Math.floor(currentMonth / 3) * 3;
+                    startDate.setMonth(quarterStartMonth);
+                    startDate.setDate(1);
+                    startDate.setHours(0, 0, 0, 0);
+                } else if (currentPeriod === 'year') {
+                    startDate.setMonth(0);
+                    startDate.setDate(1);
+                    startDate.setHours(0, 0, 0, 0);
+                }
+
+                query = query.gte('created_at', startDate.toISOString());
+            }
+
+            const { data: treatments, error } = await query;
+
+            if (error) return;
+
+            // Group by batch_number
+            const batchMap = new Map();
+            treatments.forEach(t => {
+                if (!batchMap.has(t.batch_number)) {
+                    batchMap.set(t.batch_number, {
+                        number: t.batch_number,
+                        count: 0,
+                        lastDate: t.created_at,
+                        types: new Set()
+                    });
+                }
+                const b = batchMap.get(t.batch_number);
+                b.count++;
+                b.types.add(t.type);
+            });
+
+            allBatches = Array.from(batchMap.values());
+
+            // Apply current search filter if any
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = searchVal ? allBatches.filter(b => b.number.toLowerCase().includes(searchVal)) : allBatches;
+            renderBatches(filtered);
+        }
+
+        function renderBatches(list) {
+            const container = document.getElementById('batchesRows');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = `<p class="py-20 text-center text-slate/30 text-sm">No se encontraron lotes en este periodo.</p>`;
+                return;
+            }
+
+            list.forEach(b => {
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-4 items-center px-8 py-4 hover:bg-cream/50 transition-colors group cursor-pointer';
+                row.onclick = (e) => {
+                    // Prevent navigation if clicking on link button specifically
+                    if (e.target.closest('a')) return;
+                    window.location.href = `ficha-lotes.html?batch=${encodeURIComponent(b.number)}`;
+                };
+                row.innerHTML = `
+                    <div class="col-span-4">
+                        <a href="ficha-lotes.html?batch=${encodeURIComponent(b.number)}" class="font-mono font-bold text-slate hover:text-brand transition-colors underline decoration-slate/10">${b.number}</a>
+                    </div>
+                    <div class="col-span-2 text-center text-sm font-bold text-slate/70">
+                        <span class="px-3 py-1 bg-slate/5 rounded-lg">${b.count}</span>
+                    </div>
+                    <div class="col-span-3 text-sm text-slate/40">${new Date(b.lastDate).toLocaleDateString()}</div>
+                    <div class="col-span-2 text-center">
+                        <span class="text-[10px] font-bold text-brand uppercase tracking-tight">${b.types.size} tipo${b.types.size > 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="col-span-1 text-right">
+                        <a href="ficha-lotes.html?batch=${encodeURIComponent(b.number)}" class="w-9 h-9 bg-lavender/10 rounded-xl flex items-center justify-center text-slate hover:bg-lavender hover:text-slate transition-all ml-auto">
+                            <i class="ph ph-barcode"></i>
+                        </a>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            const filtered = allBatches.filter(b => b.number.toLowerCase().includes(q));
+            renderBatches(filtered);
+        });
+
+        checkSession();
+    </script>
+    <!-- Navigation Logic -->
+    <script src="./navigation.js"></script>
+</body>
+
+</html>
