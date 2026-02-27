@@ -83,122 +83,198 @@
             <span class="text-3xl font-bold tracking-tight text-slate">Residoc</span>
         </div>
 
-        <!-- Login Card -->
+        <!-- Auth Card -->
         <div
             class="bg-white/80 backdrop-blur-xl p-10 rounded-[40px] shadow-float border border-white/50 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
 
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-slate mb-2 tracking-tight">Bienvenido de nuevo</h1>
-                <p class="text-slate/50 font-light">Accede a tu panel de trazabilidad.</p>
-            </div>
+            <!-- ── LOGIN VIEW ── -->
+            <div id="loginView">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-slate mb-2 tracking-tight">Bienvenido de nuevo</h1>
+                    <p class="text-slate/50 font-light">Accede a tu panel de trazabilidad.</p>
+                </div>
 
-            <form class="space-y-6" onsubmit="event.preventDefault(); window.location.href='dashboard.html';">
-                <!-- Email -->
-                <div>
-                    <label for="email" class="block text-sm font-bold text-slate/70 mb-2 ml-1">Email profesional</label>
-                    <div class="relative group">
+                <div id="loginError"
+                    class="hidden mb-4 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-sm text-red-600 font-medium">
+                </div>
+
+                <form id="loginForm" class="space-y-6">
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-bold text-slate/70 mb-2 ml-1">Email
+                            profesional</label>
+                        <div class="relative group">
+                            <i
+                                class="ph ph-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
+                            <input type="email" id="email"
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="ejemplo@clinica.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-bold text-slate/70 mb-2 ml-1">Contraseña</label>
+                        <div class="relative group">
+                            <i
+                                class="ph ph-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
+                            <input type="password" id="password"
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" id="loginBtn"
+                        class="w-full bg-slate text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate/90 hover:-translate-y-1 transition-all shadow-lg active:scale-95 group">
+                        Iniciar sesión
                         <i
-                            class="ph ph-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
-                        <input type="email" id="email"
-                            class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
-                            placeholder="ejemplo@clinica.com">
-                    </div>
+                            class="ph ph-arrow-right inline-block ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="my-8 flex items-center gap-4">
+                    <div class="h-px bg-slate/5 flex-1"></div>
+                    <span class="text-xs font-bold text-slate/30 uppercase tracking-widest">O accede con</span>
+                    <div class="h-px bg-slate/5 flex-1"></div>
                 </div>
 
-                <!-- Password -->
-                <div>
-                    <label for="password" class="block text-sm font-bold text-slate/70 mb-2 ml-1">Contraseña</label>
-                    <div class="relative group">
-                        <i
-                            class="ph ph-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
-                        <input type="password" id="password"
-                            class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-12 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
-                            placeholder="••••••••">
-                        <button type="button"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate/30 hover:text-slate transition-colors">
-                            <i class="ph ph-eye"></i>
-                        </button>
-                    </div>
-                    <div class="flex justify-end mt-2">
-                        <a href="#"
-                            class="text-sm font-bold text-brand/70 hover:text-brand transition-colors">¿Olvidaste tu
-                            contraseña?</a>
-                    </div>
-                </div>
-
-                <!-- Remember Me -->
-                <div class="flex items-center gap-2 ml-1">
-                    <input type="checkbox" id="remember"
-                        class="w-5 h-5 rounded-lg border-slate/10 text-brand focus:ring-brand shadow-sm">
-                    <label for="remember" class="text-sm font-medium text-slate/60">Recordar mi sesión</label>
-                </div>
-
-                <!-- Submit -->
-                <button type="submit"
-                    class="w-full bg-slate text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate/90 hover:-translate-y-1 transition-all shadow-lg active:scale-95 group">
-                    Iniciar sesión
-                    <i class="ph ph-arrow-right inline-block ml-2 group-hover:translate-x-1 transition-transform"></i>
-                </button>
-            </form>
-
-            <!-- Divider -->
-            <div class="my-8 flex items-center gap-4">
-                <div class="h-px bg-slate/5 flex-1"></div>
-                <span class="text-xs font-bold text-slate/30 uppercase tracking-widest">O accede con</span>
-                <div class="h-px bg-slate/5 flex-1"></div>
-            </div>
-
-            <!-- Social Links -->
-            <div class="grid grid-cols-2 gap-4">
+                <!-- Social Login -->
                 <button id="googleLoginBtn"
-                    class="bg-white border border-slate/5 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-slate/5 transition-colors shadow-sm">
-                    <i class="ph-fill ph-google-logo text-brand"></i>
-                    <span class="text-sm font-bold text-slate">Google</span>
+                    class="w-full bg-white border border-slate/5 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-slate/5 transition-colors shadow-sm">
+                    <i class="ph-fill ph-google-logo text-brand text-xl"></i>
+                    <span class="text-sm font-bold text-slate">Continuar con Google</span>
                 </button>
-                <button
-                    class="bg-white border border-slate/5 py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-slate/5 transition-colors shadow-sm">
-                    <i class="ph-fill ph-apple-logo text-slate"></i>
-                    <span class="text-sm font-bold text-slate">Apple</span>
-                </button>
+
+                <p class="mt-8 text-center text-slate/50 font-medium text-sm">
+                    ¿Nuevo en Residoc? <button onclick="showRegister()"
+                        class="text-brand font-bold hover:underline">Crear cuenta gratis</button>
+                </p>
+            </div>
+
+            <!-- ── REGISTER VIEW ── -->
+            <div id="registerView" class="hidden">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-slate mb-2 tracking-tight">Crear tu cuenta</h1>
+                    <p class="text-slate/50 font-light">14 días gratis. Sin tarjeta de crédito.</p>
+                </div>
+
+                <div id="registerError"
+                    class="hidden mb-4 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-sm text-red-600 font-medium">
+                </div>
+                <div id="registerSuccess"
+                    class="hidden mb-4 px-4 py-3 bg-green-50 border border-green-100 rounded-2xl text-sm text-green-700 font-medium">
+                </div>
+
+                <form id="registerForm" class="space-y-5">
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Email profesional</label>
+                        <div class="relative group">
+                            <i
+                                class="ph ph-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
+                            <input type="email" id="regEmail"
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="ejemplo@clinica.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate/70 mb-2 ml-1">Contraseña</label>
+                        <div class="relative group">
+                            <i
+                                class="ph ph-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate/30 group-focus-within:text-brand transition-colors"></i>
+                            <input type="password" id="regPassword"
+                                class="w-full bg-cream/50 border border-slate/5 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all font-medium placeholder:text-slate/20"
+                                placeholder="Mínimo 8 caracteres" required minlength="8">
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" id="registerBtn"
+                        class="w-full bg-brand text-white py-5 rounded-2xl font-bold text-lg hover:bg-brand-dark hover:-translate-y-1 transition-all shadow-lg active:scale-95 group">
+                        Crear mi cuenta
+                        <i
+                            class="ph ph-rocket-launch inline-block ml-2 group-hover:-translate-y-1 transition-transform"></i>
+                    </button>
+                </form>
+
+                <p class="mt-8 text-center text-slate/50 font-medium text-sm">
+                    ¿Ya tienes cuenta? <button onclick="showLogin()"
+                        class="text-brand font-bold hover:underline">Iniciar sesión</button>
+                </p>
             </div>
         </div>
 
         <!-- Footer link -->
-        <p class="mt-8 text-center text-slate/50 font-medium">
-            ¿No tienes cuenta? <a href="index.html#pricing" class="text-brand font-bold hover:underline">Prueba 14 días
-                gratis</a>
+        <p class="mt-6 text-center text-slate/40 text-xs">
+            Al registrarte aceptas nuestros <a href="#" class="underline hover:text-slate transition-colors">Términos de
+                Uso</a>.
         </p>
     </div>
 
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // Check if already logged in and has profile
+        // ── View Toggle ─────────────────────────────────────────────────────
+        window.showRegister = () => {
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('registerView').classList.remove('hidden');
+        };
+        window.showLogin = () => {
+            document.getElementById('registerView').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+        };
+
+        function showError(elId, msg) {
+            const el = document.getElementById(elId);
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+        function hideError(elId) {
+            document.getElementById(elId).classList.add('hidden');
+        }
+
+        // ── Translate Supabase errors ────────────────────────────────────────
+        function translateError(msg) {
+            if (!msg) return 'Error desconocido.';
+            if (msg.includes('Invalid login credentials')) return 'Email o contraseña incorrectos.';
+            if (msg.includes('Email not confirmed')) return 'Confirma tu email antes de iniciar sesión.';
+            if (msg.includes('User already registered')) return 'Este email ya tiene cuenta. Inicia sesión.';
+            if (msg.includes('Password should be')) return 'La contraseña debe tener al menos 8 caracteres.';
+            return msg;
+        }
+
+        // ── Session check on page load ────────────────────────────────────────
         async function checkSession() {
             const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('id', session.user.id)
-                    .single();
+            if (!session) return; // No session, stay on login
 
-                if (profile) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    window.location.href = 'onboarding.html';
-                }
+            // Check if user has a profile
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', session.user.id)
+                .maybeSingle(); // maybeSingle doesn't throw if no row found
+
+            if (profile) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'onboarding.html';
             }
         }
         checkSession();
 
+        // ── Handle post-login routing ─────────────────────────────────────────
         async function handlePostLogin(user) {
-            const { data: profile, error } = await supabase
+            const { data: profile } = await supabase
                 .from('profiles')
                 .select('id')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
             if (profile) {
                 window.location.href = 'dashboard.html';
@@ -207,52 +283,79 @@
             }
         }
 
-        const googleLoginBtn = document.getElementById('googleLoginBtn');
-        googleLoginBtn.addEventListener('click', async () => {
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin + '/login.html' // Volver aquí para procesar el perfil
-                }
-            });
-            if (error) {
-                alert('Error al iniciar sesión con Google: ' + error.message);
-            }
-        });
-
-        // Email login (Functional implementation)
-        const loginForm = document.querySelector('form');
-        const submitBtn = loginForm.querySelector('button[type="submit"]');
-        const submitBtnText = submitBtn.innerHTML;
+        // ── LOGIN ─────────────────────────────────────────────────────────────
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const originalLoginText = loginBtn.innerHTML;
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            hideError('loginError');
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            try {
-                // Set loading state
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin mr-2"></i> Iniciando sesión...';
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin mr-2"></i> Iniciando sesión...';
 
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-                if (error) throw error;
-
-                if (data.user) {
-                    await handlePostLogin(data.user);
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Error al iniciar sesión: ' + (error.message === 'Invalid login credentials' ? 'Credenciales inválidas' : error.message));
-
-                // Reset loading state
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = submitBtnText;
+            if (error) {
+                showError('loginError', translateError(error.message));
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = originalLoginText;
+                return;
             }
+
+            if (data.user) {
+                await handlePostLogin(data.user);
+            }
+        });
+
+        // ── REGISTER ─────────────────────────────────────────────────────────
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const originalRegText = registerBtn.innerHTML;
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError('registerError');
+            document.getElementById('registerSuccess').classList.add('hidden');
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin mr-2"></i> Creando cuenta...';
+
+            const { data, error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                showError('registerError', translateError(error.message));
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = originalRegText;
+                return;
+            }
+
+            // If a session was returned immediately (email confirmation disabled), redirect
+            if (data.session) {
+                await handlePostLogin(data.user);
+                return;
+            }
+
+            // Otherwise email confirmation is required
+            registerBtn.disabled = false;
+            registerBtn.innerHTML = originalRegText;
+            const successEl = document.getElementById('registerSuccess');
+            successEl.textContent = '✓ ¡Cuenta creada! Revisa tu email para confirmar tu dirección antes de iniciar sesión.';
+            successEl.classList.remove('hidden');
+        });
+
+        // ── GOOGLE LOGIN ─────────────────────────────────────────────────────
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin + '/login.html' }
+            });
+            if (error) showError('loginError', error.message);
         });
     </script>
     </body>
