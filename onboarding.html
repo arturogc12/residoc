@@ -266,15 +266,8 @@
             try {
                 const { data: { user } } = await supabase.auth.getUser();
 
-                // DEVELOPMENT BYPASS: If no user, mock the process and redirect
                 if (!user) {
-                    const ownerName = document.getElementById('ownerName').value;
-                    console.log("Onboarding: No hay usuario activo. Realizando bypass para pruebas.");
-                    localStorage.setItem('residoc_mock_name', ownerName);
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
-                    return;
+                    throw new Error('No se encontró una sesión activa.');
                 }
 
                 const ownerName = document.getElementById('ownerName').value;
@@ -322,7 +315,7 @@
 
             } catch (error) {
                 console.error('Error during onboarding:', error);
-                alert('Hubo un error al guardar los datos. Inténtalo de nuevo.');
+                alert('Hubo un error al guardar los datos: ' + error.message);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Finalizar configuración <i class="ph ph-rocket-launch"></i>';
             }

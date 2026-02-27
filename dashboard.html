@@ -522,12 +522,7 @@
             const { data: { session } } = await supabase.auth.getSession();
 
             if (!session) {
-                console.log("Sesión no detectada, pero el acceso está permitido (bypass temporal).");
-                const mockName = localStorage.getItem('residoc_mock_name') || 'Dra. Elena';
-                document.getElementById('userGreeting').textContent = `Hola, ${mockName} 👋`;
-                // Use default company id for existing data if no session
-                currentCompanyId = '00000000-0000-0000-0000-000000000001';
-                initDashboard();
+                window.location.href = 'login.html';
                 return;
             }
 

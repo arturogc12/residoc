@@ -174,21 +174,45 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // Check if already logged in
+        // Check if already logged in and has profile
         async function checkSession() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                window.location.href = 'dashboard.html';
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profile) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'onboarding.html';
+                }
             }
         }
         checkSession();
+
+        async function handlePostLogin(user) {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', user.id)
+                .single();
+
+            if (profile) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'onboarding.html';
+            }
+        }
 
         const googleLoginBtn = document.getElementById('googleLoginBtn');
         googleLoginBtn.addEventListener('click', async () => {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin + '/dashboard.html'
+                    redirectTo: window.location.origin + '/login.html' // Volver aquí para procesar el perfil
                 }
             });
             if (error) {
@@ -218,8 +242,8 @@
 
                 if (error) throw error;
 
-                if (data.session) {
-                    window.location.href = 'dashboard.html';
+                if (data.user) {
+                    await handlePostLogin(data.user);
                 }
             } catch (error) {
                 console.error('Login error:', error);
