@@ -231,14 +231,15 @@
     <script type="module">
         import { supabase } from './supabase.js';
 
-        // ── Session Guard ──────────────────────────────────────────────────
-        // If no session, user must login first
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            window.location.href = 'login.html';
-        }
-
         let currentStep = 1;
+
+        // ── Session Guard ──────────────────────────────────────────────────
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+            }
+        })();
 
         window.nextStep = (step) => {
             // Validation
