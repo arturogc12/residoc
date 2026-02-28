@@ -448,6 +448,9 @@
                     <i class="ph ph-x"></i>
                 </button>
             </div>
+            <div id="ncError"
+                class="hidden mx-8 mb-0 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-sm text-red-600 font-medium">
+            </div>
             <form id="newClientForm" class="p-8 space-y-5">
                 <div class="space-y-2">
                     <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Nombre y
@@ -687,12 +690,14 @@
         document.getElementById('newClientForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('ncSubmitBtn');
+            const errEl = document.getElementById('ncError');
+            errEl.classList.add('hidden');
             btn.disabled = true; btn.textContent = 'Creando...';
             const name = document.getElementById('ncName').value.trim();
-            const dni = document.getElementById('ncDni').value.trim();
+            const dni = document.getElementById('ncDni').value.trim().toUpperCase();
             const phone = document.getElementById('ncPhone').value.trim() || null;
 
-            // Check for existing client by DNI
+            // Check for existing client by DNI within this company
             let { data: existing } = await supabase.from('clients')
                 .select('id').eq('dni', dni).eq('company_id', currentCompanyId).maybeSingle();
             let clientId = existing?.id;
@@ -701,10 +706,117 @@
                 const { data: created, error } = await supabase.from('clients')
                     .insert({ full_name: name, dni, phone, company_id: currentCompanyId })
                     .select('id').single();
-                if (error) { btn.disabled = false; btn.textContent = 'Crear cliente y ver ficha'; alert('Error al crear el cliente.'); return; }
+                if (error) {
+                    btn.disabled = false; btn.textContent = 'Crear cliente y ver ficha';
+                    errEl.textContent = error.code === '23505'
+                        ? 'Ya existe un cliente con ese DNI en tu centro.'
+                        : 'Error al crear el cliente: ' + error.message;
+                    errEl.classList.remove('hidden');
+                    return;
+                }
                 clientId = created.id;
             }
             window.location.href = `ficha-cliente.html?id=${clientId}`;
+        };
+
+        // ── Residuos Modal ────────────────────────────────────────────────────
+        let _residuosFiles = [];
+
+        window.openResiduosModal = function () {
+            document.getElementById('residuosForm').reset();
+            _residuosFiles = [];
+            document.getElementById('residuosPhotoPreview').innerHTML = '';
+            document.getElementById('residuosPhotoPreview').classList.add('hidden');
+            document.getElementById('residuosDate').value = new Date().toISOString().split('T')[0];
+            const m = document.getElementById('residuosModal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+            setTimeout(() => document.getElementById('residuosGestor').focus(), 80);
+        };
+        window.closeResiduosModal = function () {
+            const m = document.getElementById('residuosModal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+        };
+
+        // Photo handling for residuos modal
+        (['residuosCamera', 'residuosGallery']).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.onchange = (e) => {
+                    const preview = document.getElementById('residuosPhotoPreview');
+                    for (const f of e.target.files) {
+                        _residuosFiles.push(f);
+                        const thumb = document.createElement('div');
+                        thumb.className = 'w-16 h-16 rounded-xl overflow-hidden border border-slate/10';
+                        thumb.innerHTML = `<img src="${URL.createObjectURL(f)}" class="w-full h-full object-cover">`;
+                        preview.appendChild(thumb);
+                        preview.classList.remove('hidden');
+                    }
+                };
+            }
+        });
+
+        document.getElementById('residuosForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('residuosSubmitBtn');
+            if (btn.disabled) return;
+            btn.disabled = true; btn.textContent = 'Guardando...';
+
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout: El servidor no responde')), 10000)
+            );
+
+            try {
+                console.log('Starting waste record submission from dashboard...', { currentCompanyId });
+                if (!currentCompanyId) {
+                    throw new Error('Sesión no cargada. Por favor, recarga la página.');
+                }
+
+                // Upload photos if any
+                const photoUrls = [];
+                for (const file of _residuosFiles) {
+                    const path = `residuos/${currentCompanyId}/${Date.now()}_${file.name}`;
+                    const { error: uploadError } = await supabase.storage.from('treatment-photos').upload(path, file);
+                    if (!uploadError) {
+                        const { data: { publicUrl } } = supabase.storage.from('treatment-photos').getPublicUrl(path);
+                        photoUrls.push(publicUrl);
+                    }
+                }
+
+                const gestor = document.getElementById('residuosGestor').value.trim();
+                const date = document.getElementById('residuosDate').value;
+
+                console.log('Inserting waste record...', { gestor, date });
+
+                // Race the insert against a timeout
+                const insertPromise = supabase.from('waste_records').insert({
+                    company_id: currentCompanyId,
+                    gestor_name: gestor,
+                    pickup_date: date,
+                    photo_urls: photoUrls,
+                    class: 'III'
+                }).select();
+
+                const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+
+                if (error) throw error;
+
+                console.log('Submission successful!', data);
+                btn.textContent = '✓ Registrado';
+                btn.classList.replace('bg-amber-500', 'bg-green-500');
+
+                setTimeout(() => {
+                    closeResiduosModal();
+                    btn.disabled = false;
+                    btn.textContent = 'Registrar retirada';
+                    btn.classList.replace('bg-green-500', 'bg-amber-500');
+                    if (typeof fetchAlerts === 'function') fetchAlerts();
+                }, 1500);
+            } catch (err) {
+                console.error('Submission error:', err);
+                alert('Error: ' + (err.message || 'Error desconocido'));
+                btn.disabled = false;
+                btn.textContent = 'Registrar retirada';
+            }
         };
 
 

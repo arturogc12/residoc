@@ -201,6 +201,9 @@
         <img id="photoViewerImg" src="" class="max-w-[90vw] max-h-[85vh] rounded-3xl shadow-float object-contain">
     </div>
 
+    <!-- GLOBAL PHOTO INPUT FOR EXISTING RECORDS -->
+    <input type="file" id="globalPhotoInput" accept="image/*" class="hidden">
+
     <script type="module">
         import { supabase } from './supabase.js';
         let currentCompanyId = null;
@@ -209,11 +212,15 @@
         async function checkSession() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                currentCompanyId = '00000000-0000-0000-0000-000000000001';
-            } else {
-                const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
-                currentCompanyId = profile?.company_id || '00000000-0000-0000-0000-000000000001';
+                window.location.href = 'login.html';
+                return;
             }
+            const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', session.user.id).single();
+            if (!profile?.company_id) {
+                window.location.href = 'onboarding.html';
+                return;
+            }
+            currentCompanyId = profile.company_id;
             fetchRecords();
         }
 
@@ -250,9 +257,9 @@
                 row.className = `record-row sm:grid sm:grid-cols-12 gap-4 items-center py-4 border-b border-slate/5 flex flex-col sm:flex-row hover:bg-cream/50 transition-colors rounded-2xl px-2 group ${noPhoto ? 'bg-yellow-50/40' : ''}`;
                 const dateStr = r.pickup_date ? new Date(r.pickup_date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
                 const photoCell = noPhoto
-                    ? `<span class="inline-flex items-center gap-1 text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-1 rounded-lg border border-yellow-200">
-                           <i class="ph ph-warning"></i> Sin foto
-                       </span>`
+                    ? `<button class="add-photo-btn inline-flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100 hover:bg-amber-100 transition-all" data-id="${r.id}">
+                           <i class="ph ph-camera-plus"></i> Añadir foto
+                       </button>`
                     : `<button class="view-photo-btn text-amber-500 hover:text-amber-700 transition-colors" data-url="${r.photo_urls[0]}">
                            <i class="ph ph-image text-lg"></i>
                        </button>`;
@@ -261,18 +268,55 @@
                     <div class="col-span-3 text-sm text-slate/60">${dateStr}</div>
                     <div class="col-span-3 text-xs text-slate/40 font-mono">${r.created_by || 'Sistema'}</div>
                     <div class="col-span-2 text-xs text-slate/50 font-mono">${r.albaran || '—'}</div>
-                    <div class="col-span-1 text-right">${photoCell}</div>`;
+                    <div class="col-span-1 text-right flex justify-end">${photoCell}</div>`;
                 container.appendChild(row);
             });
         }
 
-        // Photo viewer — registrado UNA sola vez fuera de fetchRecords
+        // Event delegation for records container
         document.getElementById('recordsContainer').addEventListener('click', e => {
-            const btn = e.target.closest('.view-photo-btn');
-            if (!btn) return;
-            document.getElementById('photoViewerImg').src = btn.dataset.url;
-            document.getElementById('photoModal').classList.remove('hidden');
-            document.getElementById('photoModal').classList.add('flex');
+            const viewBtn = e.target.closest('.view-photo-btn');
+            if (viewBtn) {
+                document.getElementById('photoViewerImg').src = viewBtn.dataset.url;
+                document.getElementById('photoModal').classList.remove('hidden');
+                document.getElementById('photoModal').classList.add('flex');
+                return;
+            }
+
+            const addBtn = e.target.closest('.add-photo-btn');
+            if (addBtn) {
+                const recordId = addBtn.dataset.id;
+                const input = document.getElementById('globalPhotoInput');
+                input.onchange = async (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    addBtn.disabled = true;
+                    addBtn.innerHTML = `<i class="ph ph-circle-notch animate-spin"></i> Subiendo...`;
+
+                    try {
+                        const path = `residuos/${currentCompanyId}/${Date.now()}_${file.name}`;
+                        const { error: uploadErr } = await supabase.storage.from('treatment-photos').upload(path, file);
+                        if (uploadErr) throw uploadErr;
+
+                        const { data: { publicUrl } } = supabase.storage.from('treatment-photos').getPublicUrl(path);
+
+                        const { error: updateErr } = await supabase.from('waste_records')
+                            .update({ photo_urls: [publicUrl] })
+                            .eq('id', recordId);
+
+                        if (updateErr) throw updateErr;
+
+                        fetchRecords(); // Refresh list
+                    } catch (err) {
+                        console.error('Error adding photo:', err);
+                        alert('Error al añadir foto: ' + err.message);
+                        addBtn.disabled = false;
+                        addBtn.innerHTML = `<i class="ph ph-camera-plus"></i> Añadir foto`;
+                    }
+                };
+                input.click();
+            }
         });
 
         // Modal
@@ -313,30 +357,57 @@
             const btn = document.getElementById('rSubmitBtn');
             btn.disabled = true; btn.textContent = 'Guardando...';
 
-            const photoUrls = [];
-            for (const file of _rFiles) {
-                const path = `residuos/${currentCompanyId}/${Date.now()}_${file.name}`;
-                await supabase.storage.from('treatment-photos').upload(path, file).catch(() => { });
-                const { data: { publicUrl } } = supabase.storage.from('treatment-photos').getPublicUrl(path);
-                photoUrls.push(publicUrl);
-            }
+            try {
+                console.log('Starting waste record submission...', { currentCompanyId });
+                const photoUrls = [];
+                for (const file of _rFiles) {
+                    const path = `residuos/${currentCompanyId}/${Date.now()}_${file.name}`;
+                    console.log('Uploading photo:', path);
+                    const { error: uploadErr } = await supabase.storage.from('treatment-photos').upload(path, file);
+                    if (uploadErr) {
+                        console.error('Photo upload error:', uploadErr);
+                    } else {
+                        const { data: { publicUrl } } = supabase.storage.from('treatment-photos').getPublicUrl(path);
+                        photoUrls.push(publicUrl);
+                    }
+                }
 
-            await supabase.from('waste_records').insert({
-                company_id: currentCompanyId,
-                gestor_name: document.getElementById('rGestor').value.trim(),
-                pickup_date: document.getElementById('rDate').value,
-                albaran: document.getElementById('rAlbaran').value.trim() || null,
-                photo_urls: photoUrls,
-                class: 'III'
-            }).catch(() => { });
+                const gestor = document.getElementById('rGestor').value.trim();
+                const date = document.getElementById('rDate').value;
+                const albaran = document.getElementById('rAlbaran').value.trim() || null;
 
-            btn.textContent = '✓ Registrado';
-            setTimeout(() => {
-                closeModal();
+                console.log('Inserting waste record...', { gestor, date, albaran, photoUrls });
+                const { error } = await supabase.from('waste_records').insert({
+                    company_id: currentCompanyId,
+                    gestor_name: gestor,
+                    pickup_date: date,
+                    albaran: albaran,
+                    photo_urls: photoUrls,
+                    class: 'III'
+                });
+
+                if (error) {
+                    console.error('Database insert error:', error);
+                    alert('Error al guardar en la base de datos: ' + error.message);
+                    btn.disabled = false;
+                    btn.textContent = 'Registrar retirada';
+                    return;
+                }
+
+                console.log('Submission successful!');
+                btn.textContent = '✓ Registrado';
+                setTimeout(() => {
+                    closeModal();
+                    btn.disabled = false;
+                    btn.textContent = 'Registrar retirada';
+                    fetchRecords();
+                }, 900);
+            } catch (err) {
+                console.error('Unexpected error during submission:', err);
+                alert('Error inesperado: ' + err.message);
                 btn.disabled = false;
                 btn.textContent = 'Registrar retirada';
-                fetchRecords();
-            }, 900);
+            }
         };
 
         checkSession();

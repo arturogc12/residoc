@@ -31,7 +31,7 @@ function injectNavigation() {
             `).join('')}
             
             <div class="mt-auto pt-6 border-t border-white/10 w-10 flex flex-col items-center">
-                 <button onclick="window.location.href='login.html'" class="text-white/30 hover:text-red-400 transition-colors">
+                 <button onclick="handleLogout()" class="text-white/30 hover:text-red-400 transition-colors">
                     <i class="ph ph-power text-2xl"></i>
                 </button>
             </div>
@@ -51,7 +51,7 @@ function injectNavigation() {
             
             <div class="w-px h-6 bg-white/10 mx-2"></div>
             
-            <button onclick="window.location.href='login.html'" class="text-white/30 hover:text-red-400 transition-colors">
+            <button onclick="handleLogout()" class="text-white/30 hover:text-red-400 transition-colors">
                 <i class="ph ph-power text-2xl"></i>
             </button>
         </nav>
@@ -76,6 +76,18 @@ function injectNavigation() {
 
     navContainer.innerHTML = navHtml;
 }
+
+// Global logout function
+window.handleLogout = async () => {
+    try {
+        if (window.supabase) {
+            await window.supabase.auth.signOut();
+        }
+    } catch (e) {
+        console.error('Error during sign out:', e);
+    }
+    window.location.href = 'index.html';
+};
 
 // Run immediately
 injectNavigation();
