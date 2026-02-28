@@ -234,14 +234,14 @@
         </div>
     </div>
 
-    <!-- ===================== NEW SERVICE MODAL ===================== -->
+    <!-- ===================== SERVICE MODAL (CREATE / COMPLETE) ===================== -->
     <div id="cfNewServiceModal"
         class="fixed inset-0 z-[100] bg-slate/20 backdrop-blur-sm hidden items-start justify-center pt-[10vh]">
         <div
             class="bg-white rounded-[32px] shadow-float w-full max-w-lg mx-4 overflow-hidden border border-slate/10 animate-[fadeInUp_0.3s_ease]">
             <div class="px-8 py-6 border-b border-slate/5 flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-bold text-slate">Nuevo servicio</h2>
+                    <h2 class="text-xl font-bold text-slate" id="cfModalTitle">Nuevo servicio</h2>
                     <p class="text-xs text-slate/40 mt-1" id="cfServiceClientLabel">Registrar tratamiento</p>
                 </div>
                 <button id="cfCloseService"
@@ -249,92 +249,109 @@
                         class="ph ph-x"></i></button>
             </div>
             <form id="cfNewServiceForm" class="p-8 space-y-5 overflow-y-auto max-h-[75vh]">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Tipo de
-                        servicio</label>
-                    <div class="relative">
-                        <i class="ph ph-eyedropper absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
-                        <select id="cfServiceType" required
-                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate appearance-none">
-                            <option value="">Selecciona un servicio...</option>
-                            <option>Ácido Hialurónico</option>
-                            <option>Botox</option>
-                            <option>Microblading</option>
-                            <option>Micropigmentación</option>
-                            <option>Peeling Químico</option>
-                            <option>Mesoterapia</option>
-                            <option>Plasma Rico en Plaquetas</option>
-                            <option>Tatuaje</option>
-                            <option>Láser</option>
-                            <option>Otro</option>
-                        </select>
+
+                <!-- PHASE 1: CREATE (Basic Info & Consent) -->
+                <div id="cfPhaseCreate" class="space-y-5">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Tipo de
+                            servicio</label>
+                        <div class="relative">
+                            <i class="ph ph-eyedropper absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                            <select id="cfServiceType" required
+                                class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate appearance-none">
+                                <option value="">Selecciona un servicio...</option>
+                                <option>Ácido Hialurónico</option>
+                                <option>Botox</option>
+                                <option>Microblading</option>
+                                <option>Micropigmentación</option>
+                                <option>Peeling Químico</option>
+                                <option>Mesoterapia</option>
+                                <option>Plasma Rico en Plaquetas</option>
+                                <option>Tatuaje</option>
+                                <option>Láser</option>
+                                <option>Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Consent Form Photo -->
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Consentimiento
+                            Formado (Firma)</label>
+                        <button type="button" id="cfBtnConsent"
+                            class="w-full flex items-center justify-center gap-2 py-3.5 bg-brand/5 border border-brand/10 rounded-2xl text-xs font-bold text-brand hover:bg-brand/10 transition-colors">
+                            <i class="ph ph-signature"></i> Subir foto del documento firmado
+                        </button>
+                        <input type="file" id="cfInputConsent" accept="image/*" capture="environment" class="hidden">
+                        <div id="cfConsentPreview" class="hidden pt-1"></div>
                     </div>
                 </div>
 
-                <!-- Product Details -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Producto /
-                            Marca</label>
-                        <input type="text" id="cfProductName" placeholder="Ej: Juvederm"
-                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                <!-- PHASE 2: COMPLETE (Technical Info) -->
+                <div id="cfPhaseComplete" class="hidden space-y-5">
+                    <div
+                        class="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-3 text-amber-700 text-xs font-medium">
+                        <i class="ph ph-info mt-0.5 text-lg"></i>
+                        <p>Completa la información técnica y clínica de este servicio para garantizar la trazabilidad.
+                        </p>
                     </div>
-                    <div class="space-y-2">
-                        <label
-                            class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Caducidad</label>
-                        <input type="date" id="cfProductExpiry"
-                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
-                    </div>
-                </div>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Ciclo
-                        Esterilización (si aplica)</label>
-                    <input type="text" id="cfSterilization" placeholder="Nº de ciclo o autoclave"
-                        class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
-                </div>
-                <!-- Photos -->
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Evidencia clínica
-                        (Fotos)</label>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Número de
+                            lote</label>
+                        <div class="relative">
+                            <i class="ph ph-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
+                            <input type="text" id="cfBatchInput" placeholder="Foto, escáner o manual"
+                                class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
-                        <button type="button" id="cfBtnCamera"
-                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-xs font-bold text-slate hover:bg-slate/5 transition-colors min-h-[44px]"><i
-                                class="ph ph-camera text-brand"></i> Cámara</button>
-                        <button type="button" id="cfBtnGallery"
-                            class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-xs font-bold text-slate hover:bg-slate/5 transition-colors min-h-[44px]"><i
-                                class="ph ph-images text-brand"></i> Galería</button>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Producto /
+                                Marca</label>
+                            <input type="text" id="cfProductName" placeholder="Ej: Juvederm"
+                                class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                        </div>
+                        <div class="space-y-2">
+                            <label
+                                class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Caducidad</label>
+                            <input type="date" id="cfProductExpiry"
+                                class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                        </div>
                     </div>
-                    <input type="file" id="cfInputCamera" accept="image/*" capture="environment" class="hidden"
-                        multiple>
-                    <input type="file" id="cfInputGallery" accept="image/*" class="hidden" multiple>
-                    <div id="cfPhotoPreview" class="hidden flex gap-2 flex-wrap pt-1"></div>
-                    <div id="cfOcrStatus" class="hidden items-center gap-2 text-xs text-slate/50 mt-1">
-                        <div class="w-3 h-3 rounded-full bg-lavender/60 animate-pulse"></div><span>Leyendo
-                            lote...</span>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Ciclo
+                            Esterilización (si aplica)</label>
+                        <input type="text" id="cfSterilization" placeholder="Nº de ciclo o autoclave"
+                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Evidencia
+                            clínica (Fotos)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="cfBtnCamera"
+                                class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-xs font-bold text-slate hover:bg-slate/5 transition-colors min-h-[44px]"><i
+                                    class="ph ph-camera text-brand"></i> Cámara</button>
+                            <button type="button" id="cfBtnGallery"
+                                class="flex items-center justify-center gap-2 py-3.5 bg-cream rounded-2xl border border-slate/5 text-xs font-bold text-slate hover:bg-slate/5 transition-colors min-h-[44px]"><i
+                                    class="ph ph-images text-brand"></i> Galería</button>
+                        </div>
+                        <input type="file" id="cfInputCamera" accept="image/*" capture="environment" class="hidden"
+                            multiple>
+                        <input type="file" id="cfInputGallery" accept="image/*" class="hidden" multiple>
+                        <div id="cfPhotoPreview" class="hidden flex gap-2 flex-wrap pt-1"></div>
+                        <div id="cfOcrStatus" class="hidden items-center gap-2 text-xs text-slate/50 mt-1">
+                            <div class="w-3 h-3 rounded-full bg-lavender/60 animate-pulse"></div><span>Leyendo
+                                lote...</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Consent Form Photo -->
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Consentimiento
-                        Formado (Firma)</label>
-                    <button type="button" id="cfBtnConsent"
-                        class="w-full flex items-center justify-center gap-2 py-3.5 bg-brand/5 border border-brand/10 rounded-2xl text-xs font-bold text-brand hover:bg-brand/10 transition-colors">
-                        <i class="ph ph-signature"></i> Subir foto del documento firmado
-                    </button>
-                    <input type="file" id="cfInputConsent" accept="image/*" capture="environment" class="hidden">
-                    <div id="cfConsentPreview" class="hidden pt-1"></div>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate/30 uppercase tracking-widest px-1">Número de
-                        lote</label>
-                    <div class="relative">
-                        <i class="ph ph-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate/30"></i>
-                        <input type="text" id="cfBatchInput" placeholder="Foto, escáner o manual"
-                            class="w-full bg-cream border border-slate/5 rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-sm font-medium text-slate">
-                    </div>
-                </div>
+                <input type="hidden" id="cfEditTreatmentId" value="">
+
                 <button type="submit" id="cfSubmitBtn"
                     class="w-full bg-brand text-white py-4 rounded-2xl font-bold text-sm hover:shadow-float hover:-translate-y-0.5 transition-all active:scale-95 min-h-[44px]">Registrar
                     servicio</button>
@@ -390,16 +407,23 @@
 
                 const date = new Date(item.created_at).toLocaleDateString();
                 const productInfo = item.product_name ? `<div class="text-[10px] text-slate/40 italic">${item.product_name} ${item.product_brand || ''}</div>` : '';
-                const expiryInfo = item.product_expiry ? `<div class="text-[10px] text-amber-600/60 font-medium">CAD: ${new Date(item.product_expiry).toLocaleDateString()}</div>` : '';
+
+                let infoMissingHtml = '';
+                if (!item.batch_number) {
+                    infoMissingHtml = `
+                    <button class="complete-treatment-btn mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 border-amber-200 border rounded-xl text-xs font-bold hover:opacity-80 transition-opacity" data-id="${item.id}" data-type="${item.type}">
+                        <i class="ph ph-warning"></i> Completar Trazabilidad
+                    </button>`;
+                }
 
                 row.innerHTML = `<div class="col-span-2 text-sm font-bold text-slate">${date}</div>
                     <div class="col-span-4 min-w-0">
                         <div class="text-sm font-bold text-slate truncate hover:text-brand cursor-pointer" onclick="window.location.href='listado-servicios.html?type=${encodeURIComponent(item.type)}'">${item.type}</div>
                         ${productInfo}
+                        ${infoMissingHtml}
                     </div>
                     <div class="col-span-4">
                         <div class="font-mono text-xs text-slate underline decoration-slate/10 hover:text-brand cursor-pointer" onclick="window.location.href='ficha-lotes.html?batch=${encodeURIComponent(item.batch_number)}'">${item.batch_number || '—'}</div>
-                        ${expiryInfo}
                     </div>
                     <div class="col-span-1 text-center">${item.photo_urls?.length > 0 ? `<button class="view-photos-btn text-brand" data-photos='${JSON.stringify(item.photo_urls)}'><i class="ph ph-images"></i> ${item.photo_urls.length}</button>` : '—'}</div>
                     <div class="col-span-1 text-right flex justify-end gap-2">
@@ -446,11 +470,49 @@
             document.getElementById('cancelEditBtn').click();
         };
 
-        // ── New Service ───────────────────────────────────────────────────────
+        // ── New/Complete Service ───────────────────────────────────────────────────────
         const cfModal = document.getElementById('cfNewServiceModal');
         const cfForm = document.getElementById('cfNewServiceForm');
         let cfSelectedFiles = [];
-        document.getElementById('cfOpenServiceBtn').onclick = () => { cfModal.classList.remove('hidden'); cfModal.classList.add('flex'); };
+        let isCompleteMode = false;
+
+        document.getElementById('cfOpenServiceBtn').onclick = () => {
+            isCompleteMode = false;
+            document.getElementById('cfModalTitle').textContent = 'Nuevo servicio';
+            document.getElementById('cfSubmitBtn').textContent = 'Registrar servicio';
+            document.getElementById('cfPhaseCreate').classList.remove('hidden');
+            document.getElementById('cfPhaseComplete').classList.add('hidden');
+            document.getElementById('cfEditTreatmentId').value = '';
+            document.getElementById('cfServiceType').required = true;
+            document.getElementById('cfServiceType').disabled = false;
+            cfModal.classList.remove('hidden');
+            cfModal.classList.add('flex');
+        };
+
+        // Handle Complete clicks
+        document.getElementById('historyContainer').addEventListener('click', (e) => {
+            const btn = e.target.closest('.complete-treatment-btn');
+            if (btn) {
+                isCompleteMode = true;
+                const txId = btn.dataset.id;
+                const txType = btn.dataset.type;
+
+                document.getElementById('cfModalTitle').textContent = 'Completar Trazabilidad';
+                document.getElementById('cfSubmitBtn').textContent = 'Guardar datos técnicos';
+                document.getElementById('cfPhaseCreate').classList.add('hidden');
+                document.getElementById('cfPhaseComplete').classList.remove('hidden');
+                document.getElementById('cfEditTreatmentId').value = txId;
+
+                // Prefill type just in case and disable it
+                const typeSelect = document.getElementById('cfServiceType');
+                typeSelect.value = txType;
+                typeSelect.required = false;
+
+                cfModal.classList.remove('hidden');
+                cfModal.classList.add('flex');
+            }
+        });
+
         document.getElementById('cfCloseService').onclick = () => { cfModal.classList.add('hidden'); cfModal.classList.remove('flex'); };
 
         document.getElementById('cfBtnCamera').onclick = () => document.getElementById('cfInputCamera').click();
@@ -494,39 +556,62 @@
             submitBtn.disabled = true; submitBtn.textContent = 'Guardando...';
 
             try {
-                // Upload treatment photos
-                const urls = [];
-                for (const file of cfSelectedFiles) {
-                    const path = `${clientId}/${Date.now()}_${file.name}`;
-                    const { error } = await supabase.storage.from('treatment-photos').upload(path, file);
-                    if (!error) urls.push(supabase.storage.from('treatment-photos').getPublicUrl(path).data.publicUrl);
+                if (isCompleteMode) {
+                    // Update Mode (Phase 2)
+                    const txId = document.getElementById('cfEditTreatmentId').value;
+
+                    const urls = [];
+                    for (const file of cfSelectedFiles) {
+                        const path = `${clientId}/${Date.now()}_${file.name}`;
+                        const { error } = await supabase.storage.from('treatment-photos').upload(path, file);
+                        if (!error) urls.push(supabase.storage.from('treatment-photos').getPublicUrl(path).data.publicUrl);
+                    }
+
+                    // fetch existing to append photos safely
+                    let finalUrls = urls;
+                    if (urls.length > 0) {
+                        const { data: existing } = await supabase.from('treatments').select('photo_urls').eq('id', txId).single();
+                        if (existing && existing.photo_urls) {
+                            finalUrls = [...existing.photo_urls, ...urls];
+                        }
+                    }
+
+                    const updates = {
+                        batch_number: document.getElementById('cfBatchInput').value || null,
+                        product_name: document.getElementById('cfProductName').value || null,
+                        product_expiry: document.getElementById('cfProductExpiry').value || null,
+                        sterilization_cycle: document.getElementById('cfSterilization').value || null
+                    };
+
+                    if (finalUrls.length > 0) {
+                        updates.photo_urls = finalUrls;
+                    }
+
+                    const { error } = await supabase.from('treatments').update(updates).eq('id', txId).eq('company_id', currentCompanyId);
+                    if (error) throw error;
+
+                } else {
+                    // Create Mode (Phase 1)
+                    let consentUrl = null;
+                    if (cfConsentFile) {
+                        const path = `${clientId}/consent_${Date.now()}_${cfConsentFile.name}`;
+                        const { error } = await supabase.storage.from('treatment-photos').upload(path, cfConsentFile);
+                        if (!error) consentUrl = supabase.storage.from('treatment-photos').getPublicUrl(path).data.publicUrl;
+                    }
+
+                    const { data: { user } } = await supabase.auth.getUser();
+
+                    const { error } = await supabase.from('treatments').insert({
+                        client_id: clientId,
+                        company_id: currentCompanyId,
+                        technician_id: user?.id || null,
+                        type: document.getElementById('cfServiceType').value,
+                        consent_photo_url: consentUrl,
+                        registration_id: `#RES-${Math.floor(Math.random() * 90000)}`
+                    });
+
+                    if (error) throw error;
                 }
-
-                // Upload consent photo if exists
-                let consentUrl = null;
-                if (cfConsentFile) {
-                    const path = `${clientId}/consent_${Date.now()}_${cfConsentFile.name}`;
-                    const { error } = await supabase.storage.from('treatment-photos').upload(path, cfConsentFile);
-                    if (!error) consentUrl = supabase.storage.from('treatment-photos').getPublicUrl(path).data.publicUrl;
-                }
-
-                const { data: { user } } = await supabase.auth.getUser();
-
-                const { error } = await supabase.from('treatments').insert({
-                    client_id: clientId,
-                    company_id: currentCompanyId,
-                    technician_id: user?.id || null,
-                    type: document.getElementById('cfServiceType').value,
-                    batch_number: document.getElementById('cfBatchInput').value,
-                    product_name: document.getElementById('cfProductName').value,
-                    product_expiry: document.getElementById('cfProductExpiry').value || null,
-                    sterilization_cycle: document.getElementById('cfSterilization').value,
-                    registration_id: `#RES-${Math.floor(Math.random() * 90000)}`,
-                    photo_urls: urls,
-                    consent_photo_url: consentUrl
-                });
-
-                if (error) throw error;
 
                 cfModal.classList.add('hidden');
                 cfForm.reset();
@@ -535,11 +620,14 @@
                 document.getElementById('cfPhotoPreview').innerHTML = '';
                 document.getElementById('cfConsentPreview').innerHTML = '';
                 fetchClientData();
+
+                // If dashboard is open in another tab, we don't have direct access, but the dashboard will fetch freshness eventually.
             } catch (err) {
                 console.error(err);
-                alert('Error al guardar el servicio: ' + err.message);
+                alert('Error al guardar: ' + err.message);
             } finally {
-                submitBtn.disabled = false; submitBtn.textContent = 'Registrar Servicio';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Aceptar';
             }
         };
 

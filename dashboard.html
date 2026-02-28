@@ -566,14 +566,14 @@
         async function fetchAlerts() {
             const container = document.getElementById('alertsContainer');
             const badge = document.getElementById('alertsBadge');
-            const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+            const cutoff2h = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
 
             // 1. Fetch Traceability (Red)
             const { data: tracData } = await supabase
                 .from('treatments')
                 .select('id, type, created_at, registration_id, clients(id, full_name)')
                 .eq('company_id', currentCompanyId)
-                .lt('created_at', cutoff)
+                .lt('created_at', cutoff2h)
                 .is('batch_number', null)
                 .order('created_at', { ascending: true })
                 .limit(3);
@@ -584,6 +584,7 @@
                 .select('*')
                 .eq('company_id', currentCompanyId)
                 .or('photo_urls.is.null,photo_urls.eq.{}')
+                .lt('created_at', cutoff2h)
                 .order('pickup_date', { ascending: false })
                 .limit(3);
 
@@ -597,10 +598,36 @@
                 .or('address.is.null,birth_date.is.null')
                 .limit(3);
 
+            // 4. Fetch vials expiring in 7 days (Green)
+            const todayStr = new Date().toISOString();
+            const { data: expiringDataRaw } = await supabase
+                .from('treatments')
+                .select('id, type, product_name, batch_number, product_expiry')
+                .eq('company_id', currentCompanyId)
+                .gte('product_expiry', todayStr)
+                .not('batch_number', 'is', null)
+                .order('product_expiry', { ascending: true });
+
+            const uniqueExpiring = [];
+            const seenBatches = new Set();
+            if (expiringDataRaw) {
+                // Filter items expiring within 7 days securely on client-side and deduplicate by batch
+                const in7Days = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+                expiringDataRaw.forEach(item => {
+                    const expiryDate = new Date(item.product_expiry);
+                    if (expiryDate <= in7Days && item.batch_number && !seenBatches.has(item.batch_number)) {
+                        seenBatches.add(item.batch_number);
+                        uniqueExpiring.push({ ...item, _type: 'expiring' });
+                    }
+                });
+            }
+            const expiringData = uniqueExpiring.slice(0, 3);
+
             const allAlerts = [];
             if (tracData) tracData.forEach(i => allAlerts.push({ ...i, _type: 'traceability' }));
             if (wasteData) wasteData.forEach(i => allAlerts.push({ ...i, _type: 'waste' }));
             if (incompleteClients) incompleteClients.forEach(i => allAlerts.push({ ...i, _type: 'incomplete' }));
+            if (expiringData) expiringData.forEach(i => allAlerts.push(i));
 
             if (allAlerts.length === 0) {
                 badge.textContent = '';
@@ -646,14 +673,14 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-sm font-bold text-slate truncate">${item.gestor_name || 'Gestor'}</p>
-                                <p class="text-xs text-slate/40">${dateStr} · Sin foto</p>
+                                <p class="text-xs text-slate/40">${dateStr} · +2h sin foto</p>
                             </div>
                         </div>
                         <a href="residuos.html"
                             class="text-xs font-bold text-amber-600 border border-amber-200 px-3 py-1.5 rounded-xl hover:bg-amber-50 transition-colors">
                             Foto
                         </a>`;
-                } else {
+                } else if (item._type === 'incomplete') {
                     // Incomplete Profile
                     row.className = 'flex items-center justify-between py-3 px-4 bg-orange-50/60 rounded-2xl border border-orange-100 gap-3';
                     row.innerHTML = `
@@ -669,6 +696,26 @@
                         <a href="ficha-cliente.html?id=${item.id}"
                             class="text-xs font-bold text-orange-600 border border-orange-200 px-3 py-1.5 rounded-xl hover:bg-orange-50 transition-colors">
                             Ver
+                        </a>`;
+                } else if (item._type === 'expiring') {
+                    // Expiring Vials
+                    const targetDateStr = item.product_expiry.split('T')[0];
+                    const todayParts = new Date().toISOString().split('T')[0];
+                    const daysLeft = Math.ceil((new Date(targetDateStr) - new Date(todayParts)) / (1000 * 60 * 60 * 24));
+                    row.className = 'flex items-center justify-between py-3 px-4 bg-emerald-50/60 rounded-2xl border border-emerald-100 gap-3';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                                <i class="ph ph-clock-countdown text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-slate truncate">Lote: ${item.batch_number}</p>
+                                <p class="text-xs text-slate/40">Caduca en ${daysLeft} día(s) · ${item.product_name || item.type}</p>
+                            </div>
+                        </div>
+                        <a href="ficha-lotes.html?batch=${encodeURIComponent(item.batch_number)}"
+                            class="text-xs font-bold text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-xl hover:bg-emerald-50 transition-colors">
+                            Ver Lote
                         </a>`;
                 }
                 container.appendChild(row);
