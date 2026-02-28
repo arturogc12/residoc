@@ -254,7 +254,6 @@
     <script type="module">
         import { supabase } from './supabase.js';
         let currentCompanyId = null;
-        let companyName = 'Centro Médico';
 
         async function checkSession() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -275,123 +274,145 @@
                     document.getElementById('centerSanitary').textContent = c.registro_sanitario || '—';
                     document.getElementById('centerAddress').textContent = c.address || c.location || '—';
                     document.getElementById('auditSeal').textContent = `Expediente de ${c.name} (CIF: ${c.cif || '—'}) · Autenticado por Residoc`;
+
+                    // Call loadAll after setting currentCompanyId
+                    loadAll(c.name);
                 }
-                loadAll();
             }
         }
 
-        async function loadAll() {
-            const now = new Date();
-            const exportDateStr = now.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            document.getElementById('exportDate').textContent = exportDateStr;
-            document.getElementById('auditTimestamp').textContent = `Timestamp: ${now.toISOString()}`;
-            document.getElementById('centerName').textContent = companyName;
-            document.getElementById('auditSeal').textContent = `Expediente de ${companyName} · Generado automáticamente por Residoc`;
+        const setSafeText = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        };
 
-            const thirtyDaysAgo = new Date(now - 30 * 86400000).toISOString();
+        async function loadAll(nameOverride) {
+            try {
+                const now = new Date();
+                setSafeText('auditTimestamp', `Timestamp: ${now.toISOString()}`);
 
-            const [treatments, residuos, clients] = await Promise.all([
-                supabase.from('treatments')
-                    .select('*, clients(full_name, dni), profiles(full_name, enabling_title)')
-                    .eq('company_id', currentCompanyId)
-                    .gte('created_at', thirtyDaysAgo)
-                    .order('created_at', { ascending: false }),
-                supabase.from('waste_records').select('*').eq('company_id', currentCompanyId).order('pickup_date', { ascending: false }),
-                supabase.from('clients').select('*', { count: 'exact', head: true }).eq('company_id', currentCompanyId)
-            ]);
+                if (nameOverride) {
+                    setSafeText('centerName', nameOverride);
+                    setSafeText('auditSeal', `Expediente de ${nameOverride} · Generado automáticamente por Residoc`);
+                }
 
-            const data = treatments.data || [];
-            document.getElementById('auditClients').textContent = clients.count ?? 0;
-            document.getElementById('auditServices').textContent = data.length;
+                const thirtyDaysAgo = new Date(now - 30 * 86400000).toISOString();
 
-            // Unique batches
-            const uniqueBatches = [...new Set(data.map(t => t.batch_number).filter(Boolean))];
-            document.getElementById('auditBatches').textContent = uniqueBatches.length;
+                const [treatments, residuos, clients] = await Promise.all([
+                    supabase.from('treatments')
+                        .select('*, clients(full_name, dni), profiles(full_name, enabling_title)')
+                        .eq('company_id', currentCompanyId)
+                        .gte('created_at', thirtyDaysAgo)
+                        .order('created_at', { ascending: false }),
+                    supabase.from('waste_records').select('*').eq('company_id', currentCompanyId).order('pickup_date', { ascending: false }),
+                    supabase.from('clients').select('*', { count: 'exact', head: true }).eq('company_id', currentCompanyId)
+                ]);
 
-            // Services table
-            document.getElementById('servicesCount').textContent = `${data.length} registros`;
-            const sc = document.getElementById('servicesContainer');
-            sc.innerHTML = '';
-            if (data.length === 0) {
-                sc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin servicios en los últimos 30 días.</div>';
-            } else {
-                data.forEach(item => {
-                    const d = document.createElement('div');
-                    d.className = 'grid grid-cols-12 gap-4 items-start py-4 border-b border-slate/5 text-sm print-section';
-                    const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                    const time = new Date(item.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                if (treatments.error) console.error('Error fetching treatments:', treatments.error);
+                if (residuos.error) console.error('Error fetching waste_records:', residuos.error);
+                if (clients.error) console.error('Error fetching clients count:', clients.error);
 
-                    const technician = item.profiles?.full_name || '—';
-                    const techTitle = item.profiles?.enabling_title || '';
+                const data = treatments.data || [];
+                setSafeText('auditClients', clients.count ?? 0);
+                setSafeText('auditServices', data.length);
 
-                    d.innerHTML = `
-                        <div class="col-span-2">
-                            <div class="font-bold text-slate">${date}</div>
-                            <div class="text-[10px] text-slate/30 font-mono">${time}</div>
-                        </div>
-                        <div class="col-span-2">
-                            <div class="font-bold text-slate">${item.clients?.full_name || '—'}</div>
-                            <div class="text-[10px] text-slate/40 font-mono">${item.clients?.dni || '—'}</div>
-                        </div>
-                        <div class="col-span-2">
-                            <div class="text-xs font-bold text-slate mb-0.5">${item.type}</div>
-                            <div class="text-[10px] text-slate/50 italic">${item.product_name || '—'}</div>
-                        </div>
-                        <div class="col-span-2">
-                            <div class="text-[10px] font-bold text-brand uppercase tracking-widest">${item.batch_number || 'S/N'}</div>
-                            <div class="text-[10px] text-slate/40">CAD: ${item.product_expiry ? new Date(item.product_expiry).toLocaleDateString() : '—'}</div>
-                        </div>
-                        <div class="col-span-2">
-                            <div class="text-xs font-bold text-slate">${technician}</div>
-                            <div class="text-[9px] text-slate/40 leading-tight">${techTitle}</div>
-                        </div>
-                        <div class="col-span-2 text-right flex flex-col items-end gap-1">
-                            ${item.consent_photo_url ? `<div class="text-[9px] font-bold text-brand flex items-center gap-1"><i class="ph ph-signature"></i> FIRMA OK</div>` : '<div class="text-[9px] text-slate/30">PEND. FIRMA</div>'}
-                            <div class="text-[9px] text-slate/30">${item.photo_urls?.length || 0} FOTOS</div>
-                        </div>`;
-                    sc.appendChild(d);
-                });
-            }
+                // Unique batches
+                const uniqueBatches = [...new Set(data.map(t => t.batch_number).filter(Boolean))];
+                setSafeText('auditBatches', uniqueBatches.length);
 
-            // Lotes table
-            document.getElementById('lotesCount').textContent = `${uniqueBatches.length} lotes`;
-            const lc = document.getElementById('lotesContainer');
-            lc.innerHTML = '';
-            if (uniqueBatches.length === 0) {
-                lc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin lotes registrados.</div>';
-            } else {
-                uniqueBatches.forEach(batch => {
-                    const items = data.filter(t => t.batch_number === batch);
-                    const lastUse = new Date(Math.max(...items.map(t => new Date(t.created_at)))).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const d = document.createElement('div');
-                    d.className = 'grid grid-cols-12 gap-4 items-center py-3 border-b border-slate/5 text-sm';
-                    d.innerHTML = `
-                        < div class="col-span-4 font-mono font-bold text-brand text-xs" > ${batch}</div >
-                        <div class="col-span-4 text-xs text-slate/60">${[...new Set(items.map(t => t.type))].join(', ')}</div>
-                        <div class="col-span-4 text-right text-xs text-slate/40">${lastUse}</div>`;
-                    lc.appendChild(d);
-                });
-            }
+                // Services table
+                setSafeText('servicesCount', `${data.length} registros`);
+                const sc = document.getElementById('servicesContainer');
+                if (sc) {
+                    sc.innerHTML = '';
+                    if (data.length === 0) {
+                        sc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin servicios en los últimos 30 días.</div>';
+                    } else {
+                        data.forEach(item => {
+                            const d = document.createElement('div');
+                            d.className = 'grid grid-cols-12 gap-4 items-start py-4 border-b border-slate/5 text-sm print-section';
+                            const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                            const time = new Date(item.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-            // Residuos table
-            const rd = residuos.data || [];
-            document.getElementById('residuosCount').textContent = `${rd.length} retiradas`;
-            const rc = document.getElementById('residuosContainer');
-            rc.innerHTML = '';
-            if (rd.length === 0) {
-                rc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin registros de residuos.</div>';
-            } else {
-                rd.forEach(r => {
-                    const date = r.pickup_date ? new Date(r.pickup_date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-                    const d = document.createElement('div');
-                    d.className = 'grid grid-cols-12 gap-4 items-center py-3 border-b border-slate/5 text-sm';
-                    d.innerHTML = `
-                        < div class="col-span-4 font-bold text-slate" > ${r.gestor_name || '—'}</div >
-                        <div class="col-span-3 text-slate/50">${date}</div>
-                        <div class="col-span-3 text-xs font-mono text-slate/40">${r.albaran || '—'}</div>
-                        <div class="col-span-2 text-right"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-lg border border-amber-100">${r.class || 'III'}</span></div>`;
-                    rc.appendChild(d);
-                });
+                            const technician = item.profiles?.full_name || '—';
+                            const techTitle = item.profiles?.enabling_title || '';
+
+                            d.innerHTML = `
+                            <div class="col-span-2">
+                                <div class="font-bold text-slate">${date}</div>
+                                <div class="text-[10px] text-slate/30 font-mono">${time}</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="font-bold text-slate">${item.clients?.full_name || '—'}</div>
+                                <div class="text-[10px] text-slate/40 font-mono">${item.clients?.dni || '—'}</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="text-xs font-bold text-slate mb-0.5">${item.type}</div>
+                                <div class="text-[10px] text-slate/50 italic">${item.product_name || '—'}</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="text-[10px] font-bold text-brand uppercase tracking-widest">${item.batch_number || 'S/N'}</div>
+                                <div class="text-[10px] text-slate/40">CAD: ${item.product_expiry ? new Date(item.product_expiry).toLocaleDateString() : '—'}</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="text-xs font-bold text-slate">${technician}</div>
+                                <div class="text-[9px] text-slate/40 leading-tight">${techTitle}</div>
+                            </div>
+                            <div class="col-span-2 text-right flex flex-col items-end gap-1">
+                                ${item.consent_photo_url ? `<div class="text-[9px] font-bold text-brand flex items-center gap-1"><i class="ph ph-signature"></i> FIRMA OK</div>` : '<div class="text-[9px] text-slate/30">PEND. FIRMA</div>'}
+                                <div class="text-[9px] text-slate/30">${item.photo_urls?.length || 0} FOTOS</div>
+                            </div>`;
+                            sc.appendChild(d);
+                        });
+                    }
+                }
+
+                // Lotes table
+                setSafeText('lotesCount', `${uniqueBatches.length} lotes`);
+                const lc = document.getElementById('lotesContainer');
+                if (lc) {
+                    lc.innerHTML = '';
+                    if (uniqueBatches.length === 0) {
+                        lc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin lotes registrados.</div>';
+                    } else {
+                        uniqueBatches.forEach(batch => {
+                            const items = data.filter(t => t.batch_number === batch);
+                            const lastUse = new Date(Math.max(...items.map(t => new Date(t.created_at)))).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+                            const d = document.createElement('div');
+                            d.className = 'grid grid-cols-12 gap-4 items-center py-3 border-b border-slate/5 text-sm';
+                            d.innerHTML = `
+                            <div class="col-span-4 font-mono font-bold text-brand text-xs">${batch}</div>
+                            <div class="col-span-4 text-xs text-slate/60">${[...new Set(items.map(t => t.type))].join(', ')}</div>
+                            <div class="col-span-4 text-right text-xs text-slate/40">${lastUse}</div>`;
+                            lc.appendChild(d);
+                        });
+                    }
+                }
+
+                // Residuos table
+                const rd = residuos.data || [];
+                setSafeText('residuosCount', `${rd.length} retiradas`);
+                const rc = document.getElementById('residuosContainer');
+                if (rc) {
+                    rc.innerHTML = '';
+                    if (rd.length === 0) {
+                        rc.innerHTML = '<div class="py-8 text-center text-slate/30 text-sm">Sin registros de residuos.</div>';
+                    } else {
+                        rd.forEach(r => {
+                            const date = r.pickup_date ? new Date(r.pickup_date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+                            const d = document.createElement('div');
+                            d.className = 'grid grid-cols-12 gap-4 items-center py-3 border-b border-slate/5 text-sm';
+                            d.innerHTML = `
+                            <div class="col-span-4 font-bold text-slate">${r.gestor_name || '—'}</div>
+                            <div class="col-span-3 text-slate/50">${date}</div>
+                            <div class="col-span-3 text-xs font-mono text-slate/40">${r.albaran || '—'}</div>
+                            <div class="col-span-2 text-right"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-lg border border-amber-100">${r.class || 'III'}</span></div>`;
+                            rc.appendChild(d);
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('CRITICAL: loadAll failed:', err);
             }
         }
 
